@@ -10,6 +10,8 @@ namespace TournamentManager.Domain
 {
     public class Referee : AggregateRoot
     {
+        private RefereeMsgs.Grade _refereeGrade;
+
         public Referee(
             Guid refereeId,
             string givenName,
@@ -38,7 +40,12 @@ namespace TournamentManager.Domain
 
         private void RegisterEvents()
         {
-            Register<RefereeMsgs.RefereeAdded>(e => Id = e.RefereeId);
+            Register<RefereeMsgs.RefereeAdded>(e =>
+            {
+                Id = e.RefereeId;
+                _refereeGrade = e.RefereeGrade;
+            });
+            Register<RefereeMsgs.GradeChanged>(e => _refereeGrade = e.RefereeGrade);
         }
 
         public void UpdateGivenName(string newName)
@@ -108,6 +115,16 @@ namespace TournamentManager.Domain
                         city,
                         normalizedState,
                         zipCode));
+        }
+
+        public void AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket ageBracket)
+        {
+            if (_refereeGrade == RefereeMsgs.Grade.Intramural && ageBracket > TeamMsgs.AgeBracket.U8)
+                throw new ArgumentOutOfRangeException(nameof(ageBracket),
+                    "Intramural referees cannot do games above U8.");
+            Raise(new RefereeMsgs.MaxAgeBracketChanged(
+                        Id,
+                        ageBracket));
         }
     }
 }

@@ -30,13 +30,13 @@ namespace TournamentManager.Tests
                                  evt.RefereeGrade == Grade));
         }
 
-        private Referee AddReferee(ICorrelatedMessage sourceMsg)
+        private Referee AddReferee(ICorrelatedMessage sourceMsg, RefereeMsgs.Grade grade = RefereeMsgs.Grade.Grassroots)
         {
             return new Referee(
                         _refId,
                         GivenName,
                         Surname,
-                        Grade,
+                        grade,
                         sourceMsg);
         }
 
@@ -346,6 +346,42 @@ namespace TournamentManager.Tests
                                                     city,
                                                     state,
                                                     "0123a"));
+            var events = referee.TakeEvents();
+            Assert.Collection(
+                events,
+                e => Assert.IsType<RefereeMsgs.RefereeAdded>(e));
+        }
+
+        [Fact]
+        public void can_add_or_update_max_age_bracket()
+        {
+            const TeamMsgs.AgeBracket bracket1 = TeamMsgs.AgeBracket.U14;
+            const TeamMsgs.AgeBracket bracket2 = TeamMsgs.AgeBracket.U18;
+            var referee = AddReferee(MessageBuilder.New(() => new TestCommands.Command1()));
+            referee.AddOrUpdateMaxAgeBracket(bracket1);
+            referee.AddOrUpdateMaxAgeBracket(bracket2);
+            var events = referee.TakeEvents();
+            Assert.Collection(
+                events,
+                e => Assert.IsType<RefereeMsgs.RefereeAdded>(e),
+                e => Assert.True(e is RefereeMsgs.MaxAgeBracketChanged evt &&
+                                 evt.RefereeId == _refId &&
+                                 evt.MaxAgeBracket == bracket1),
+                e => Assert.True(e is RefereeMsgs.MaxAgeBracketChanged evt &&
+                                 evt.RefereeId == _refId &&
+                                 evt.MaxAgeBracket == bracket2));
+        }
+
+        [Fact]
+        public void cannot_set_max_age_above_u8_for_intramural_referee()
+        {
+            var referee = AddReferee(MessageBuilder.New(() => new TestCommands.Command1()), RefereeMsgs.Grade.Intramural);
+            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.U10));
+            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.U12));
+            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.U14));
+            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.U16));
+            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.U18));
+            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.Adult));
             var events = referee.TakeEvents();
             Assert.Collection(
                 events,

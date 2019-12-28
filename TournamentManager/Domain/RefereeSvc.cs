@@ -1,5 +1,4 @@
-﻿using System;
-using ReactiveDomain.Foundation;
+﻿using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
 using TournamentManager.Messages;
@@ -15,7 +14,8 @@ namespace TournamentManager.Domain
         IHandleCommand<RefereeMsgs.AddOrUpdateBirthdate>,
         IHandleCommand<RefereeMsgs.AddOrUpdateAge>,
         IHandleCommand<RefereeMsgs.AddOrUpdateEmailAddress>,
-        IHandleCommand<RefereeMsgs.AddOrUpdateMailingAddress>
+        IHandleCommand<RefereeMsgs.AddOrUpdateMailingAddress>,
+        IHandleCommand<RefereeMsgs.AddOrUpdateMaxAgeBracket>
     {
         private readonly ICorrelatedRepository _repository;
         public RefereeSvc(
@@ -32,6 +32,7 @@ namespace TournamentManager.Domain
             Subscribe<RefereeMsgs.AddOrUpdateAge>(this);
             Subscribe<RefereeMsgs.AddOrUpdateEmailAddress>(this);
             Subscribe<RefereeMsgs.AddOrUpdateMailingAddress>(this);
+            Subscribe<RefereeMsgs.AddOrUpdateMaxAgeBracket>(this);
         }
 
         public CommandResponse Handle(RefereeMsgs.AddReferee command)
@@ -103,6 +104,14 @@ namespace TournamentManager.Domain
                 command.City,
                 command.State,
                 command.ZipCode);
+            _repository.Save(referee);
+            return command.Succeed();
+        }
+
+        public CommandResponse Handle(RefereeMsgs.AddOrUpdateMaxAgeBracket command)
+        {
+            var referee = _repository.GetById<Referee>(command.RefereeId, command);
+            referee.AddOrUpdateMaxAgeBracket(command.MaxAgeBracket);
             _repository.Save(referee);
             return command.Succeed();
         }

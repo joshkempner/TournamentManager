@@ -404,5 +404,50 @@ namespace TournamentManager.Tests
                 .AssertEmpty();
             _fixture.RepositoryEvents.AssertEmpty();
         }
+
+        [Fact]
+        public void can_add_or_update_max_age_bracket()
+        {
+            AddReferee();
+
+            const TeamMsgs.AgeBracket bracket = TeamMsgs.AgeBracket.U14;
+            var cmd = MessageBuilder.New(() => new RefereeMsgs.AddOrUpdateMaxAgeBracket(
+                                                    _refId,
+                                                    bracket));
+            _fixture.Dispatcher.Send(cmd);
+            _fixture.RepositoryEvents.WaitFor<RefereeMsgs.MaxAgeBracketChanged>(TimeSpan.FromMilliseconds(100));
+            _fixture
+                .TestQueue
+                .AssertNext<RefereeMsgs.AddOrUpdateMaxAgeBracket>(cmd.CorrelationId)
+                .AssertEmpty();
+            _fixture
+                .RepositoryEvents
+                .AssertNext<RefereeMsgs.MaxAgeBracketChanged>(cmd.CorrelationId, out var evt)
+                .AssertEmpty();
+            Assert.Equal(_refId, evt.RefereeId);
+            Assert.Equal(bracket, evt.MaxAgeBracket);
+        }
+
+        [Fact]
+        public void cannot_add_or_update_max_age_bracket_for_invalid_referee()
+        {
+            AddReferee();
+
+            const TeamMsgs.AgeBracket bracket = TeamMsgs.AgeBracket.U14;
+            var cmd = MessageBuilder.New(() => new RefereeMsgs.AddOrUpdateMaxAgeBracket(
+                                                        Guid.NewGuid(),
+                                                        bracket));
+            AssertEx.CommandThrows<AggregateNotFoundException>(() => _fixture.Dispatcher.Send(cmd));
+            var cmd2 = MessageBuilder.New(() => new RefereeMsgs.AddOrUpdateMaxAgeBracket(
+                                                        Guid.Empty,
+                                                        bracket));
+            AssertEx.CommandThrows<AggregateNotFoundException>(() => _fixture.Dispatcher.Send(cmd2));
+            _fixture
+                .TestQueue
+                .AssertNext<RefereeMsgs.AddOrUpdateMaxAgeBracket>(cmd.CorrelationId)
+                .AssertNext<RefereeMsgs.AddOrUpdateMaxAgeBracket>(cmd2.CorrelationId)
+                .AssertEmpty();
+            _fixture.RepositoryEvents.AssertEmpty();
+        }
     }
 }

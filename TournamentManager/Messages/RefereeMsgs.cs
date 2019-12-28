@@ -271,5 +271,33 @@ namespace TournamentManager.Messages
                 ZipCode = zipCode;
             }
         }
+
+        public class AddOrUpdateMaxAgeBracket : Command
+        {
+            public readonly Guid RefereeId;
+            public readonly TeamMsgs.AgeBracket MaxAgeBracket;
+
+            public AddOrUpdateMaxAgeBracket(
+                Guid refereeId,
+                TeamMsgs.AgeBracket maxAgeBracket)
+            {
+                RefereeId = refereeId;
+                MaxAgeBracket = maxAgeBracket;
+            }
+        }
+
+        public class MaxAgeBracketChanged : Event
+        {
+            public readonly Guid RefereeId;
+            public readonly TeamMsgs.AgeBracket MaxAgeBracket;
+
+            public MaxAgeBracketChanged(
+                Guid refereeId,
+                TeamMsgs.AgeBracket maxAgeBracket)
+            {
+                RefereeId = refereeId;
+                MaxAgeBracket = maxAgeBracket;
+            }
+        }
     }
 }
