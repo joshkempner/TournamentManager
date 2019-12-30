@@ -5,7 +5,7 @@ using TournamentManager.Domain;
 using TournamentManager.Messages;
 using Xunit;
 
-namespace TournamentManager.Tests
+namespace TournamentManager.Tests.Domain
 {
     public class when_using_referee_aggregate
     {

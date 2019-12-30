@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TournamentManager.Helpers;
 using Xunit;
 
-namespace TournamentManager.Tests
+namespace TournamentManager.Tests.Misc
 {
     public class when_using_string_utilities
     {
