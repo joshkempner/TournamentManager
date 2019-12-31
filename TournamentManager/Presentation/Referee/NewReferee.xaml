@@ -1,0 +1,50 @@
+﻿<Window x:Class="TournamentManager.Presentation.NewReferee"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TournamentManager.Presentation"
+        xmlns:messages="clr-namespace:TournamentManager.Messages"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+        mc:Ignorable="d"
+        Title="Add a Referee" Width="450">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ObjectDataProvider x:Key="Grade" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                        <x:Type TypeName="messages:RefereeMsgs+Grade"/>
+                    </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+            <ObjectDataProvider x:Key="AgeBracket" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="messages:TeamMsgs+AgeBracket"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
+    </Window.Resources>
+    <DockPanel Margin="20" LastChildFill="True">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Name="Add" IsDefault="True" Content="Add" Style="{StaticResource DialogAction}" />
+            <Button Name="Cancel" IsCancel="True" Content="Cancel" Style="{StaticResource DialogAction}" Margin="20,0,0,0" />
+        </StackPanel>
+        <StackPanel>
+            <TextBox Name="GivenName" Tag="First Name" Text="John" />
+            <TextBox Name="Surname" Tag="Last Name" Margin="0,20,0,0" />
+            <TextBox Name="EmailAddress" Tag="Email Address" Margin="0,20,0,0" />
+            <ComboBox Name="RefereeGrade" Height="{Binding ElementName=EmailAddress,Path=ActualHeight}"
+                      ItemsSource="{Binding Source={StaticResource Grade}}"
+                      VerticalContentAlignment="Center"
+                      Margin="0,20,0,0" />
+            <TextBox Name="Age" Tag="Age" Margin="0,20,0,0" />
+            <local:CustomDatePicker x:Name="Birthdate" Text="Referee's birthdate" WatermarkText="Birthdate"
+                                    Height="{Binding ElementName=EmailAddress,Path=ActualHeight}"
+                                    VerticalContentAlignment="Center" BorderBrush="{StaticResource InputBorderColor}"
+                                    ToolTip="Birthdate"
+                                    FontSize="14" Margin="0,20,0,0" />
+            <ComboBox Name="MaxAgeBracket" Height="{Binding ElementName=EmailAddress,Path=ActualHeight}"
+                      ItemsSource="{Binding Source={StaticResource AgeBracket}}"
+                      VerticalContentAlignment="Center"
+                      Margin="0,20,0,0"/>
+        </StackPanel>
+    </DockPanel>
+</Window>

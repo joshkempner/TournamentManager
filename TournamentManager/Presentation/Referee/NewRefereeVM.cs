@@ -13,6 +13,7 @@ namespace TournamentManager.Presentation
     public class NewRefereeVM : ReactiveObject
     {
         public ReactiveCommand<Unit, Unit> AddReferee { get; }
+        public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         public NewRefereeVM(IDispatcher bus)
         {
@@ -21,6 +22,8 @@ namespace TournamentManager.Presentation
                 {
                     if (g == RefereeMsgs.Grade.Intramural)
                         MaxAgeBracket = TeamMsgs.AgeBracket.U8;
+                    else if (MaxAgeBracket == TeamMsgs.AgeBracket.U8)
+                        MaxAgeBracket = TeamMsgs.AgeBracket.U10;
                 });
 
             this.WhenAnyValue(
@@ -81,6 +84,12 @@ namespace TournamentManager.Presentation
                                                                 refId,
                                                                 MaxAgeBracket)));
                     });
+
+            Cancel = CommandBuilder.FromAction(() => { });
+
+            // Default values
+            Age = 12;
+            Birthdate = DateTime.Today - TimeSpan.FromDays(365.25 * 20);
         }
 
         private bool ValidateEmailAddress(string emailAddress)

@@ -7,6 +7,6 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" SnapsToDevicePixels="True">
     <Grid>
-
+        <Button Name="AddReferee" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Add Referee" />
     </Grid>
 </Window>
