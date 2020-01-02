@@ -130,7 +130,7 @@
                                                     Padding="2">
                                         <ContentControl.Template>
                                             <ControlTemplate>
-                                                <TextBlock Name="WaterMarkLabel" Text="Select a date" Foreground="{StaticResource WatermarkText}"/>
+                                                <TextBlock Name="WaterMarkLabel" Text="Select the referee's birthdate" Foreground="{StaticResource WatermarkText}"/>
                                             </ControlTemplate>
                                         </ContentControl.Template>
                                     </ContentControl>

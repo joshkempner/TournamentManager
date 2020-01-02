@@ -36,7 +36,7 @@
                       VerticalContentAlignment="Center"
                       Margin="0,20,0,0" />
             <TextBox Name="Age" Tag="Age" Margin="0,20,0,0" />
-            <local:CustomDatePicker x:Name="Birthdate" Text="Referee's birthdate" WatermarkText="Birthdate"
+            <DatePicker x:Name="Birthdate" Text="Referee's birthdate"
                                     Height="{Binding ElementName=EmailAddress,Path=ActualHeight}"
                                     VerticalContentAlignment="Center" BorderBrush="{StaticResource InputBorderColor}"
                                     ToolTip="Birthdate"
