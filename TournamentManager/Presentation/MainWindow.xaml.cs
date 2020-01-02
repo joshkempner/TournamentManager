@@ -1,5 +1,4 @@
 ﻿using System.Reactive.Disposables;
-using System.Windows;
 using ReactiveUI;
 
 namespace TournamentManager.Presentation
@@ -7,7 +6,7 @@ namespace TournamentManager.Presentation
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : IViewFor<MainWindowVM>
+    public partial class MainWindow
     {
         public MainWindow()
         {
@@ -15,27 +14,12 @@ namespace TournamentManager.Presentation
 
             this.WhenActivated(disposables =>
             {
-                this.BindCommand(ViewModel, vm => vm.AddReferee, v => v.AddReferee)
+                // Bind the view model router to RoutedViewHost.Router property.
+                this.OneWayBind(ViewModel, x => x.Router, x => x.RoutedViewHost.Router)
                     .DisposeWith(disposables);
             });
-        }
 
-        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
-            "ViewModel",
-            typeof(MainWindowVM),
-            typeof(MainWindow),
-            new PropertyMetadata(default(MainWindowVM)));
-
-        public MainWindowVM ViewModel
-        {
-            get => (MainWindowVM)GetValue(ViewModelProperty);
-            set => SetValue(ViewModelProperty, value);
-        }
-
-        object IViewFor.ViewModel
-        {
-            get => ViewModel;
-            set => ViewModel = (MainWindowVM)value;
+            Loaded += (sender, args) => ViewModel?.NavigateToInitialView();
         }
     }
 }

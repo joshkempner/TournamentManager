@@ -46,10 +46,6 @@ namespace TournamentManager.Presentation
                     .DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.Cancel, v => v.Cancel)
                     .DisposeWith(disposables);
-
-                this.WhenAnyObservable(x => x.ViewModel.Cancel)
-                    .Subscribe(_ => Threading.RunOnUiThread(Close))
-                    .DisposeWith(disposables);
             });
         }
 

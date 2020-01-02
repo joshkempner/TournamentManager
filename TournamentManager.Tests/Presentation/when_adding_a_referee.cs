@@ -5,6 +5,7 @@ using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.Testing;
 using TournamentManager.Messages;
 using TournamentManager.Presentation;
+using TournamentManager.Tests.Helpers;
 using Xunit;
 
 namespace TournamentManager.Tests.Presentation
@@ -18,6 +19,7 @@ namespace TournamentManager.Tests.Presentation
         IHandleCommand<RefereeMsgs.AddOrUpdateMaxAgeBracket>
     {
         private readonly MockRepositorySpecification _fixture = new MockRepositorySpecification();
+        private MockHostScreen _mockHostScreen = new MockHostScreen();
 
         public when_adding_a_referee()
         {
@@ -41,7 +43,7 @@ namespace TournamentManager.Tests.Presentation
         [Fact]
         public void can_add_intramural_referee()
         {
-            var vm = new NewRefereeVM(_fixture.Dispatcher)
+            var vm = new NewRefereeVM(_fixture.Dispatcher, _mockHostScreen)
             {
                 GivenName = "John",
                 Surname = "Smith",
@@ -67,7 +69,7 @@ namespace TournamentManager.Tests.Presentation
         public void can_add_certified_referee()
         {
             var birthdate = new DateTime(1990, 7, 1);
-            var vm = new NewRefereeVM(_fixture.Dispatcher)
+            var vm = new NewRefereeVM(_fixture.Dispatcher, _mockHostScreen)
             {
                 GivenName = "John",
                 Surname = "Smith",
@@ -94,7 +96,7 @@ namespace TournamentManager.Tests.Presentation
         [Fact]
         public void cannot_add_referee_with_invalid_email_address()
         {
-            var vm = new NewRefereeVM(_fixture.Dispatcher)
+            var vm = new NewRefereeVM(_fixture.Dispatcher, _mockHostScreen)
             {
                 GivenName = "John",
                 Surname = "Smith",

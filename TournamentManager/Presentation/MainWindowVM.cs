@@ -1,26 +1,24 @@
-﻿using System.Reactive;
-using ReactiveDomain.Messaging.Bus;
-using ReactiveDomain.UI;
+﻿using ReactiveDomain.Messaging.Bus;
 using ReactiveUI;
-using TournamentManager.Helpers;
 
 namespace TournamentManager.Presentation
 {
-    public class MainWindowVM
+    public class MainWindowVM : IScreen
     {
-        public ReactiveCommand<Unit, Unit> AddReferee { get; }
+        private readonly IDispatcher _bus;
 
         public MainWindowVM(IDispatcher bus)
         {
-            AddReferee = CommandBuilder.FromAction(() =>
-            {
-                Threading.RunOnUiThread(() =>
-                {
-                    var vm = new NewRefereeVM(bus);
-                    var view = new NewReferee { ViewModel = vm };
-                    view.Show();
-                });
-            });
+            _bus = bus;
+        }
+
+        public RoutingState Router { get; } = new RoutingState();
+
+        public void NavigateToInitialView()
+        {
+            Router.Navigate.Execute(new ManageRefereesVM(
+                                            _bus,
+                                            this));
         }
     }
 }

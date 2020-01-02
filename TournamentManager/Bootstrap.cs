@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
+﻿using System.Reflection;
 using ReactiveDomain;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Logging;
 using ReactiveDomain.Messaging.Bus;
+using ReactiveUI;
 using Splat;
 using TournamentManager.Domain;
 using TournamentManager.Presentation;
@@ -64,6 +62,9 @@ namespace TournamentManager
         }
 
         private void RegisterViews()
-        { }
+        {
+            // Splat uses assembly scanning here to register all views and view models.
+            Locator.CurrentMutable.RegisterViewsForViewModels(Assembly.GetCallingAssembly());
+        }
     }
 }
