@@ -80,8 +80,7 @@ namespace TournamentManager.Presentation
                 });
 
             this.WhenAnyValue(x => x.SelectedStateName)
-                .Where(x => x != null)
-                .Select(x => StringUtilities.States[x])
+                .Select(x => x != null ? StringUtilities.States[x] : string.Empty)
                 .Subscribe(x => StateAbbreviation = x);
 
             this.WhenAnyValue(x => x.ZipCode)
