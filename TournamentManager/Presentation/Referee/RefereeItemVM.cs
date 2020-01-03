@@ -1,18 +1,26 @@
 ﻿using System;
 using System.Net.Mail;
+using System.Reactive;
 using System.Reactive.Linq;
+using ReactiveDomain.Messaging.Bus;
+using ReactiveDomain.UI;
 using ReactiveUI;
+using Splat;
+using TournamentManager.Helpers;
 using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
 {
     public sealed class RefereeItemVM : ReactiveObject
     {
-        private Guid _refereeId;
+        public ReactiveCommand<Unit, Unit> EditContactInfo { get; }
 
-        public RefereeItemVM(RefereeModel model)
+        public RefereeItemVM(
+            IDispatcher bus,
+            RefereeModel model)
         {
-            _refereeId = model.RefereeId;
+            var refereeId = model.RefereeId;
+            HostScreen = Locator.Current.GetService<IScreen>();
 
             model.WhenAnyValue(
                     x => x.GivenName,
@@ -36,6 +44,18 @@ namespace TournamentManager.Presentation
 
             model.WhenAnyValue(x => x.MaxAgeBracket)
                 .ToProperty(this, x => x.MaxAgeBracket, out _maxAgeBracket);
+
+            EditContactInfo = CommandBuilder.FromAction(
+                                () => Threading.RunOnUiThread(() =>
+                                {
+                                    HostScreen.Router.Navigate
+                                            .Execute(new ContactInfoVM(
+                                                            refereeId,
+                                                            FullName,
+                                                            bus,
+                                                            HostScreen))
+                                            .Subscribe();
+                                }));
         }
 
         public string Surname => _surname.Value ?? string.Empty;
@@ -55,5 +75,7 @@ namespace TournamentManager.Presentation
 
         public TeamMsgs.AgeBracket MaxAgeBracket => _maxAgeBracket.Value;
         private readonly ObservableAsPropertyHelper<TeamMsgs.AgeBracket> _maxAgeBracket;
+
+        public IScreen HostScreen { get; }
     }
 }

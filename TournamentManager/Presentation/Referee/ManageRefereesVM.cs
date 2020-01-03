@@ -28,7 +28,7 @@ namespace TournamentManager.Presentation
             _rm.Referees
                 .Connect()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Transform(x => new RefereeItemVM(x))
+                .Transform(x => new RefereeItemVM(bus, x))
                 .Sort(SortExpressionComparer<RefereeItemVM>.Ascending(x => x.Surname))
                 .Bind(Referees)
                 .Subscribe();

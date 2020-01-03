@@ -1,5 +1,6 @@
 ﻿using ReactiveDomain.Messaging.Bus;
 using ReactiveUI;
+using Splat;
 
 namespace TournamentManager.Presentation
 {
@@ -10,6 +11,7 @@ namespace TournamentManager.Presentation
         public MainWindowVM(IDispatcher bus)
         {
             _bus = bus;
+            Locator.CurrentMutable.RegisterLazySingleton(() => this, typeof(IScreen));
         }
 
         public RoutingState Router { get; } = new RoutingState();

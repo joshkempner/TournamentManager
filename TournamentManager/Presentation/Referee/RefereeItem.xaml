@@ -9,10 +9,10 @@
              d:DesignWidth="750">
     <DockPanel>
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-            <Button Style="{StaticResource ColorHighlightButton}" Padding="10,2">
+            <Button Name="EditCapabilities" Style="{StaticResource ColorHighlightButton}" Padding="10,2">
                 <iconPacks:PackIconFontAwesome Kind="CertificateSolid" Width="24" Height="24" Style="{StaticResource FontAwesomeYellowRollover}" />
             </Button>
-            <Button Style="{StaticResource ColorHighlightButton}" Padding="10,2">
+            <Button Name="EditContactInfo" Style="{StaticResource ColorHighlightButton}" Padding="10,2">
                 <iconPacks:PackIconFontAwesome Kind="AddressCardRegular" Width="32" Height="32" Style="{StaticResource FontAwesomeGreenRollover}" />
             </Button>
         </StackPanel>

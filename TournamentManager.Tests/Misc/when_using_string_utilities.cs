@@ -51,5 +51,22 @@ namespace TournamentManager.Tests.Misc
                 Assert.True(StringUtilities.IsValidStateAbbreviation(abbreviation));
             }
         }
+
+        [Fact]
+        public void can_get_postal_abbreviation_from_state_name()
+        {
+            var postalCode = StringUtilities.GetPostalAbbreviation("Arizona");
+            Assert.Equal("AZ", postalCode);
+        }
+
+        [Fact]
+        public void all_place_names_have_valid_postal_abbreviations()
+        {
+            foreach (var state in StringUtilities.States)
+            {
+                var postalCode = StringUtilities.GetPostalAbbreviation(state.Key);
+                Assert.Equal(state.Value, postalCode);
+            }
+        }
     }
 }

@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="TournamentManager.Presentation.ContactInfo"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TournamentManager.Presentation"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <DockPanel Margin="20" LastChildFill="True">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Name="Save" IsDefault="True" Content="Save" Style="{StaticResource DialogAction}" />
+            <Button Name="Cancel" IsCancel="True" Content="Cancel" Style="{StaticResource DialogAction}" Margin="20,0,0,0" />
+        </StackPanel>
+        <StackPanel>
+            <TextBlock Name="FullName" Text="Contact info for John Smith" FontSize="18" />
+            <TextBox Name="EmailAddress" Tag="Email Address" Margin="0,20,0,0" />
+            <TextBox Name="StreetAddress1" Tag="Street Address" Margin="0,20,0,0" />
+            <TextBox Name="StreetAddress2" Tag="Street Address continued (optional)" Margin="0,20,0,0" />
+            <DockPanel Margin="0,20,0,0">
+                <TextBox Name="City" Tag="City or Town" Width="300" />
+                <ComboBox Name="State" Height="{Binding ElementName=EmailAddress,Path=ActualHeight}"
+                          IsEditable="True" IsReadOnly="True" Text="Select a state"
+                          DisplayMemberPath="."
+                          VerticalContentAlignment="Center"
+                          MinWidth="200"
+                          Margin="20,0" />
+                <TextBox Name="ZipCode" Tag="Zip Code" />
+            </DockPanel>
+        </StackPanel>
+    </DockPanel>
+</UserControl>

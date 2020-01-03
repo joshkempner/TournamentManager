@@ -5,7 +5,6 @@ using ReactiveDomain;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging.Bus;
 using Splat;
-using TournamentManager.Domain;
 using TournamentManager.Helpers;
 using TournamentManager.Messages;
 
@@ -31,7 +30,7 @@ namespace TournamentManager.Presentation
             EventStream.Subscribe<RefereeMsgs.AgeChanged>(this);
             EventStream.Subscribe<RefereeMsgs.BirthdateChanged>(this);
             EventStream.Subscribe<RefereeMsgs.MaxAgeBracketChanged>(this);
-            Start<Referee>();
+            Start<Domain.Referee>();
         }
 
         public SourceCache<RefereeModel, Guid> Referees { get; } = new SourceCache<RefereeModel, Guid>(x => x.RefereeId);
