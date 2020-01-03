@@ -19,7 +19,7 @@ namespace TournamentManager.Tests.Presentation
         IHandleCommand<RefereeMsgs.AddOrUpdateMaxAgeBracket>
     {
         private readonly MockRepositorySpecification _fixture = new MockRepositorySpecification();
-        private MockHostScreen _mockHostScreen = new MockHostScreen();
+        private readonly MockHostScreen _mockHostScreen = new MockHostScreen();
 
         public when_adding_a_referee()
         {
@@ -37,7 +37,6 @@ namespace TournamentManager.Tests.Presentation
             _fixture.Dispatcher.Unsubscribe<RefereeMsgs.AddOrUpdateAge>(this);
             _fixture.Dispatcher.Unsubscribe<RefereeMsgs.AddOrUpdateBirthdate>(this);
             _fixture.Dispatcher.Unsubscribe<RefereeMsgs.AddOrUpdateMaxAgeBracket>(this);
-
         }
 
         [Fact]

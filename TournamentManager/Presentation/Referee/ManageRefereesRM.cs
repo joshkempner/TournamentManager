@@ -67,7 +67,7 @@ namespace TournamentManager.Presentation
         public void Handle(RefereeMsgs.BirthdateChanged message)
         {
             var referee = Referees.Items.First(x => x.RefereeId == message.RefereeId);
-            referee.CurrentAge = (ushort)((DateTime.Today - message.Birthdate).TotalDays / 365.25);
+            referee.CurrentAge = (ushort)message.Birthdate.YearsAgo();
             Referees.AddOrUpdate(referee);
         }
 

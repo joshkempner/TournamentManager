@@ -101,7 +101,7 @@ namespace TournamentManager.Presentation
 
             // Default values
             Age = 12;
-            Birthdate = DateTime.Today - TimeSpan.FromDays(365.25 * 20);
+            Birthdate = DateTime.Today.AddYears(-20);
         }
 
         private bool ValidateEmailAddress(string emailAddress)
