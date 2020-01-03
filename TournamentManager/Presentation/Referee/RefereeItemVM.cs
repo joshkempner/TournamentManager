@@ -38,14 +38,14 @@ namespace TournamentManager.Presentation
                 .ToProperty(this, x => x.MaxAgeBracket, out _maxAgeBracket);
         }
 
-        public string Surname => _surname.Value;
-        private readonly ObservableAsPropertyHelper<string> _surname;
+        public string Surname => _surname.Value ?? string.Empty;
+        private readonly ObservableAsPropertyHelper<string?> _surname;
 
-        public string FullName => _fullName.Value;
-        private readonly ObservableAsPropertyHelper<string> _fullName;
+        public string FullName => _fullName.Value ?? string.Empty;
+        private readonly ObservableAsPropertyHelper<string?> _fullName;
 
-        public MailAddress EmailAddress => _emailAddress.Value;
-        private readonly ObservableAsPropertyHelper<MailAddress> _emailAddress;
+        public MailAddress? EmailAddress => _emailAddress.Value;
+        private readonly ObservableAsPropertyHelper<MailAddress?> _emailAddress;
 
         public RefereeMsgs.Grade RefereeGrade => _refereeGrade.Value;
         private readonly ObservableAsPropertyHelper<RefereeMsgs.Grade> _refereeGrade;

@@ -4,9 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        d:DesignHeight="450" d:DesignWidth="800">
+        d:DesignHeight="450" d:DesignWidth="600">
     <DockPanel LastChildFill="True" Margin="20">
         <Button DockPanel.Dock="Bottom" Name="AddReferee" HorizontalAlignment="Left" Content="Add Referee" Style="{StaticResource DialogAction}" />
-        <ListBox Name="Referees" Margin="0,0,0,20" />
+        <ListBox Name="Referees" HorizontalContentAlignment="Stretch" Margin="0,0,0,20" />
     </DockPanel>
 </UserControl>

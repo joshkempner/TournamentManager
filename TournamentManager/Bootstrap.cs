@@ -13,22 +13,21 @@ namespace TournamentManager
 {
     internal class Bootstrap
     {
-        internal const string LogName = "TournamentManager";
-        private static string _assemblyName;
+        private const string LogName = "TournamentManager";
         private static readonly ILogger Log = LogManager.GetLogger(LogName);
 
-        private static IStreamStoreConnection _esConnection;
-        private static StreamStoreRepository _repo;
-        private IDispatcher _mainBus;
+        private static IStreamStoreConnection? _esConnection;
+        private static StreamStoreRepository? _repo;
+        private IDispatcher? _mainBus;
 
-        private RefereeSvc _refereeSvc;
-        private MainWindowVM _mainVM;
+        private RefereeSvc? _refereeSvc;
+        private MainWindowVM? _mainVM;
 
         internal Bootstrap()
         {
-            var fullName = Assembly.GetExecutingAssembly().FullName;
+            // ReSharper disable once ConstantNullCoalescingCondition
+            var fullName = Assembly.GetExecutingAssembly().FullName ?? LogName;
             Log.Info(fullName + " Created.");
-            _assemblyName = fullName.Split(',')[0];
         }
         internal void Run(IStreamStoreConnection esConnection)
         {
@@ -40,7 +39,7 @@ namespace TournamentManager
             mainWindow.Show();
         }
 
-        internal void Configure(
+        private void Configure(
             IStreamStoreConnection esConnection,
             IDispatcher bus)
         {
@@ -49,7 +48,7 @@ namespace TournamentManager
                             new PrefixedCamelCaseStreamNameBuilder(),
                             esConnection,
                             new JsonMessageSerializer());
-            Locator.CurrentMutable.RegisterConstant(esConnection, typeof(IStreamStoreConnection));
+            Locator.CurrentMutable.RegisterConstant(_esConnection, typeof(IStreamStoreConnection));
 
             _refereeSvc = new RefereeSvc(bus, _repo);
 
@@ -58,7 +57,7 @@ namespace TournamentManager
 
         internal void Shutdown()
         {
-            _refereeSvc.Dispose();
+            _refereeSvc?.Dispose();
         }
 
         private void RegisterViews()

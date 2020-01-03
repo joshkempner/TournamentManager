@@ -23,21 +23,21 @@ namespace TournamentManager.Presentation
             get => _givenName;
             set => this.RaiseAndSetIfChanged(ref _givenName, value);
         }
-        private string _givenName;
+        private string _givenName = string.Empty;
 
         public string Surname
         {
             get => _surname;
             set => this.RaiseAndSetIfChanged(ref _surname, value);
         }
-        private string _surname;
+        private string _surname = string.Empty;
 
         public string EmailAddress
         {
             get => _emailAddress;
             set => this.RaiseAndSetIfChanged(ref _emailAddress, value);
         }
-        private string _emailAddress;
+        private string _emailAddress = string.Empty;
 
         public RefereeMsgs.Grade RefereeGrade
         {

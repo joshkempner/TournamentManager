@@ -35,7 +35,7 @@ namespace TournamentManager.Presentation
 
             AddReferee = CommandBuilder.FromAction(() =>
             {
-                Threading.RunOnUiThread(() => HostScreen.Router.Navigate.Execute(new NewRefereeVM(bus, screen)).Subscribe());
+                Threading.RunOnUiThread(() => HostScreen.Router.Navigate.Execute(new NewRefereeVM(bus, HostScreen)).Subscribe());
             });
         }
 

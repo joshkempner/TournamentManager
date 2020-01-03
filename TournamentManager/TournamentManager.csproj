@@ -4,9 +4,11 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="3.0.1" />
     <PackageReference Include="ReactiveDomain.UI" Version="0.8.21.8" />
     <PackageReference Include="ReactiveUI.WPF" Version="11.1.1" />
   </ItemGroup>

@@ -22,6 +22,10 @@ namespace TournamentManager.Presentation
         {
             HostScreen = screen ?? Locator.Current.GetService<IScreen>();
 
+            _givenName = string.Empty;
+            _surname = string.Empty;
+            _emailAddress = string.Empty;
+
             this.WhenAnyValue(x => x.RefereeGrade)
                 .Subscribe(g =>
                 {
