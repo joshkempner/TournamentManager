@@ -3,10 +3,39 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
         d:DesignHeight="450" d:DesignWidth="600">
     <DockPanel LastChildFill="True" Margin="20">
-        <Button DockPanel.Dock="Bottom" Name="AddReferee" HorizontalAlignment="Left" Content="Add Referee" Style="{StaticResource DialogAction}" />
-        <ListBox Name="Referees" HorizontalContentAlignment="Stretch" Margin="0,0,0,20" />
+        <Button DockPanel.Dock="Bottom" Name="AddReferee" HorizontalAlignment="Left" Width="46" Style="{StaticResource ColorHighlightButton}">
+            <Grid Margin="-4,0,0,0">
+                <iconPacks:PackIconFontAwesome Kind="UserRegular" Width="32" Height="32">
+                    <iconPacks:PackIconFontAwesome.Style>
+                        <Style TargetType="iconPacks:PackIconFontAwesome">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button,AncestorLevel=1}, Path=IsMouseOver}" Value="True">
+                                    <Setter Property="Foreground" Value="DeepSkyBlue"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </iconPacks:PackIconFontAwesome.Style>
+                </iconPacks:PackIconFontAwesome>
+                <Canvas>
+                    <Path Data="M 26 15 L 36 15 M 31 10 L 31 20" StrokeThickness="3">
+                        <Path.Style>
+                            <Style TargetType="Path">
+                                <Setter Property="Stroke" Value="Black" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button,AncestorLevel=1}, Path=IsMouseOver}" Value="True">
+                                        <Setter Property="Stroke" Value="DeepSkyBlue"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Path.Style>
+                    </Path>
+                </Canvas>
+            </Grid>
+        </Button>
+        <ListBox Name="Referees" HorizontalContentAlignment="Stretch" Margin="0,0,0,15" />
     </DockPanel>
 </UserControl>
