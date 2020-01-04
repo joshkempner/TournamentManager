@@ -80,7 +80,7 @@ namespace TournamentManager.Presentation
                 });
 
             this.WhenAnyValue(x => x.SelectedStateName)
-                .Select(x => x != null ? StringUtilities.States[x] : string.Empty)
+                .Select(x => string.IsNullOrEmpty(x) ? string.Empty : StringUtilities.States[x])
                 .Subscribe(x => StateAbbreviation = x);
 
             this.WhenAnyValue(x => x.ZipCode)
@@ -97,11 +97,14 @@ namespace TournamentManager.Presentation
                                          string.IsNullOrEmpty(a1) && string.IsNullOrEmpty(c) && string.IsNullOrEmpty(s) && string.IsNullOrEmpty(z))
                 .ToProperty(this, x => x.IsAddressValid, out _isAddressValid);
 
+            this.WhenAnyValue(
+                    x => x.EmailAddress,
+                    x => x.IsAddressValid,
+                    (e, a) => (string.IsNullOrEmpty(e) || StringUtilities.IsValidEmailAddress(e)) && a)
+                .ToProperty(this, x => x.CanSave, out _canSave);
+
             Save = CommandBuilder.FromAction(
-                    this.WhenAnyValue(
-                        x => x.EmailAddress,
-                        x => x.IsAddressValid,
-                        (e, a) => !string.IsNullOrWhiteSpace(e) && a),
+                    this.WhenAnyValue(x => x.CanSave),
                     () =>
                     {
                         if (StreetAddress1 != LastSavedStreetAddress1 || StreetAddress2 != LastSavedStreetAddress2 ||
@@ -209,6 +212,9 @@ namespace TournamentManager.Presentation
 
         public bool IsAddressValid => _isAddressValid.Value;
         private readonly ObservableAsPropertyHelper<bool> _isAddressValid;
+
+        public bool CanSave => _canSave.Value;
+        private readonly ObservableAsPropertyHelper<bool> _canSave;
 
         public string UrlPathSegment => "Contact Info";
         public IScreen HostScreen { get; }

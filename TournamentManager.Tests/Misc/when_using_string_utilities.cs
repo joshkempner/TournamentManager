@@ -7,6 +7,19 @@ namespace TournamentManager.Tests.Misc
     public class when_using_string_utilities
     {
         [Fact]
+        public void correct_email_address_validates()
+        {
+            Assert.True(StringUtilities.IsValidEmailAddress("joe@aol.com"));
+        }
+
+        [Fact]
+        public void incorrect_email_address_is_invalid()
+        {
+            Assert.False(StringUtilities.IsValidEmailAddress("joe"));
+            Assert.False(StringUtilities.IsValidEmailAddress("joe@aol@gmail.com"));
+        }
+
+        [Fact]
         public void correct_zip_validates()
         {
             Assert.True(StringUtilities.IsValidUSZipCode("01234"));

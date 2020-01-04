@@ -1,11 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Mail;
 using System.Text.RegularExpressions;
 
 namespace TournamentManager.Helpers
 {
     public static class StringUtilities
     {
+        public static bool IsValidEmailAddress(string emailAddress)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(emailAddress)) return false;
+                // ReSharper disable once ObjectCreationAsStatement
+                new MailAddress(emailAddress); // Validates the email address. We don't use the output for anything.
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static bool IsValidUSZipCode(string zipCode)
         {
             const string usZipRegEx = @"^\d{5}(?:[-\s]\d{4})?$";
