@@ -83,6 +83,9 @@ namespace TournamentManager.Presentation
                 .InvokeCommand(HostScreen.Router.NavigateBack);
 
             Cancel = HostScreen.Router.NavigateBack;
+
+            this.WhenAnyObservable(x => x.HostScreen.Router.NavigateBack)
+                .Subscribe(_ => Dispose());
         }
 
         public void Dispose()

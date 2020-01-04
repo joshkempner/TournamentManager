@@ -106,6 +106,17 @@ namespace TournamentManager.Tests.Presentation
             AssertEx.IsOrBecomesFalse(() => vm.CanAddReferee);
         }
 
+        [Fact]
+        public void can_cancel_adding_a_referee()
+        {
+            var vm = new NewRefereeVM(_fixture.Dispatcher, _mockHostScreen);
+            vm.Cancel.Execute(Unit.Default).Subscribe();
+            Assert.Throws<TimeoutException>(
+                () => _fixture.TestQueue.WaitFor<RefereeMsgs.RefereeAdded>(TimeSpan.FromMilliseconds(100)));
+            _fixture.TestQueue.AssertEmpty();
+            _fixture.RepositoryEvents.AssertEmpty();
+        }
+
         public CommandResponse Handle(RefereeMsgs.AddReferee command)
         {
             return command.Succeed();

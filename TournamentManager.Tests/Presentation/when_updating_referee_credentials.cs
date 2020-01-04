@@ -96,6 +96,8 @@ namespace TournamentManager.Tests.Presentation
             AddIntramuralReferee(refereeId);
             using var vm = new RefereeCredentialsVM(refereeId, _fixture.Dispatcher, _screen);
             Assert.Equal(RefereeMsgs.Grade.Intramural, vm.RefereeGrade);
+            // ReSharper disable once AccessToDisposedClosure
+            AssertEx.IsOrBecomesTrue(() => 12 == vm.CurrentAge);
 
             const ushort newAge = 12;
             vm.CurrentAge = newAge;
@@ -124,6 +126,60 @@ namespace TournamentManager.Tests.Presentation
             _fixture.RepositoryEvents.AssertEmpty();
         }
 
+        [Fact]
+        public void can_update_max_age_bracket()
+        {
+            var refereeId = Guid.NewGuid();
+            AddTravelReferee(refereeId);
+            using var vm = new RefereeCredentialsVM(refereeId, _fixture.Dispatcher, _screen);
+            // ReSharper disable AccessToDisposedClosure
+            AssertEx.IsOrBecomesTrue(() => RefereeMsgs.Grade.Grassroots == vm.RefereeGrade);
+            AssertEx.IsOrBecomesTrue(() => TeamMsgs.AgeBracket.U16 == vm.MaxAgeBracket);
+            // ReSharper restore AccessToDisposedClosure
+
+            const TeamMsgs.AgeBracket newAgeBracket = TeamMsgs.AgeBracket.Adult;
+            vm.MaxAgeBracket = newAgeBracket;
+            vm.Save.Execute().Subscribe();
+            _fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateMaxAgeBracket>(TimeSpan.FromMilliseconds(100));
+            _fixture
+                .TestQueue
+                .AssertNext<RefereeMsgs.AddOrUpdateMaxAgeBracket>(cmd => cmd.RefereeId == refereeId &&
+                                                                         cmd.MaxAgeBracket == newAgeBracket)
+                .AssertEmpty();
+            _fixture.RepositoryEvents.AssertEmpty();
+        }
+
+        [Fact]
+        public void setting_max_age_bracket_to_existing_value_does_not_trigger_update()
+        {
+            var refereeId = Guid.NewGuid();
+            AddTravelReferee(refereeId);
+            using var vm = new RefereeCredentialsVM(refereeId, _fixture.Dispatcher, _screen);
+            // ReSharper disable AccessToDisposedClosure
+            AssertEx.IsOrBecomesTrue(() => RefereeMsgs.Grade.Grassroots == vm.RefereeGrade);
+            AssertEx.IsOrBecomesTrue(() => TeamMsgs.AgeBracket.U16 == vm.MaxAgeBracket);
+            // ReSharper restore AccessToDisposedClosure
+
+            const TeamMsgs.AgeBracket newAgeBracket = TeamMsgs.AgeBracket.U16;
+            vm.MaxAgeBracket = newAgeBracket;
+            vm.Save.Execute().Subscribe();
+            Assert.Throws<TimeoutException>(
+                () => _fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateMaxAgeBracket>(TimeSpan.FromMilliseconds(100)));
+            _fixture.TestQueue.AssertEmpty();
+            _fixture.RepositoryEvents.AssertEmpty();
+        }
+
+        [Fact]
+        public void can_cancel_updating_credentials()
+        {
+            var refereeId = Guid.NewGuid();
+            AddTravelReferee(refereeId);
+            using var vm = new RefereeCredentialsVM(refereeId, _fixture.Dispatcher, _screen);
+            vm.Cancel.Execute().Subscribe();
+            _fixture.TestQueue.AssertEmpty();
+            _fixture.RepositoryEvents.AssertEmpty();
+        }
+
         private void AddIntramuralReferee(Guid refereeId)
         {
             var referee = new Referee(
@@ -133,8 +189,9 @@ namespace TournamentManager.Tests.Presentation
                                 RefereeMsgs.Grade.Intramural,
                                 MessageBuilder.New(() => new TestCommands.Command1()));
             referee.AddOrUpdateAge(12);
+            referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.U8);
             _repo.Save(referee);
-            _fixture.RepositoryEvents.WaitFor<RefereeMsgs.AgeChanged>(TimeSpan.FromMilliseconds(100));
+            _fixture.RepositoryEvents.WaitFor<RefereeMsgs.MaxAgeBracketChanged>(TimeSpan.FromMilliseconds(100));
             _fixture.ClearQueues();
         }
 
@@ -147,8 +204,9 @@ namespace TournamentManager.Tests.Presentation
                                 RefereeMsgs.Grade.Grassroots,
                                 MessageBuilder.New(() => new TestCommands.Command1()));
             referee.AddOrUpdateBirthdate(new DateTime(1990, 1, 1));
+            referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.U16);
             _repo.Save(referee);
-            _fixture.RepositoryEvents.WaitFor<RefereeMsgs.BirthdateChanged>(TimeSpan.FromMilliseconds(100));
+            _fixture.RepositoryEvents.WaitFor<RefereeMsgs.MaxAgeBracketChanged>(TimeSpan.FromMilliseconds(100));
             _fixture.ClearQueues();
         }
 
