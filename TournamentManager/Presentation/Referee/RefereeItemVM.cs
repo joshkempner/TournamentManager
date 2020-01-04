@@ -50,12 +50,24 @@ namespace TournamentManager.Presentation
                                 () => Threading.RunOnUiThread(() =>
                                 {
                                     HostScreen.Router.Navigate
-                                            .Execute(new ContactInfoVM(
-                                                            refereeId,
-                                                            FullName,
-                                                            bus,
-                                                            HostScreen))
-                                            .Subscribe();
+                                        .Execute(new ContactInfoVM(
+                                                        refereeId,
+                                                        FullName,
+                                                        bus,
+                                                        HostScreen))
+                                        .Subscribe();
+                                }));
+
+            EditCredentials = CommandBuilder.FromAction(
+                                () => Threading.RunOnUiThread(() =>
+                                {
+                                    HostScreen.Router.Navigate
+                                        .Execute(new CredentialsVM(
+                                                        refereeId,
+                                                        FullName,
+                                                        bus,
+                                                        HostScreen))
+                                        .Subscribe();
                                 }));
         }
 

@@ -20,9 +20,11 @@ namespace TournamentManager.Presentation
 
         public CredentialsVM(
             Guid refereeId,
+            string fullName,
             IDispatcher bus,
             IScreen screen)
         {
+            FullName = fullName;
             HostScreen = screen ?? Locator.Current.GetService<IScreen>();
             _rm = new CredentialsRM(refereeId);
 
@@ -111,6 +113,8 @@ namespace TournamentManager.Presentation
         {
             _rm.Dispose();
         }
+
+        public string FullName { get; }
 
         private RefereeMsgs.Grade LastSavedGrade { get; set; }
 

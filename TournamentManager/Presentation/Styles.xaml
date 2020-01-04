@@ -100,6 +100,7 @@
     <SolidColorBrush x:Key="DisabledBackground" Color="#eeeeee" />
     <SolidColorBrush x:Key="DisabledInput" Color="#555555" />
     <SolidColorBrush x:Key="WatermarkText" Color="#cccccc" />
+    <SolidColorBrush x:Key="SecondaryText" Color="#aaaaaa" />
 
     <Style TargetType="{x:Type TextBox}">
         <Setter Property="FontSize" Value="14" />

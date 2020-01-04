@@ -20,6 +20,8 @@ namespace TournamentManager.Presentation
 
                 this.BindCommand(ViewModel, vm => vm.EditContactInfo, v => v.EditContactInfo)
                     .DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.EditCredentials, v => v.EditCredentials)
+                    .DisposeWith(disposables);
             });
         }
 
