@@ -1,31 +1,26 @@
 ﻿using System;
-using System.Reactive;
 using System.Reactive.Linq;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
 using ReactiveUI;
-using Splat;
 using TournamentManager.Helpers;
 using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
 {
-    public class CredentialsVM : ReactiveObject, IRoutableViewModel, IDisposable
+    public sealed class CredentialsVM : TransientViewModel
     {
         private readonly CredentialsRM _rm;
-
-        public ReactiveCommand<Unit, Unit> Save { get; }
-        public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         public CredentialsVM(
             Guid refereeId,
             string fullName,
             IDispatcher bus,
             IScreen screen)
+            : base(screen)
         {
             FullName = fullName;
-            HostScreen = screen ?? Locator.Current.GetService<IScreen>();
             _rm = new CredentialsRM(refereeId);
 
             _rm.RefereeGrade
@@ -99,19 +94,13 @@ namespace TournamentManager.Presentation
                                                                     MaxAgeBracket)));
                         }
                     });
-
-            this.WhenAnyObservable(x => x.Save)
-                .InvokeCommand(HostScreen.Router.NavigateBack);
-
-            Cancel = HostScreen.Router.NavigateBack;
-
-            this.WhenAnyObservable(x => x.HostScreen.Router.NavigateBack)
-                .Subscribe(_ => Dispose());
         }
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            _rm.Dispose();
+            if (disposing)
+                _rm.Dispose();
+            base.Dispose(disposing);
         }
 
         public string FullName { get; }
@@ -152,7 +141,6 @@ namespace TournamentManager.Presentation
         }
         private TeamMsgs.AgeBracket _maxAgeBracket;
 
-        public string UrlPathSegment => "Referee Credentials";
-        public IScreen HostScreen { get; }
+        public override string UrlPathSegment => "Referee Credentials";
     }
 }

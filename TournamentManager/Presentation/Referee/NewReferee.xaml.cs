@@ -40,7 +40,7 @@ namespace TournamentManager.Presentation
                 this.Bind(ViewModel, vm => vm.MaxAgeBracket, v => v.MaxAgeBracket.SelectedItem)
                     .DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.AddReferee, v => v.Add)
+                this.BindCommand(ViewModel, vm => vm.Save, v => v.Add)
                     .DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.Cancel, v => v.Cancel)
                     .DisposeWith(disposables);

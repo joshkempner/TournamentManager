@@ -1,27 +1,21 @@
 ﻿using System;
 using System.Net.Mail;
-using System.Reactive;
 using System.Reactive.Linq;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
 using ReactiveUI;
-using Splat;
 using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
 {
-    public class NewRefereeVM : ReactiveObject, IRoutableViewModel
+    public class NewRefereeVM : TransientViewModel
     {
-        public ReactiveCommand<Unit, Unit> AddReferee { get; }
-        public ReactiveCommand<Unit, Unit> Cancel { get; }
-
         public NewRefereeVM(
             IDispatcher bus,
             IScreen screen)
+            : base(screen)
         {
-            HostScreen = screen ?? Locator.Current.GetService<IScreen>();
-
             _givenName = string.Empty;
             _surname = string.Empty;
             _emailAddress = string.Empty;
@@ -54,7 +48,7 @@ namespace TournamentManager.Presentation
                     (gn, sn, emailOk, detailsOk) => !string.IsNullOrWhiteSpace(gn) && !string.IsNullOrWhiteSpace(sn) && emailOk && detailsOk)
                 .ToProperty(this, x => x.CanAddReferee, out _canAddReferee);
 
-            AddReferee =
+            Save =
                 CommandBuilder.FromAction(
                     this.WhenAnyValue(x => x.CanAddReferee),
                     () =>
@@ -93,11 +87,6 @@ namespace TournamentManager.Presentation
                                                                 refId,
                                                                 MaxAgeBracket)));
                     });
-
-            this.WhenAnyObservable(x => x.AddReferee)
-                .InvokeCommand(HostScreen.Router.NavigateBack);
-
-            Cancel = HostScreen.Router.NavigateBack;
 
             // Default values
             Age = 12;
@@ -176,7 +165,6 @@ namespace TournamentManager.Presentation
 
         public bool CanAddReferee => _canAddReferee.Value;
         private readonly ObservableAsPropertyHelper<bool> _canAddReferee;
-        public string UrlPathSegment => "Add Referee";
-        public IScreen HostScreen { get; }
+        public override string UrlPathSegment => "Add Referee";
     }
 }

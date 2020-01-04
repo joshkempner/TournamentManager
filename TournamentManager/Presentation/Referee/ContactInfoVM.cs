@@ -1,33 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
 using ReactiveUI;
-using Splat;
 using TournamentManager.Helpers;
 using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
 {
-    public class ContactInfoVM : ReactiveObject, IRoutableViewModel, IDisposable
+    public class ContactInfoVM : TransientViewModel
     {
         private readonly ContactInfoRM _rm;
-
-        public ReactiveCommand<Unit, Unit> Save { get; }
-        public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         public ContactInfoVM(
             Guid refereeId,
             string fullName,
             IDispatcher bus,
             IScreen screen)
+            : base(screen)
         {
             FullName = fullName;
-            HostScreen = screen ?? Locator.Current.GetService<IScreen>();
             _rm = new ContactInfoRM(refereeId);
 
             _rm.EmailAddress
@@ -127,19 +122,13 @@ namespace TournamentManager.Presentation
                                                     EmailAddress)));
                         }
                     });
-
-            this.WhenAnyObservable(x => x.Save)
-                .InvokeCommand(HostScreen.Router.NavigateBack);
-
-            Cancel = HostScreen.Router.NavigateBack;
-
-            this.WhenAnyObservable(x => x.HostScreen.Router.NavigateBack)
-                .Subscribe(_ => Dispose());
         }
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            _rm.Dispose();
+            if (disposing)
+                _rm.Dispose();
+            base.Dispose(disposing);
         }
 
         public IEnumerable<string> StateNames => StringUtilities.States.Keys;
@@ -216,7 +205,6 @@ namespace TournamentManager.Presentation
         public bool CanSave => _canSave.Value;
         private readonly ObservableAsPropertyHelper<bool> _canSave;
 
-        public string UrlPathSegment => "Contact Info";
-        public IScreen HostScreen { get; }
+        public override string UrlPathSegment => "Contact Info";
     }
 }

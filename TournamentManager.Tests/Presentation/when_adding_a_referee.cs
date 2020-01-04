@@ -51,7 +51,7 @@ namespace TournamentManager.Tests.Presentation
                 Age = 12
             };
             AssertEx.IsOrBecomesTrue(() => vm.CanAddReferee);
-            vm.AddReferee.Execute(Unit.Default).Subscribe();
+            vm.Save.Execute(Unit.Default).Subscribe();
             _fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateMaxAgeBracket>(TimeSpan.FromMilliseconds(100));
             var cmd = _fixture.TestQueue.DequeueNext<RefereeMsgs.AddReferee>();
             _fixture
@@ -78,7 +78,7 @@ namespace TournamentManager.Tests.Presentation
                 MaxAgeBracket = TeamMsgs.AgeBracket.U14
             };
             AssertEx.IsOrBecomesTrue(() => vm.CanAddReferee);
-            vm.AddReferee.Execute(Unit.Default).Subscribe();
+            vm.Save.Execute(Unit.Default).Subscribe();
             _fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateMaxAgeBracket>(TimeSpan.FromMilliseconds(100));
             var cmd = _fixture.TestQueue.DequeueNext<RefereeMsgs.AddReferee>();
             _fixture
