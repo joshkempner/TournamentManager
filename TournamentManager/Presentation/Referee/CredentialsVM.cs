@@ -6,24 +6,25 @@ using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
 using ReactiveUI;
 using Splat;
+using TournamentManager.Helpers;
 using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
 {
-    public class RefereeCredentialsVM : ReactiveObject, IRoutableViewModel, IDisposable
+    public class CredentialsVM : ReactiveObject, IRoutableViewModel, IDisposable
     {
-        private readonly RefereeCredentialsRM _rm;
+        private readonly CredentialsRM _rm;
 
         public ReactiveCommand<Unit, Unit> Save { get; }
         public ReactiveCommand<Unit, Unit> Cancel { get; }
 
-        public RefereeCredentialsVM(
+        public CredentialsVM(
             Guid refereeId,
             IDispatcher bus,
             IScreen screen)
         {
             HostScreen = screen ?? Locator.Current.GetService<IScreen>();
-            _rm = new RefereeCredentialsRM(refereeId);
+            _rm = new CredentialsRM(refereeId);
 
             _rm.RefereeGrade
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -36,7 +37,11 @@ namespace TournamentManager.Presentation
 
             _rm.Birthdate
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .ToProperty(this, x => x.Birthdate, out _birthdate);
+                .Subscribe(x =>
+                {
+                    LastSavedBirthdate = x;
+                    Birthdate = x;
+                });
 
             _rm.CurrentAge
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -52,6 +57,13 @@ namespace TournamentManager.Presentation
                 {
                     LastSavedMaxAgeBracket = x;
                     MaxAgeBracket = x;
+                });
+
+            this.WhenAnyValue(x => x.Birthdate)
+                .Subscribe(x =>
+                {
+                    if (x == default || RefereeGrade == RefereeMsgs.Grade.Intramural) return;
+                    CurrentAge = (ushort)x.YearsAgo();
                 });
 
             Save = CommandBuilder.FromAction(
@@ -71,6 +83,13 @@ namespace TournamentManager.Presentation
                                                                     CurrentAge)));
                         }
 
+                        if (RefereeGrade != RefereeMsgs.Grade.Intramural && LastSavedBirthdate != Birthdate)
+                        {
+                            bus.Send(MessageBuilder.New(() => new RefereeMsgs.AddOrUpdateBirthdate(
+                                                                    refereeId,
+                                                                    Birthdate)));
+                        }
+                        
                         if (MaxAgeBracket != LastSavedMaxAgeBracket)
                         {
                             bus.Send(MessageBuilder.New(() => new RefereeMsgs.AddOrUpdateMaxAgeBracket(
@@ -111,8 +130,14 @@ namespace TournamentManager.Presentation
         }
         private ushort _currentAge;
 
-        public DateTime Birthdate => _birthdate.Value;
-        private readonly ObservableAsPropertyHelper<DateTime> _birthdate;
+        private DateTime LastSavedBirthdate { get; set; }
+
+        public DateTime Birthdate
+        {
+            get => _birthdate;
+            set => this.RaiseAndSetIfChanged(ref _birthdate, value);
+        }
+        private DateTime _birthdate;
 
         private TeamMsgs.AgeBracket LastSavedMaxAgeBracket { get; set; }
 

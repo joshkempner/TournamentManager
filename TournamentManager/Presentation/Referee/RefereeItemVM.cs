@@ -14,6 +14,7 @@ namespace TournamentManager.Presentation
     public sealed class RefereeItemVM : ReactiveObject
     {
         public ReactiveCommand<Unit, Unit> EditContactInfo { get; }
+        public ReactiveCommand<Unit, Unit> EditCredentials { get; }
 
         public RefereeItemVM(
             IDispatcher bus,

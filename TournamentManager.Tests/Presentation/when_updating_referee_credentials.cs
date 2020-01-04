@@ -29,7 +29,7 @@ namespace TournamentManager.Tests.Presentation
         {
             var refereeId = Guid.NewGuid();
             RefereeTestHelper.AddIntramuralReferee(refereeId);
-            using var vm = new RefereeCredentialsVM(refereeId, Fixture.Dispatcher, Screen);
+            using var vm = new CredentialsVM(refereeId, Fixture.Dispatcher, Screen);
             Assert.Equal(RefereeMsgs.Grade.Intramural, vm.RefereeGrade);
 
             vm.RefereeGrade = RefereeMsgs.Grade.Regional;
@@ -48,7 +48,7 @@ namespace TournamentManager.Tests.Presentation
         {
             var refereeId = Guid.NewGuid();
             RefereeTestHelper.AddIntramuralReferee(refereeId);
-            using var vm = new RefereeCredentialsVM(refereeId, Fixture.Dispatcher, Screen);
+            using var vm = new CredentialsVM(refereeId, Fixture.Dispatcher, Screen);
             Assert.Equal(RefereeMsgs.Grade.Intramural, vm.RefereeGrade);
 
             vm.RefereeGrade = RefereeMsgs.Grade.Intramural;
@@ -64,7 +64,7 @@ namespace TournamentManager.Tests.Presentation
         {
             var refereeId = Guid.NewGuid();
             RefereeTestHelper.AddIntramuralReferee(refereeId);
-            using var vm = new RefereeCredentialsVM(refereeId, Fixture.Dispatcher, Screen);
+            using var vm = new CredentialsVM(refereeId, Fixture.Dispatcher, Screen);
             Assert.Equal(RefereeMsgs.Grade.Intramural, vm.RefereeGrade);
             // ReSharper disable once AccessToDisposedClosure
             AssertEx.IsOrBecomesTrue(() => RefereeTestHelper.IntramuralAge == vm.CurrentAge);
@@ -86,7 +86,7 @@ namespace TournamentManager.Tests.Presentation
         {
             var refereeId = Guid.NewGuid();
             RefereeTestHelper.AddIntramuralReferee(refereeId);
-            using var vm = new RefereeCredentialsVM(refereeId, Fixture.Dispatcher, Screen);
+            using var vm = new CredentialsVM(refereeId, Fixture.Dispatcher, Screen);
             Assert.Equal(RefereeMsgs.Grade.Intramural, vm.RefereeGrade);
             // ReSharper disable once AccessToDisposedClosure
             AssertEx.IsOrBecomesTrue(() => RefereeTestHelper.IntramuralAge == vm.CurrentAge);
@@ -105,7 +105,7 @@ namespace TournamentManager.Tests.Presentation
         {
             var refereeId = Guid.NewGuid();
             RefereeTestHelper.AddTravelReferee(refereeId);
-            using var vm = new RefereeCredentialsVM(refereeId, Fixture.Dispatcher, Screen);
+            using var vm = new CredentialsVM(refereeId, Fixture.Dispatcher, Screen);
             // ReSharper disable once AccessToDisposedClosure
             AssertEx.IsOrBecomesTrue(() => RefereeMsgs.Grade.Grassroots == vm.RefereeGrade);
 
@@ -119,11 +119,52 @@ namespace TournamentManager.Tests.Presentation
         }
 
         [Fact]
+        public void can_update_travel_referee_birthdate()
+        {
+            var refereeId = Guid.NewGuid();
+            RefereeTestHelper.AddTravelReferee(refereeId);
+            using var vm = new CredentialsVM(refereeId, Fixture.Dispatcher, Screen);
+            // ReSharper disable AccessToDisposedClosure
+            AssertEx.IsOrBecomesTrue(() => RefereeMsgs.Grade.Grassroots == vm.RefereeGrade);
+            AssertEx.IsOrBecomesTrue(() => RefereeTestHelper.TravelBirthdate == vm.Birthdate);
+
+            vm.Birthdate -= TimeSpan.FromDays(1);
+            vm.Save.Execute().Subscribe();
+            Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateBirthdate>(TimeSpan.FromMilliseconds(200));
+            Fixture
+                .TestQueue
+                .AssertNext<RefereeMsgs.AddOrUpdateBirthdate>(cmd => cmd.RefereeId == refereeId &&
+                                                                     cmd.Birthdate == vm.Birthdate)
+                .AssertEmpty();
+            // ReSharper restore AccessToDisposedClosure
+            Fixture.RepositoryEvents.AssertEmpty();
+        }
+
+        [Fact]
+        public void setting_birthdate_to_existing_value_does_not_trigger_update()
+        {
+            var refereeId = Guid.NewGuid();
+            RefereeTestHelper.AddTravelReferee(refereeId);
+            using var vm = new CredentialsVM(refereeId, Fixture.Dispatcher, Screen);
+            // ReSharper disable AccessToDisposedClosure
+            AssertEx.IsOrBecomesTrue(() => RefereeMsgs.Grade.Grassroots == vm.RefereeGrade);
+            AssertEx.IsOrBecomesTrue(() => RefereeTestHelper.TravelBirthdate == vm.Birthdate);
+            // ReSharper restore AccessToDisposedClosure
+
+            vm.Birthdate = RefereeTestHelper.TravelBirthdate;
+            vm.Save.Execute().Subscribe();
+            Assert.Throws<TimeoutException>(
+                () => Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateBirthdate>(TimeSpan.FromMilliseconds(200)));
+            Fixture.TestQueue.AssertEmpty();
+            Fixture.RepositoryEvents.AssertEmpty();
+        }
+
+        [Fact]
         public void can_update_max_age_bracket()
         {
             var refereeId = Guid.NewGuid();
             RefereeTestHelper.AddTravelReferee(refereeId);
-            using var vm = new RefereeCredentialsVM(refereeId, Fixture.Dispatcher, Screen);
+            using var vm = new CredentialsVM(refereeId, Fixture.Dispatcher, Screen);
             // ReSharper disable AccessToDisposedClosure
             AssertEx.IsOrBecomesTrue(() => RefereeMsgs.Grade.Grassroots == vm.RefereeGrade);
             AssertEx.IsOrBecomesTrue(() => RefereeTestHelper.TravelMaxAgeBracket == vm.MaxAgeBracket);
@@ -146,7 +187,7 @@ namespace TournamentManager.Tests.Presentation
         {
             var refereeId = Guid.NewGuid();
             RefereeTestHelper.AddTravelReferee(refereeId);
-            using var vm = new RefereeCredentialsVM(refereeId, Fixture.Dispatcher, Screen);
+            using var vm = new CredentialsVM(refereeId, Fixture.Dispatcher, Screen);
             // ReSharper disable AccessToDisposedClosure
             AssertEx.IsOrBecomesTrue(() => RefereeMsgs.Grade.Grassroots == vm.RefereeGrade);
             AssertEx.IsOrBecomesTrue(() => RefereeTestHelper.TravelMaxAgeBracket == vm.MaxAgeBracket);
@@ -166,7 +207,7 @@ namespace TournamentManager.Tests.Presentation
         {
             var refereeId = Guid.NewGuid();
             RefereeTestHelper.AddTravelReferee(refereeId);
-            using var vm = new RefereeCredentialsVM(refereeId, Fixture.Dispatcher, Screen);
+            using var vm = new CredentialsVM(refereeId, Fixture.Dispatcher, Screen);
             vm.Cancel.Execute().Subscribe();
             Fixture.TestQueue.AssertEmpty();
             Fixture.RepositoryEvents.AssertEmpty();

@@ -10,7 +10,7 @@ using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
 {
-    public class RefereeCredentialsRM :
+    public class CredentialsRM :
         ReadModelBase,
         IHandle<RefereeMsgs.RefereeAdded>,
         IHandle<RefereeMsgs.GradeChanged>,
@@ -18,10 +18,10 @@ namespace TournamentManager.Presentation
         IHandle<RefereeMsgs.BirthdateChanged>,
         IHandle<RefereeMsgs.MaxAgeBracketChanged>
     {
-        public RefereeCredentialsRM(Guid refereeId)
+        public CredentialsRM(Guid refereeId)
             : base(
-                nameof(RefereeCredentialsRM),
-                () => Locator.Current.GetService<IStreamStoreConnection>().GetListener(nameof(RefereeCredentialsRM)))
+                nameof(CredentialsRM),
+                () => Locator.Current.GetService<IStreamStoreConnection>().GetListener(nameof(CredentialsRM)))
         {
             EventStream.Subscribe<RefereeMsgs.RefereeAdded>(this);
             EventStream.Subscribe<RefereeMsgs.GradeChanged>(this);
