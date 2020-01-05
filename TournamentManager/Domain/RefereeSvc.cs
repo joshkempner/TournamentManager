@@ -1,4 +1,5 @@
-﻿using ReactiveDomain.Foundation;
+﻿using System;
+using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
 using TournamentManager.Messages;
@@ -6,7 +7,7 @@ using TournamentManager.Messages;
 namespace TournamentManager.Domain
 {
     public class RefereeSvc :
-        TransientSubscriber,
+        QueuedSubscriber,
         IHandleCommand<RefereeMsgs.AddReferee>,
         IHandleCommand<RefereeMsgs.UpdateGivenName>,
         IHandleCommand<RefereeMsgs.UpdateSurname>,
@@ -19,7 +20,7 @@ namespace TournamentManager.Domain
     {
         private readonly ICorrelatedRepository _repository;
         public RefereeSvc(
-            IDispatcher subscriber,
+            IBus subscriber,
             IRepository repository)
             : base(subscriber)
         {
@@ -37,6 +38,8 @@ namespace TournamentManager.Domain
 
         public CommandResponse Handle(RefereeMsgs.AddReferee command)
         {
+            if (_repository.TryGetById<Referee>(command.RefereeId, out _, command))
+                throw new AggregateException("Cannot create two referees with the same ID.");
             var referee = new Referee(
                                 command.RefereeId,
                                 command.GivenName,

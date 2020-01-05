@@ -67,6 +67,23 @@ namespace TournamentManager.Tests.Domain
         }
 
         [Fact]
+        public void cannot_create_duplicate_referee()
+        {
+            AddReferee();
+            var cmd = MessageBuilder.New(() => new RefereeMsgs.AddReferee(
+                                                    _refId,
+                                                    GivenName,
+                                                    Surname,
+                                                    Grade));
+            AssertEx.CommandThrows<AggregateException>(() => _fixture.Dispatcher.Send(cmd));
+            _fixture
+                .TestQueue
+                .AssertNext<RefereeMsgs.AddReferee>(cmd.CorrelationId)
+                .AssertEmpty();
+            _fixture.RepositoryEvents.AssertEmpty();
+        }
+
+        [Fact]
         public void can_update_referee_given_name()
         {
             AddReferee();
