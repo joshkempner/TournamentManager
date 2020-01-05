@@ -10,7 +10,7 @@ using Xunit;
 
 namespace TournamentManager.Tests.Presentation
 {
-    public class when_updating_referee_credentials :
+    public sealed class when_updating_referee_credentials :
         with_vm_fixtures,
         IDisposable,
         IHandleCommand<RefereeMsgs.UpdateGrade>,

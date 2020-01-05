@@ -8,7 +8,7 @@ using Xunit;
 
 namespace TournamentManager.Tests.Presentation
 {
-    public class when_updating_referee_contact_info :
+    public sealed class when_updating_referee_contact_info :
         with_vm_fixtures,
         IDisposable,
         IHandleCommand<RefereeMsgs.AddOrUpdateEmailAddress>,

@@ -4,7 +4,7 @@ using Xunit;
 
 namespace TournamentManager.Tests.Misc
 {
-    public class when_using_string_utilities
+    public sealed class when_using_string_utilities
     {
         [Fact]
         public void correct_email_address_validates()

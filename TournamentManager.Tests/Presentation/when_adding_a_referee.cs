@@ -10,7 +10,7 @@ using Xunit;
 
 namespace TournamentManager.Tests.Presentation
 {
-    public class when_adding_a_referee :
+    public sealed class when_adding_a_referee :
         IDisposable,
         IHandleCommand<RefereeMsgs.AddReferee>,
         IHandleCommand<RefereeMsgs.AddOrUpdateEmailAddress>,
