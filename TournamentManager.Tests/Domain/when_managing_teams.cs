@@ -1,4 +1,5 @@
 ﻿using System;
+using ReactiveDomain;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Testing;
 using TournamentManager.Domain;
@@ -19,8 +20,8 @@ namespace TournamentManager.Tests.Domain
             return new Tournament(
                         _tournamentId,
                         "The Milk Cup",
-                        new DateTime(2020, 6, 1), 
-                        new DateTime(2020, 6, 1), 
+                        new DateTime(2020, 6, 1),
+                        new DateTime(2020, 6, 1),
                         MessageBuilder.New(() => new TestCommands.Command1()));
         }
 
@@ -31,6 +32,9 @@ namespace TournamentManager.Tests.Domain
                 _teamId,
                 TeamName,
                 _ageBracket);
+            // Take events and reset the Source so we can continue to use the aggregate as "pre-hydrated"
+            tournament.TakeEvents();
+            ((ICorrelatedEventSource)tournament).Source = MessageBuilder.New(() => new TestCommands.Command1());
             return tournament;
         }
 
@@ -77,9 +81,7 @@ namespace TournamentManager.Tests.Domain
                         _teamId,
                         TeamName,
                         _ageBracket));
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
-            Assert.Equal(2, events.Length);
+            Assert.False(tournament.HasRecordedEvents);
         }
 
         [Fact]
@@ -113,8 +115,6 @@ namespace TournamentManager.Tests.Domain
             var events = tournament.TakeEvents();
             Assert.Collection(
                 events,
-                e => Assert.True(e is TournamentMsgs.TournamentAdded),
-                e => Assert.True(e is TeamMsgs.TeamAdded),
                 e => Assert.True(e is TeamMsgs.TeamRenamed evt &&
                                  evt.TournamentId == _tournamentId &&
                                  evt.TeamId == _teamId &&
@@ -130,9 +130,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.RenameTeam(
                     Guid.NewGuid(),
                     newName));
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
-            Assert.Equal(2, events.Length);
+            Assert.False(tournament.HasRecordedEvents);
         }
 
         [Fact]
@@ -147,9 +145,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.RenameTeam(
                         _teamId,
                         " "));
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
-            Assert.Equal(2, events.Length);
+            Assert.False(tournament.HasRecordedEvents);
         }
 
         [Fact]
@@ -164,8 +160,6 @@ namespace TournamentManager.Tests.Domain
             var events = tournament.TakeEvents();
             Assert.Collection(
                 events,
-                e => Assert.True(e is TournamentMsgs.TournamentAdded),
-                e => Assert.True(e is TeamMsgs.TeamAdded),
                 e => Assert.True(e is TeamMsgs.AgeBracketUpdated evt &&
                                  evt.TournamentId == _tournamentId &&
                                  evt.TeamId == _teamId &&
@@ -181,9 +175,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.UpdateAgeBracket(
                         Guid.NewGuid(),
                         ageBracket));
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
-            Assert.Equal(2, events.Length);
+            Assert.False(tournament.HasRecordedEvents);
         }
     }
 }

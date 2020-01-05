@@ -1,4 +1,5 @@
 ﻿using System;
+using ReactiveDomain;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Testing;
 using TournamentManager.Domain;
@@ -17,8 +18,12 @@ namespace TournamentManager.Tests.Domain
         [Fact]
         public void can_create_tournament()
         {
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = new Tournament(
+                                    _tournamentId,
+                                    TournamentName,
+                                    _firstDay,
+                                    _lastDay,
+                                    MessageBuilder.New(() => new TestCommands.Command1()));
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
             Assert.Collection(
@@ -94,29 +99,30 @@ namespace TournamentManager.Tests.Domain
                             MessageBuilder.New(() => new TestCommands.Command1())));
         }
 
-        private Tournament AddTournament(ICorrelatedMessage sourceMsg)
+        private Tournament AddTournament()
         {
-            return new Tournament(
-                        _tournamentId,
-                        TournamentName,
-                        _firstDay,
-                        _lastDay,
-                        sourceMsg);
+            var tournament = new Tournament(
+                                    _tournamentId,
+                                    TournamentName,
+                                    _firstDay,
+                                    _lastDay,
+                                    MessageBuilder.New(() => new TestCommands.Command1()));
+            // Take events and reset the Source so we can continue to use the aggregate as "pre-hydrated"
+            tournament.TakeEvents();
+            ((ICorrelatedEventSource)tournament).Source = MessageBuilder.New(() => new TestCommands.Command1());
+            return tournament;
         }
 
         [Fact]
         public void can_rename_tournament()
         {
             const string newName = "The Bourbon Cup";
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             tournament.Rename(newName);
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
-            Assert.Equal(2, events.Length);
             Assert.Collection(
                 events,
-                e => Assert.True(e is TournamentMsgs.TournamentAdded),
                 e => Assert.True(e is TournamentMsgs.TournamentRenamed evt &&
                                  evt.TournamentId == _tournamentId &&
                                  evt.Name == newName));
@@ -125,15 +131,10 @@ namespace TournamentManager.Tests.Domain
         [Fact]
         public void cannot_rename_to_empty_name()
         {
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             Assert.Throws<ArgumentNullException>(() => tournament.Rename(string.Empty));
             Assert.Throws<ArgumentException>(() => tournament.Rename(" "));
-
-            // Make sure the "Added" event is the only one.
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
-            Assert.Equal(1, events.Length);
+            Assert.False(tournament.HasRecordedEvents);
         }
 
         [Fact]
@@ -141,17 +142,14 @@ namespace TournamentManager.Tests.Domain
         {
             var newFirstDay = _firstDay.AddDays(1);
             var newLastDay = _lastDay.AddDays(1);
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             tournament.Reschedule(
                 newFirstDay,
                 newLastDay);
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
-            Assert.Equal(2, events.Length);
             Assert.Collection(
                 events,
-                e => Assert.True(e is TournamentMsgs.TournamentAdded),
                 e => Assert.True(e is TournamentMsgs.TournamentRescheduled evt &&
                                  evt.TournamentId == _tournamentId &&
                                  evt.FirstDay == newFirstDay &&
@@ -161,17 +159,14 @@ namespace TournamentManager.Tests.Domain
         [Fact]
         public void can_reschedule_tournament_to_single_day()
         {
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             tournament.Reschedule(
                 _firstDay,
                 _firstDay);
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
-            Assert.Equal(2, events.Length);
             Assert.Collection(
                 events,
-                e => Assert.True(e is TournamentMsgs.TournamentAdded),
                 e => Assert.True(e is TournamentMsgs.TournamentRescheduled evt &&
                                  evt.TournamentId == _tournamentId &&
                                  evt.FirstDay == _firstDay &&
@@ -181,17 +176,12 @@ namespace TournamentManager.Tests.Domain
         [Fact]
         public void cannot_reschedule_tournament_to_invalid_dates()
         {
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             Assert.Throws<ArgumentException>(
                 () => tournament.Reschedule(
                         _lastDay,
                         _firstDay));
-
-            // Make sure the "Added" event is the only one.
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
-            Assert.Equal(1, events.Length);
+            Assert.False(tournament.HasRecordedEvents);
         }
 
         [Fact]
@@ -199,17 +189,14 @@ namespace TournamentManager.Tests.Domain
         {
             var fieldId = Guid.NewGuid();
             const string fieldName = "Field 1";
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             tournament.AddField(
                 fieldId,
                 fieldName);
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
-            Assert.Equal(2, events.Length);
             Assert.Collection(
                 events,
-                e => Assert.True(e is TournamentMsgs.TournamentAdded),
                 e => Assert.True(e is TournamentMsgs.FieldAdded evt &&
                                  evt.TournamentId == _tournamentId &&
                                  evt.FieldId == fieldId &&
@@ -221,8 +208,7 @@ namespace TournamentManager.Tests.Domain
         {
             var fieldId = Guid.NewGuid();
             const string fieldName = "Field 1";
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             tournament.AddField(
                 fieldId,
                 fieldName);
@@ -231,44 +217,34 @@ namespace TournamentManager.Tests.Domain
                         fieldId,
                         fieldName));
 
-            // Make sure we have the right number of events
+            // Make sure we have only one event from the expected "FieldAdded"
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
-            Assert.Equal(2, events.Length);
+            Assert.Equal(1, events.Length);
         }
 
         [Fact]
         public void cannot_add_field_with_invalid_id()
         {
             const string fieldName = "Field 1";
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             Assert.Throws<ArgumentException>(
                 () => tournament.AddField(
                         Guid.Empty,
                         fieldName));
-
-            // Make sure the "Added" event is the only one.
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
-            Assert.Equal(1, events.Length);
+            Assert.False(tournament.HasRecordedEvents);
         }
 
         [Fact]
         public void cannot_add_field_with_invalid_name()
         {
             var fieldId = Guid.NewGuid();
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             Assert.Throws<ArgumentNullException>(
                 () => tournament.AddField(
                         fieldId,
                         string.Empty));
-
-            // Make sure the "Added" event is the only one.
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
-            Assert.Equal(1, events.Length);
+            Assert.False(tournament.HasRecordedEvents);
         }
 
         [Fact]
@@ -277,18 +253,15 @@ namespace TournamentManager.Tests.Domain
             var gameSlotId = Guid.NewGuid();
             var startTime = _firstDay.AddHours(9);
             var endTime = startTime.AddHours(1);
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             tournament.AddGameSlot(
                 gameSlotId,
                 startTime,
                 endTime);
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
-            Assert.Equal(2, events.Length);
             Assert.Collection(
                 events,
-                e => Assert.True(e is TournamentMsgs.TournamentAdded),
                 e => Assert.True(e is TournamentMsgs.GameSlotAdded evt &&
                                  evt.TournamentId == _tournamentId &&
                                  evt.StartTime == startTime &&
@@ -301,8 +274,7 @@ namespace TournamentManager.Tests.Domain
             var gameSlotId = Guid.NewGuid();
             var startTime = _firstDay.AddHours(9);
             var endTime = startTime.AddHours(1);
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             tournament.AddGameSlot(
                 gameSlotId,
                 startTime,
@@ -313,10 +285,10 @@ namespace TournamentManager.Tests.Domain
                         startTime,
                         endTime));
 
-            // Make sure we have the right number of events
+            // Make sure we have only 1 event from the expected "GameSlotAdded"
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
-            Assert.Equal(2, events.Length);
+            Assert.Equal(1, events.Length);
         }
 
         [Fact]
@@ -324,8 +296,7 @@ namespace TournamentManager.Tests.Domain
         {
             var startTime = _firstDay.AddHours(9);
             var endTime = startTime.AddHours(1);
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGameSlot(
                         Guid.Empty, 
@@ -339,18 +310,13 @@ namespace TournamentManager.Tests.Domain
             var gameSlotId = Guid.NewGuid();
             var startTime = _lastDay.AddDays(1).AddHours(9);
             var endTime = startTime.AddHours(1);
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGameSlot(
                         gameSlotId,
                         startTime,
                         endTime));
-
-            // Make sure the "Added" event is the only one.
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
-            Assert.Equal(1, events.Length);
+            Assert.False(tournament.HasRecordedEvents);
         }
 
         [Fact]
@@ -359,18 +325,13 @@ namespace TournamentManager.Tests.Domain
             var gameSlotId = Guid.NewGuid();
             var startTime = _firstDay.AddHours(9);
             var endTime = startTime.AddHours(-1);
-            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
-            var tournament = AddTournament(sourceMsg);
+            var tournament = AddTournament();
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGameSlot(
                         gameSlotId,
                         startTime,
                         endTime));
-
-            // Make sure the "Added" event is the only one.
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
-            Assert.Equal(1, events.Length);
+            Assert.False(tournament.HasRecordedEvents);
         }
     }
 }
