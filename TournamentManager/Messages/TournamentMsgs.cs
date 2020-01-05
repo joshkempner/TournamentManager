@@ -45,6 +45,34 @@ namespace TournamentManager.Messages
             }
         }
 
+        public class RenameTournament : Command
+        {
+            public readonly Guid TournamentId;
+            public readonly string Name;
+
+            public RenameTournament(
+                Guid tournamentId,
+                string name)
+            {
+                TournamentId = tournamentId;
+                Name = name;
+            }
+        }
+
+        public class TournamentRenamed : Event
+        {
+            public readonly Guid TournamentId;
+            public readonly string Name;
+
+            public TournamentRenamed(
+                Guid tournamentId,
+                string name)
+            {
+                TournamentId = tournamentId;
+                Name = name;
+            }
+        }
+
         public class RescheduleTournament : Command
         {
             public readonly Guid TournamentId;

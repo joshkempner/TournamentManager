@@ -98,6 +98,38 @@ namespace TournamentManager.Tests.Domain
         }
 
         [Fact]
+        public void can_rename_tournament()
+        {
+            const string newName = "The Bourbon Cup";
+            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
+            var tournament = AddTournament(sourceMsg);
+            tournament.Rename(newName);
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Equal(2, events.Length);
+            Assert.Collection(
+                events,
+                e => Assert.True(e is TournamentMsgs.TournamentAdded),
+                e => Assert.True(e is TournamentMsgs.TournamentRenamed evt &&
+                                 evt.TournamentId == _tournamentId &&
+                                 evt.Name == newName));
+        }
+
+        [Fact]
+        public void cannot_rename_to_empty_name()
+        {
+            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
+            var tournament = AddTournament(sourceMsg);
+            Assert.Throws<ArgumentNullException>(() => tournament.Rename(string.Empty));
+            Assert.Throws<ArgumentException>(() => tournament.Rename(" "));
+
+            // Make sure the "Added" event is the only one.
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Equal(1, events.Length);
+        }
+
+        [Fact]
         public void can_reschedule_tournament()
         {
             var newFirstDay = _firstDay.AddDays(1);
@@ -187,6 +219,11 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddField(
                         Guid.Empty,
                         fieldName));
+
+            // Make sure the "Added" event is the only one.
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Equal(1, events.Length);
         }
 
         [Fact]
@@ -199,6 +236,11 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddField(
                         fieldId,
                         string.Empty));
+
+            // Make sure the "Added" event is the only one.
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Equal(1, events.Length);
         }
 
         [Fact]
@@ -252,6 +294,11 @@ namespace TournamentManager.Tests.Domain
                         gameSlotId,
                         startTime,
                         endTime));
+
+            // Make sure the "Added" event is the only one.
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Equal(1, events.Length);
         }
 
         [Fact]
@@ -267,6 +314,11 @@ namespace TournamentManager.Tests.Domain
                         gameSlotId,
                         startTime,
                         endTime));
+
+            // Make sure the "Added" event is the only one.
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Equal(1, events.Length);
         }
     }
 }

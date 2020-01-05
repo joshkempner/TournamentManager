@@ -54,6 +54,15 @@ namespace TournamentManager.Domain
                         lastDay: lastDay));
         }
 
+        public void Rename(string newName)
+        {
+            Ensure.NotNullOrEmpty(newName, nameof(newName));
+            Ensure.False(() => string.IsNullOrWhiteSpace(newName), nameof(newName));
+            Raise(new TournamentMsgs.TournamentRenamed(
+                        Id,
+                        newName));
+        }
+
         public void Reschedule(
             DateTime firstDay,
             DateTime lastDay)
