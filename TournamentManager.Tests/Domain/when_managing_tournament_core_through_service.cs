@@ -2,63 +2,35 @@
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Testing;
-using TournamentManager.Domain;
 using TournamentManager.Messages;
 using Xunit;
 
 namespace TournamentManager.Tests.Domain
 {
-    public class when_using_high_level_tournament_functions_through_service
+    public sealed class when_managing_tournament_core_through_service : with_tournament_service
     {
-        private readonly MockRepositorySpecification _fixture = new MockRepositorySpecification();
-        private readonly TournamentSvc _tournamentSvc;
-
-        private readonly Guid _tournamentId = Guid.NewGuid();
-        private const string TournamentName = "The Milk Cup";
-        private readonly DateTime _firstDay = new DateTime(2020, 6, 1);
-        private readonly DateTime _lastDay = new DateTime(2020, 6, 2);
-
-        public when_using_high_level_tournament_functions_through_service()
-        {
-            _tournamentSvc = new TournamentSvc(_fixture.Dispatcher, _fixture.Repository);
-        }
-
         [Fact]
         public void can_add_tournament()
         {
             var cmd = MessageBuilder.New(() => new TournamentMsgs.AddTournament(
-                                                    _tournamentId,
+                                                    TournamentId,
                                                     TournamentName,
-                                                    _firstDay,
-                                                    _lastDay));
-            _fixture.Dispatcher.Send(cmd);
-            _fixture.RepositoryEvents.WaitFor<TournamentMsgs.TournamentAdded>(TimeSpan.FromMilliseconds(200));
-            _fixture
+                                                    FirstDay,
+                                                    LastDay));
+            Fixture.Dispatcher.Send(cmd);
+            Fixture.RepositoryEvents.WaitFor<TournamentMsgs.TournamentAdded>(TimeSpan.FromMilliseconds(200));
+            Fixture
                 .TestQueue
                 .AssertNext<TournamentMsgs.AddTournament>(cmd.CorrelationId)
                 .AssertEmpty();
-            _fixture
+            Fixture
                 .RepositoryEvents
                 .AssertNext<TournamentMsgs.TournamentAdded>(cmd.CorrelationId, out var evt)
                 .AssertEmpty();
-            Assert.Equal(_tournamentId, evt.TournamentId);
+            Assert.Equal(TournamentId, evt.TournamentId);
             Assert.Equal(TournamentName, evt.Name);
-            Assert.Equal(_firstDay, evt.FirstDay);
-            Assert.Equal(_lastDay, evt.LastDay);
-        }
-
-        private void AddTournament()
-        {
-            var tournament = new Tournament(
-                                    _tournamentId,
-                                    TournamentName,
-                                    _firstDay,
-                                    _lastDay,
-                                    MessageBuilder.New(() => new TestCommands.Command1()));
-            var repo = new CorrelatedStreamStoreRepository(_fixture.Repository);
-            repo.Save(tournament);
-            _fixture.RepositoryEvents.WaitFor<TournamentMsgs.TournamentAdded>(TimeSpan.FromMilliseconds(200));
-            _fixture.ClearQueues();
+            Assert.Equal(FirstDay, evt.FirstDay);
+            Assert.Equal(LastDay, evt.LastDay);
         }
 
         [Fact]
@@ -66,16 +38,16 @@ namespace TournamentManager.Tests.Domain
         {
             AddTournament();
             var cmd = MessageBuilder.New(() => new TournamentMsgs.AddTournament(
-                                                       _tournamentId,
+                                                       TournamentId,
                                                        TournamentName,
-                                                       _firstDay,
-                                                       _lastDay));
-            AssertEx.CommandThrows<AggregateException>(() => _fixture.Dispatcher.Send(cmd));
-            _fixture
+                                                       FirstDay,
+                                                       LastDay));
+            AssertEx.CommandThrows<AggregateException>(() => Fixture.Dispatcher.Send(cmd));
+            Fixture
                 .TestQueue
                 .AssertNext<TournamentMsgs.AddTournament>(cmd.CorrelationId)
                 .AssertEmpty();
-            _fixture.RepositoryEvents.AssertEmpty();
+            Fixture.RepositoryEvents.AssertEmpty();
         }
 
         [Fact]
@@ -84,19 +56,19 @@ namespace TournamentManager.Tests.Domain
             const string newName = "The Bourbon Cup";
             AddTournament();
             var cmd = MessageBuilder.New(() => new TournamentMsgs.RenameTournament(
-                                                    _tournamentId,
+                                                    TournamentId,
                                                     newName));
-            _fixture.Dispatcher.Send(cmd);
-            _fixture.RepositoryEvents.WaitFor<TournamentMsgs.TournamentRenamed>(TimeSpan.FromMilliseconds(200));
-            _fixture
+            Fixture.Dispatcher.Send(cmd);
+            Fixture.RepositoryEvents.WaitFor<TournamentMsgs.TournamentRenamed>(TimeSpan.FromMilliseconds(200));
+            Fixture
                 .TestQueue
                 .AssertNext<TournamentMsgs.RenameTournament>(cmd.CorrelationId)
                 .AssertEmpty();
-            _fixture
+            Fixture
                 .RepositoryEvents
                 .AssertNext<TournamentMsgs.TournamentRenamed>(cmd.CorrelationId, out var evt)
                 .AssertEmpty();
-            Assert.Equal(_tournamentId, evt.TournamentId);
+            Assert.Equal(TournamentId, evt.TournamentId);
             Assert.Equal(newName, evt.Name);
         }
 
@@ -108,35 +80,35 @@ namespace TournamentManager.Tests.Domain
             var cmd = MessageBuilder.New(() => new TournamentMsgs.RenameTournament(
                                                     Guid.NewGuid(),
                                                     newName));
-            AssertEx.CommandThrows<AggregateNotFoundException>(() => _fixture.Dispatcher.Send(cmd));
-            _fixture
+            AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
+            Fixture
                 .TestQueue
                 .AssertNext<TournamentMsgs.RenameTournament>(cmd.CorrelationId)
                 .AssertEmpty();
-            _fixture.RepositoryEvents.AssertEmpty();
+            Fixture.RepositoryEvents.AssertEmpty();
         }
 
         [Fact]
         public void can_reschedule_tournament()
         {
-            var newFirstDay = _firstDay.AddDays(7);
-            var newLastDay = _lastDay.AddDays(7);
+            var newFirstDay = FirstDay.AddDays(7);
+            var newLastDay = LastDay.AddDays(7);
             AddTournament();
             var cmd = MessageBuilder.New(() => new TournamentMsgs.RescheduleTournament(
-                                                    _tournamentId,
+                                                    TournamentId,
                                                     newFirstDay,
                                                     newLastDay));
-            _fixture.Dispatcher.Send(cmd);
-            _fixture.RepositoryEvents.WaitFor<TournamentMsgs.TournamentRescheduled>(TimeSpan.FromMilliseconds(200));
-            _fixture
+            Fixture.Dispatcher.Send(cmd);
+            Fixture.RepositoryEvents.WaitFor<TournamentMsgs.TournamentRescheduled>(TimeSpan.FromMilliseconds(200));
+            Fixture
                 .TestQueue
                 .AssertNext<TournamentMsgs.RescheduleTournament>(cmd.CorrelationId)
                 .AssertEmpty();
-            _fixture
+            Fixture
                 .RepositoryEvents
                 .AssertNext<TournamentMsgs.TournamentRescheduled>(cmd.CorrelationId, out var evt)
                 .AssertEmpty();
-            Assert.Equal(_tournamentId, evt.TournamentId);
+            Assert.Equal(TournamentId, evt.TournamentId);
             Assert.Equal(newFirstDay, evt.FirstDay);
             Assert.Equal(newLastDay, evt.LastDay);
         }
@@ -144,19 +116,19 @@ namespace TournamentManager.Tests.Domain
         [Fact]
         public void cannot_reschedule_invalid_tournament()
         {
-            var newFirstDay = _firstDay.AddDays(7);
-            var newLastDay = _lastDay.AddDays(7);
+            var newFirstDay = FirstDay.AddDays(7);
+            var newLastDay = LastDay.AddDays(7);
             AddTournament();
             var cmd = MessageBuilder.New(() => new TournamentMsgs.RescheduleTournament(
                                                     Guid.NewGuid(),
                                                     newFirstDay,
                                                     newLastDay));
-            AssertEx.CommandThrows<AggregateNotFoundException>(() => _fixture.Dispatcher.Send(cmd));
-            _fixture
+            AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
+            Fixture
                 .TestQueue
                 .AssertNext<TournamentMsgs.RescheduleTournament>(cmd.CorrelationId)
                 .AssertEmpty();
-            _fixture.RepositoryEvents.AssertEmpty();
+            Fixture.RepositoryEvents.AssertEmpty();
         }
 
         [Fact]
@@ -166,20 +138,20 @@ namespace TournamentManager.Tests.Domain
             const string fieldName = "Field 1";
             AddTournament();
             var cmd = MessageBuilder.New(() => new TournamentMsgs.AddField(
-                                                    _tournamentId,
+                                                    TournamentId,
                                                     fieldId,
                                                     fieldName));
-            _fixture.Dispatcher.Send(cmd);
-            _fixture.RepositoryEvents.WaitFor<TournamentMsgs.FieldAdded>(TimeSpan.FromMilliseconds(200));
-            _fixture
+            Fixture.Dispatcher.Send(cmd);
+            Fixture.RepositoryEvents.WaitFor<TournamentMsgs.FieldAdded>(TimeSpan.FromMilliseconds(200));
+            Fixture
                 .TestQueue
                 .AssertNext<TournamentMsgs.AddField>(cmd.CorrelationId)
                 .AssertEmpty();
-            _fixture
+            Fixture
                 .RepositoryEvents
                 .AssertNext<TournamentMsgs.FieldAdded>(cmd.CorrelationId, out var evt)
                 .AssertEmpty();
-            Assert.Equal(_tournamentId, evt.TournamentId);
+            Assert.Equal(TournamentId, evt.TournamentId);
             Assert.Equal(fieldId, evt.FieldId);
             Assert.Equal(fieldName, evt.FieldName);
         }
@@ -194,37 +166,37 @@ namespace TournamentManager.Tests.Domain
                                                     Guid.NewGuid(),
                                                     fieldId,
                                                     fieldName));
-            AssertEx.CommandThrows<AggregateNotFoundException>(() => _fixture.Dispatcher.Send(cmd));
-            _fixture
+            AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
+            Fixture
                 .TestQueue
                 .AssertNext<TournamentMsgs.AddField>(cmd.CorrelationId)
                 .AssertEmpty();
-            _fixture.RepositoryEvents.AssertEmpty();
+            Fixture.RepositoryEvents.AssertEmpty();
         }
 
         [Fact]
         public void can_add_game_slot()
         {
             var gameSlotId = Guid.NewGuid();
-            var startTime = _firstDay.AddHours(9);
+            var startTime = FirstDay.AddHours(9);
             var endTime = startTime.AddHours(1);
             AddTournament();
             var cmd = MessageBuilder.New(() => new TournamentMsgs.AddGameSlot(
-                                                    _tournamentId,
+                                                    TournamentId,
                                                     gameSlotId,
                                                     startTime,
                                                     endTime));
-            _fixture.Dispatcher.Send(cmd);
-            _fixture.RepositoryEvents.WaitFor<TournamentMsgs.GameSlotAdded>(TimeSpan.FromMilliseconds(200));
-            _fixture
+            Fixture.Dispatcher.Send(cmd);
+            Fixture.RepositoryEvents.WaitFor<TournamentMsgs.GameSlotAdded>(TimeSpan.FromMilliseconds(200));
+            Fixture
                 .TestQueue
                 .AssertNext<TournamentMsgs.AddGameSlot>(cmd.CorrelationId)
                 .AssertEmpty();
-            _fixture
+            Fixture
                 .RepositoryEvents
                 .AssertNext<TournamentMsgs.GameSlotAdded>(cmd.CorrelationId, out var evt)
                 .AssertEmpty();
-            Assert.Equal(_tournamentId, evt.TournamentId);
+            Assert.Equal(TournamentId, evt.TournamentId);
             Assert.Equal(gameSlotId, evt.GameSlotId);
             Assert.Equal(startTime, evt.StartTime);
             Assert.Equal(endTime, evt.EndTime);
@@ -234,7 +206,7 @@ namespace TournamentManager.Tests.Domain
         public void cannot_add_game_slot_to_invalid_tournament()
         {
             var gameSlotId = Guid.NewGuid();
-            var startTime = _firstDay.AddHours(9);
+            var startTime = FirstDay.AddHours(9);
             var endTime = startTime.AddHours(1);
             AddTournament();
             var cmd = MessageBuilder.New(() => new TournamentMsgs.AddGameSlot(
@@ -242,12 +214,50 @@ namespace TournamentManager.Tests.Domain
                                                     gameSlotId,
                                                     startTime,
                                                     endTime));
-            AssertEx.CommandThrows<AggregateNotFoundException>(() => _fixture.Dispatcher.Send(cmd));
-            _fixture
+            AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
+            Fixture
                 .TestQueue
                 .AssertNext<TournamentMsgs.AddGameSlot>(cmd.CorrelationId)
                 .AssertEmpty();
-            _fixture.RepositoryEvents.AssertEmpty();
+            Fixture.RepositoryEvents.AssertEmpty();
+        }
+
+        [Fact]
+        public void can_add_referee_to_tournament()
+        {
+            var refereeId = Guid.NewGuid();
+            AddTournament();
+            var cmd = MessageBuilder.New(() => new TournamentMsgs.AddRefereeToTournament(
+                                                    TournamentId,
+                                                    refereeId));
+            Fixture.Dispatcher.Send(cmd);
+            Fixture.RepositoryEvents.WaitFor<TournamentMsgs.RefereeAddedToTournament>(TimeSpan.FromMilliseconds(200));
+            Fixture
+                .TestQueue
+                .AssertNext<TournamentMsgs.AddRefereeToTournament>(cmd.CorrelationId)
+                .AssertEmpty();
+            Fixture
+                .RepositoryEvents
+                .AssertNext<TournamentMsgs.RefereeAddedToTournament>(cmd.CorrelationId, out var evt)
+                .AssertEmpty();
+            Assert.Equal(TournamentId, evt.TournamentId);
+            Assert.Equal(refereeId, evt.RefereeId);
+        }
+
+        [Fact]
+        public void cannot_add_referee_to_invalid_tournament()
+        {
+            var refereeId = Guid.NewGuid();
+            AddTournament();
+            var cmd = MessageBuilder.New(() => new TournamentMsgs.AddRefereeToTournament(
+                                                    Guid.NewGuid(),
+                                                    refereeId));
+            AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
+            Fixture
+                .TestQueue
+                .AssertNext<TournamentMsgs.AddRefereeToTournament>(cmd.CorrelationId)
+                .AssertEmpty();
+            Fixture.RepositoryEvents.AssertEmpty();
         }
     }
 }

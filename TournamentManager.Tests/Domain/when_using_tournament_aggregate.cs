@@ -8,7 +8,7 @@ using Xunit;
 
 namespace TournamentManager.Tests.Domain
 {
-    public class when_using_tournament_aggregate
+    public sealed class when_using_tournament_aggregate
     {
         private readonly Guid _tournamentId = Guid.NewGuid();
         private const string TournamentName = "The Milk Cup";

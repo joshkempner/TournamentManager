@@ -8,7 +8,7 @@ using Xunit;
 
 namespace TournamentManager.Tests.Domain
 {
-    public class when_using_referee_service : IDisposable
+    public sealed class when_using_referee_service : IDisposable
     {
         private readonly MockRepositorySpecification _fixture = new MockRepositorySpecification();
         private readonly RefereeSvc _svc;

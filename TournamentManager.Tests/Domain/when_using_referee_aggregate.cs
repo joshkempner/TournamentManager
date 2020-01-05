@@ -8,7 +8,7 @@ using Xunit;
 
 namespace TournamentManager.Tests.Domain
 {
-    public class when_using_referee_aggregate
+    public sealed class when_using_referee_aggregate
     {
         private readonly Guid _refId = Guid.NewGuid();
         private const string GivenName = "John";

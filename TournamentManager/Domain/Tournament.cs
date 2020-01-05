@@ -41,6 +41,7 @@ namespace TournamentManager.Domain
             Register<TournamentMsgs.FieldAdded>(e => _fields.Add(e.FieldId));
             Register<TournamentMsgs.GameSlotAdded>(e => _gameSlots.Add(e.GameSlotId));
             Register<TeamMsgs.TeamAdded>(e => _teams.Add(e.TeamId));
+            Register<TeamMsgs.TeamRemoved>(e => _teams.Remove(e.TeamId));
             Register<GameMsgs.GameAdded>(e => _games.Add(e.GameId, false));
             Register<GameMsgs.GameCancelled>(e => _games.Remove(e.GameId));
             Register<TournamentMsgs.RefereeAddedToTournament>(e => _referees.Add(e.RefereeId));
@@ -155,6 +156,15 @@ namespace TournamentManager.Domain
                         teamId,
                         teamName,
                         ageBracket));
+        }
+
+        public void RemoveTeam(Guid teamId)
+        {
+            Ensure.NotEmptyGuid(teamId, nameof(teamId));
+            if (!_teams.Contains(teamId)) return;
+            Raise(new TeamMsgs.TeamRemoved(
+                        Id,
+                        teamId));
         }
 
         public void RenameTeam(

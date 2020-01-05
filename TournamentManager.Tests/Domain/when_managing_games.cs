@@ -8,7 +8,7 @@ using Xunit;
 
 namespace TournamentManager.Tests.Domain
 {
-    public class when_managing_games
+    public sealed class when_managing_games
     {
         private readonly Guid _tournamentId = Guid.NewGuid();
         private readonly Guid _gameId = Guid.NewGuid();

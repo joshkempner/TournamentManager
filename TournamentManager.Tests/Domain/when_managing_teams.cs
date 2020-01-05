@@ -8,7 +8,7 @@ using Xunit;
 
 namespace TournamentManager.Tests.Domain
 {
-    public class when_managing_teams
+    public sealed class when_managing_teams
     {
         private readonly Guid _tournamentId = Guid.NewGuid();
         private readonly Guid _teamId = Guid.NewGuid();
@@ -17,15 +17,19 @@ namespace TournamentManager.Tests.Domain
 
         private Tournament AddTournament()
         {
-            return new Tournament(
-                        _tournamentId,
-                        "The Milk Cup",
-                        new DateTime(2020, 6, 1),
-                        new DateTime(2020, 6, 1),
-                        MessageBuilder.New(() => new TestCommands.Command1()));
+            var tournament = new Tournament(
+                                    _tournamentId,
+                                    "The Milk Cup",
+                                    new DateTime(2020, 6, 1),
+                                    new DateTime(2020, 6, 1),
+                                    MessageBuilder.New(() => new TestCommands.Command1()));
+            // Take events and reset the Source so we can continue to use the aggregate as "pre-hydrated"
+            tournament.TakeEvents();
+            ((ICorrelatedEventSource)tournament).Source = MessageBuilder.New(() => new TestCommands.Command1());
+            return tournament;
         }
 
-        private Tournament AddTeam()
+        private Tournament AddTournamentWithTeam()
         {
             var tournament = AddTournament();
             tournament.AddTeam(
@@ -50,7 +54,6 @@ namespace TournamentManager.Tests.Domain
             var events = tournament.TakeEvents();
             Assert.Collection(
                 events,
-                e => Assert.True(e is TournamentMsgs.TournamentAdded),
                 e => Assert.True(e is TeamMsgs.TeamAdded evt &&
                                  evt.TournamentId == _tournamentId &&
                                  evt.TeamId == _teamId &&
@@ -67,15 +70,13 @@ namespace TournamentManager.Tests.Domain
                         Guid.Empty,
                         TeamName,
                         AgeBracket));
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
-            Assert.Equal(1, events.Length);
+            Assert.False(tournament.HasRecordedEvents);
         }
 
         [Fact]
         public void cannot_add_team_with_duplicate_id()
         {
-            var tournament = AddTeam();
+            var tournament = AddTournamentWithTeam();
             Assert.Throws<ArgumentException>(
                 () => tournament.AddTeam(
                         _teamId,
@@ -98,16 +99,44 @@ namespace TournamentManager.Tests.Domain
                         _teamId,
                         " ",
                         AgeBracket));
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void can_remove_team()
+        {
+            var tournament = AddTournamentWithTeam();
+            tournament.RemoveTeam(_teamId);
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
-            Assert.Equal(1, events.Length);
+            Assert.Collection(
+                events,
+                e => Assert.True(e is TeamMsgs.TeamRemoved evt &&
+                                 evt.TournamentId == _tournamentId &&
+                                 evt.TeamId == _teamId));
+        }
+
+        [Fact]
+        public void removing_nonexistent_team_succeeds_implicitly()
+        {
+            var tournament = AddTournament();
+            tournament.RemoveTeam(_teamId);
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void cannot_remove_team_with_empty_id()
+        {
+            var tournament = AddTournamentWithTeam();
+            Assert.Throws<ArgumentException>(() => tournament.RemoveTeam(Guid.Empty));
+            Assert.False(tournament.HasRecordedEvents);
         }
 
         [Fact]
         public void can_rename_team()
         {
             const string newName = "Springfield Divided";
-            var tournament = AddTeam();
+            var tournament = AddTournamentWithTeam();
             tournament.RenameTeam(
                 _teamId,
                 newName);
@@ -125,7 +154,7 @@ namespace TournamentManager.Tests.Domain
         public void cannot_rename_team_with_invalid_team_id()
         {
             const string newName = "Springfield Divided";
-            var tournament = AddTeam();
+            var tournament = AddTournamentWithTeam();
             Assert.Throws<ArgumentException>(
                 () => tournament.RenameTeam(
                     Guid.NewGuid(),
@@ -136,7 +165,7 @@ namespace TournamentManager.Tests.Domain
         [Fact]
         public void cannot_rename_team_with_invalid_name()
         {
-            var tournament = AddTeam();
+            var tournament = AddTournamentWithTeam();
             Assert.Throws<ArgumentNullException>(
                 () => tournament.RenameTeam(
                         _teamId,
@@ -152,7 +181,7 @@ namespace TournamentManager.Tests.Domain
         public void can_change_age_bracket()
         {
             var ageBracket = TeamMsgs.AgeBracket.U16;
-            var tournament = AddTeam();
+            var tournament = AddTournamentWithTeam();
             tournament.UpdateAgeBracket(
                 _teamId,
                 ageBracket);
@@ -170,7 +199,7 @@ namespace TournamentManager.Tests.Domain
         public void cannot_change_age_bracket_with_invalid_team_id()
         {
             var ageBracket = TeamMsgs.AgeBracket.U16;
-            var tournament = AddTeam();
+            var tournament = AddTournamentWithTeam();
             Assert.Throws<ArgumentException>(
                 () => tournament.UpdateAgeBracket(
                         Guid.NewGuid(),
