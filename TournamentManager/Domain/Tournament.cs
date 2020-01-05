@@ -20,7 +20,7 @@ namespace TournamentManager.Domain
         private readonly Dictionary<Guid, bool> _games = new Dictionary<Guid, bool>();
         private readonly HashSet<Guid> _referees = new HashSet<Guid>();
 
-        public Tournament()
+        private Tournament()
         {
             RegisterEvents();
         }
