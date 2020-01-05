@@ -52,6 +52,13 @@ namespace TournamentManager.Tests.Domain
                             _firstDay,
                             _lastDay,
                             MessageBuilder.New(() => new TestCommands.Command1())));
+            Assert.Throws<ArgumentException>(
+                () => new Tournament(
+                            _tournamentId,
+                            " ",
+                            _firstDay,
+                            _lastDay,
+                            MessageBuilder.New(() => new TestCommands.Command1())));
         }
 
         [Fact]
