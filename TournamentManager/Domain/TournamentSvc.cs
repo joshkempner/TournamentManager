@@ -17,7 +17,14 @@ namespace TournamentManager.Domain
         IHandleCommand<TeamMsgs.AddTeam>,
         IHandleCommand<TeamMsgs.RemoveTeam>,
         IHandleCommand<TeamMsgs.RenameTeam>,
-        IHandleCommand<TeamMsgs.UpdateAgeBracket>
+        IHandleCommand<TeamMsgs.UpdateAgeBracket>,
+        IHandleCommand<GameMsgs.AddGame>,
+        IHandleCommand<GameMsgs.CancelGame>,
+        IHandleCommand<GameMsgs.UpdateHomeTeam>,
+        IHandleCommand<GameMsgs.UpdateAwayTeam>,
+        IHandleCommand<GameMsgs.AssignReferee>,
+        IHandleCommand<GameMsgs.ConfirmReferee>,
+        IHandleCommand<GameMsgs.RemoveReferee>
     {
         private readonly CorrelatedStreamStoreRepository _repository;
 
@@ -39,6 +46,14 @@ namespace TournamentManager.Domain
             Subscribe<TeamMsgs.RemoveTeam>(this);
             Subscribe<TeamMsgs.RenameTeam>(this);
             Subscribe<TeamMsgs.UpdateAgeBracket>(this);
+
+            Subscribe<GameMsgs.AddGame>(this);
+            Subscribe<GameMsgs.CancelGame>(this);
+            Subscribe<GameMsgs.UpdateHomeTeam>(this);
+            Subscribe<GameMsgs.UpdateAwayTeam>(this);
+            Subscribe<GameMsgs.AssignReferee>(this);
+            Subscribe<GameMsgs.ConfirmReferee>(this);
+            Subscribe<GameMsgs.RemoveReferee>(this);
         }
 
         #region Core TournamentMsgs
@@ -106,6 +121,8 @@ namespace TournamentManager.Domain
 
         #endregion
 
+        #region TeamMsgs
+
         public CommandResponse Handle(TeamMsgs.AddTeam command)
         {
             var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
@@ -144,5 +161,78 @@ namespace TournamentManager.Domain
             _repository.Save(tournament);
             return command.Succeed();
         }
+
+        #endregion
+
+        #region GameMsgs
+
+        public CommandResponse Handle(GameMsgs.AddGame command)
+        {
+            var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
+            tournament.AddGame(
+                command.GameId,
+                command.GameSlotId,
+                command.FieldId,
+                command.HomeTeamId,
+                command.AwayTeamId);
+            _repository.Save(tournament);
+            return command.Succeed();
+        }
+
+        public CommandResponse Handle(GameMsgs.CancelGame command)
+        {
+            var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
+            tournament.CancelGame(command.GameId);
+            _repository.Save(tournament);
+            return command.Succeed();
+        }
+
+        public CommandResponse Handle(GameMsgs.UpdateHomeTeam command)
+        {
+            var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
+            tournament.UpdateHomeTeam(
+                command.GameId,
+                command.HomeTeamId);
+            _repository.Save(tournament);
+            return command.Succeed();
+        }
+
+        public CommandResponse Handle(GameMsgs.UpdateAwayTeam command)
+        {
+            var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
+            tournament.UpdateAwayTeam(
+                command.GameId,
+                command.AwayTeamId);
+            _repository.Save(tournament);
+            return command.Succeed();
+        }
+
+        public CommandResponse Handle(GameMsgs.AssignReferee command)
+        {
+            var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
+            tournament.AssignRefereeToGame(
+                command.GameId,
+                command.RefereeId);
+            _repository.Save(tournament);
+            return command.Succeed();
+        }
+
+        public CommandResponse Handle(GameMsgs.ConfirmReferee command)
+        {
+            var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
+            tournament.ConfirmRefereeForGame(command.GameId);
+            _repository.Save(tournament);
+            return command.Succeed();
+        }
+
+        public CommandResponse Handle(GameMsgs.RemoveReferee command)
+        {
+            var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
+            tournament.RemoveRefereeFromGame(command.GameId);
+            _repository.Save(tournament);
+            return command.Succeed();
+        }
+
+        #endregion
     }
 }

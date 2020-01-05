@@ -174,7 +174,7 @@ namespace TournamentManager.Tests.Domain
         }
 
         [Fact]
-        public void cannot_update_team_age_bracket_from_invalid_tournament()
+        public void cannot_update_team_age_bracket_with_invalid_tournament()
         {
             const TeamMsgs.AgeBracket newBracket = TeamMsgs.AgeBracket.U16;
             AddTeam();
