@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ReactiveDomain;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Util;
@@ -10,6 +11,8 @@ namespace TournamentManager.Domain
     {
         private DateTime _firstDay;
         private DateTime _lastDay;
+        private HashSet<Guid> _fields = new HashSet<Guid>();
+        private HashSet<Guid> _gameSlots = new HashSet<Guid>();
 
         public Tournament()
         {
@@ -29,6 +32,8 @@ namespace TournamentManager.Domain
                 _firstDay = e.FirstDay;
                 _lastDay = e.LastDay;
             });
+            Register<TournamentMsgs.FieldAdded>(e => _fields.Add(e.FieldId));
+            Register<TournamentMsgs.GameSlotAdded>(e => _gameSlots.Add(e.GameSlotId));
         }
 
         public Tournament(
@@ -80,6 +85,8 @@ namespace TournamentManager.Domain
         {
             Ensure.NotEmptyGuid(fieldId, nameof(fieldId));
             Ensure.NotNullOrEmpty(fieldName, nameof(fieldName));
+            if (_fields.Contains(fieldId))
+                throw new ArgumentException("Cannot add a second field with the same ID.");
             Raise(new TournamentMsgs.FieldAdded(
                         Id,
                         fieldId,
@@ -95,6 +102,8 @@ namespace TournamentManager.Domain
             Ensure.True(() => startTime > _firstDay && startTime < _lastDay, "startTime > _firstDay && startTime < _lastDay");
             Ensure.True(() => endTime > _firstDay && endTime < _lastDay, "endTime > _firstDay && endTime < _lastDay");
             Ensure.True(() => endTime > startTime, "endTime > startTime");
+            if (_gameSlots.Contains(gameSlotId))
+                throw new ArgumentException("Cannot add a second game slot with the same ID.");
             Raise(new TournamentMsgs.GameSlotAdded(
                         Id,
                         gameSlotId,

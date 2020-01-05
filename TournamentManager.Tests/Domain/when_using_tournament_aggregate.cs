@@ -210,6 +210,27 @@ namespace TournamentManager.Tests.Domain
         }
 
         [Fact]
+        public void cannot_add_field_with_duplicate_id()
+        {
+            var fieldId = Guid.NewGuid();
+            const string fieldName = "Field 1";
+            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
+            var tournament = AddTournament(sourceMsg);
+            tournament.AddField(
+                fieldId,
+                fieldName);
+            Assert.Throws<ArgumentException>(
+                () => tournament.AddField(
+                        fieldId,
+                        fieldName));
+
+            // Make sure we have the right number of events
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Equal(2, events.Length);
+        }
+
+        [Fact]
         public void cannot_add_field_with_invalid_id()
         {
             const string fieldName = "Field 1";
@@ -265,6 +286,30 @@ namespace TournamentManager.Tests.Domain
                                  evt.TournamentId == _tournamentId &&
                                  evt.StartTime == startTime &&
                                  evt.EndTime == endTime));
+        }
+
+        [Fact]
+        public void cannot_add_game_slot_with_duplicate_id()
+        {
+            var gameSlotId = Guid.NewGuid();
+            var startTime = _firstDay.AddHours(9);
+            var endTime = startTime.AddHours(1);
+            var sourceMsg = MessageBuilder.New(() => new TestCommands.Command1());
+            var tournament = AddTournament(sourceMsg);
+            tournament.AddGameSlot(
+                gameSlotId,
+                startTime,
+                endTime);
+            Assert.Throws<ArgumentException>(
+                () => tournament.AddGameSlot(
+                        gameSlotId,
+                        startTime,
+                        endTime));
+
+            // Make sure we have the right number of events
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Equal(2, events.Length);
         }
 
         [Fact]
