@@ -13,7 +13,7 @@ namespace TournamentManager.Tests.Domain
         private readonly Guid _tournamentId = Guid.NewGuid();
         private readonly Guid _teamId = Guid.NewGuid();
         private const string TeamName = "Springfield United";
-        private readonly TeamMsgs.AgeBracket _ageBracket = TeamMsgs.AgeBracket.U14;
+        private const TeamMsgs.AgeBracket AgeBracket = TeamMsgs.AgeBracket.U14;
 
         private Tournament AddTournament()
         {
@@ -31,7 +31,7 @@ namespace TournamentManager.Tests.Domain
             tournament.AddTeam(
                 _teamId,
                 TeamName,
-                _ageBracket);
+                AgeBracket);
             // Take events and reset the Source so we can continue to use the aggregate as "pre-hydrated"
             tournament.TakeEvents();
             ((ICorrelatedEventSource)tournament).Source = MessageBuilder.New(() => new TestCommands.Command1());
@@ -45,7 +45,7 @@ namespace TournamentManager.Tests.Domain
             tournament.AddTeam(
                 _teamId,
                 TeamName,
-                _ageBracket);
+                AgeBracket);
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
             Assert.Collection(
@@ -55,7 +55,7 @@ namespace TournamentManager.Tests.Domain
                                  evt.TournamentId == _tournamentId &&
                                  evt.TeamId == _teamId &&
                                  evt.Name == TeamName &&
-                                 evt.AgeBracket == _ageBracket));
+                                 evt.AgeBracket == AgeBracket));
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddTeam(
                         Guid.Empty,
                         TeamName,
-                        _ageBracket));
+                        AgeBracket));
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
             Assert.Equal(1, events.Length);
@@ -80,7 +80,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddTeam(
                         _teamId,
                         TeamName,
-                        _ageBracket));
+                        AgeBracket));
             Assert.False(tournament.HasRecordedEvents);
         }
 
@@ -92,12 +92,12 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddTeam(
                         _teamId,
                         string.Empty,
-                        _ageBracket));
+                        AgeBracket));
             Assert.Throws<ArgumentException>(
                 () => tournament.AddTeam(
                         _teamId,
                         " ",
-                        _ageBracket));
+                        AgeBracket));
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
             Assert.Equal(1, events.Length);

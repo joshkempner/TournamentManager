@@ -269,6 +269,33 @@ namespace TournamentManager.Tests.Domain
         }
 
         [Fact]
+        public void can_add_game_slot_to_single_day_tournament()
+        {
+            var gameSlotId = Guid.NewGuid();
+            var startTime = _firstDay.AddHours(9);
+            var endTime = startTime.AddHours(1);
+            var tournament = new Tournament(
+                                    _tournamentId,
+                                    TournamentName,
+                                    _firstDay,
+                                    _firstDay,
+                                    MessageBuilder.New(() => new TestCommands.Command1()));
+            tournament.AddGameSlot(
+                gameSlotId,
+                startTime,
+                endTime);
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Collection(
+                events,
+                e => Assert.True(e is TournamentMsgs.TournamentAdded),
+                e => Assert.True(e is TournamentMsgs.GameSlotAdded evt &&
+                                 evt.TournamentId == _tournamentId &&
+                                 evt.StartTime == startTime &&
+                                 evt.EndTime == endTime));
+        }
+
+        [Fact]
         public void cannot_add_game_slot_with_duplicate_id()
         {
             var gameSlotId = Guid.NewGuid();
@@ -299,7 +326,7 @@ namespace TournamentManager.Tests.Domain
             var tournament = AddTournament();
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGameSlot(
-                        Guid.Empty, 
+                        Guid.Empty,
                         startTime,
                         endTime));
         }
@@ -331,6 +358,41 @@ namespace TournamentManager.Tests.Domain
                         gameSlotId,
                         startTime,
                         endTime));
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void can_add_referee_to_tournament()
+        {
+            var refereeId = Guid.NewGuid();
+            var tournament = AddTournament();
+            tournament.AddReferee(refereeId);
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Collection(
+                events,
+                e => Assert.True(e is TournamentMsgs.RefereeAddedToTournament evt &&
+                                 evt.TournamentId == _tournamentId &&
+                                 evt.RefereeId == refereeId));
+        }
+
+        [Fact]
+        public void cannot_add_referee_with_empty_id_to_tournament()
+        {
+            var tournament = AddTournament();
+            Assert.Throws<ArgumentException>(() => tournament.AddReferee(Guid.Empty));
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void cannot_add_duplicate_referee_to_tournament()
+        {
+            var refereeId = Guid.NewGuid();
+            var tournament = AddTournament();
+            tournament.AddReferee(refereeId);
+            tournament.TakeEvents();
+            ((ICorrelatedEventSource)tournament).Source = MessageBuilder.New(() => new TestCommands.Command1());
+            Assert.Throws<ArgumentException>(() => tournament.AddReferee(refereeId));
             Assert.False(tournament.HasRecordedEvents);
         }
     }

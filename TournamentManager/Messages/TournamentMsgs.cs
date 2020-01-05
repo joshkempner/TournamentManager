@@ -180,5 +180,33 @@ namespace TournamentManager.Messages
                 EndTime = endTime;
             }
         }
+
+        public class AddRefereeToTournament : Command
+        {
+            public readonly Guid TournamentId;
+            public readonly Guid RefereeId;
+
+            public AddRefereeToTournament(
+                Guid tournamentId,
+                Guid refereeId)
+            {
+                TournamentId = tournamentId;
+                RefereeId = refereeId;
+            }
+        }
+
+        public class RefereeAddedToTournament : Event
+        {
+            public readonly Guid TournamentId;
+            public readonly Guid RefereeId;
+
+            public RefereeAddedToTournament(
+                Guid tournamentId,
+                Guid refereeId)
+            {
+                TournamentId = tournamentId;
+                RefereeId = refereeId;
+            }
+        }
     }
 }

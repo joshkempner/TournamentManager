@@ -14,6 +14,11 @@ namespace TournamentManager.Domain
         private readonly HashSet<Guid> _fields = new HashSet<Guid>();
         private readonly HashSet<Guid> _gameSlots = new HashSet<Guid>();
         private readonly HashSet<Guid> _teams = new HashSet<Guid>();
+        /// <summary>
+        /// Games, indexed by ID, with value indicating whether a referee is assigned.
+        /// </summary>
+        private readonly Dictionary<Guid, bool> _games = new Dictionary<Guid, bool>();
+        private readonly HashSet<Guid> _referees = new HashSet<Guid>();
 
         public Tournament()
         {
@@ -36,6 +41,11 @@ namespace TournamentManager.Domain
             Register<TournamentMsgs.FieldAdded>(e => _fields.Add(e.FieldId));
             Register<TournamentMsgs.GameSlotAdded>(e => _gameSlots.Add(e.GameSlotId));
             Register<TeamMsgs.TeamAdded>(e => _teams.Add(e.TeamId));
+            Register<GameMsgs.GameAdded>(e => _games.Add(e.GameId, false));
+            Register<GameMsgs.GameCancelled>(e => _games.Remove(e.GameId));
+            Register<TournamentMsgs.RefereeAddedToTournament>(e => _referees.Add(e.RefereeId));
+            Register<GameMsgs.RefereeAssigned>(e => _games[e.GameId] = true);
+            Register<GameMsgs.RefereeRemoved>(e => _games[e.GameId] = false);
         }
 
         public Tournament(
@@ -104,8 +114,8 @@ namespace TournamentManager.Domain
             DateTime endTime)
         {
             Ensure.NotEmptyGuid(gameSlotId, nameof(gameSlotId));
-            Ensure.True(() => startTime > _firstDay && startTime < _lastDay, "startTime > _firstDay && startTime < _lastDay");
-            Ensure.True(() => endTime > _firstDay && endTime < _lastDay, "endTime > _firstDay && endTime < _lastDay");
+            Ensure.True(() => startTime.Date >= _firstDay.Date && startTime.Date <= _lastDay.Date, "startTime.Date >= _firstDay.Date && startTime.Date <= _lastDay.Date");
+            Ensure.True(() => endTime.Date >= _firstDay.Date && endTime.Date <= _lastDay.Date, "endTime.Date >= _firstDay.Date && endTime.Date <= _lastDay.Date");
             Ensure.True(() => endTime > startTime, "endTime > startTime");
             if (_gameSlots.Contains(gameSlotId))
                 throw new ArgumentException("Cannot add a second game slot with the same ID.");
@@ -114,6 +124,16 @@ namespace TournamentManager.Domain
                 gameSlotId,
                 startTime,
                 endTime));
+        }
+
+        public void AddReferee(Guid refereeId)
+        {
+            Ensure.NotEmptyGuid(refereeId, nameof(refereeId));
+            if (_referees.Contains(refereeId))
+                throw new ArgumentException("Cannot add the same referee twice to the same tournament.");
+            Raise(new TournamentMsgs.RefereeAddedToTournament(
+                        Id,
+                        refereeId));
         }
 
         #endregion
@@ -169,7 +189,114 @@ namespace TournamentManager.Domain
 
         #region Games
 
+        public void AddGame(
+            Guid gameId,
+            Guid gameSlotId,
+            Guid fieldId,
+            Guid homeTeamId,
+            Guid awayTeamId)
+        {
+            Ensure.NotEmptyGuid(gameId, nameof(gameId));
+            Ensure.NotEmptyGuid(gameSlotId, nameof(gameSlotId));
+            Ensure.NotEmptyGuid(fieldId, nameof(fieldId));
+            Ensure.NotEmptyGuid(homeTeamId, nameof(homeTeamId));
+            Ensure.NotEmptyGuid(awayTeamId, nameof(awayTeamId));
+            if (!_gameSlots.Contains(gameSlotId))
+                throw new ArgumentException("Cannot add a game to an invalid game slot.");
+            if (!_fields.Contains(fieldId))
+                throw new ArgumentException("Cannot add a game to an invalid field.");
+            if (!_teams.Contains(homeTeamId))
+                throw new ArgumentException("Cannot add a game with an invalid home team.");
+            if (!_teams.Contains(awayTeamId))
+                throw new ArgumentException("Cannot add a game with an invalid away team.");
+            Raise(new GameMsgs.GameAdded(
+                        Id,
+                        gameId,
+                        gameSlotId,
+                        fieldId,
+                        homeTeamId,
+                        awayTeamId));
+        }
 
+        public void CancelGame(Guid gameId)
+        {
+            Ensure.NotEmptyGuid(gameId, nameof(gameId));
+            if (!_games.ContainsKey(gameId)) return;
+            Raise(new GameMsgs.GameCancelled(
+                        Id,
+                        gameId));
+        }
+
+        public void UpdateHomeTeam(
+            Guid gameId,
+            Guid homeTeamId)
+        {
+            Ensure.NotEmptyGuid(gameId, nameof(gameId));
+            if (!_games.ContainsKey(gameId))
+                throw new ArgumentException("Cannot update the home team for a non-existent game.");
+            Ensure.NotEmptyGuid(homeTeamId, nameof(homeTeamId));
+            if (!_teams.Contains(homeTeamId))
+                throw new ArgumentException("Cannot update the home team with a non-existent team.");
+            Raise(new GameMsgs.HomeTeamUpdated(
+                        Id,
+                        gameId,
+                        homeTeamId));
+        }
+
+        public void UpdateAwayTeam(
+            Guid gameId,
+            Guid awayTeamId)
+        {
+            Ensure.NotEmptyGuid(gameId, nameof(gameId));
+            if (!_games.ContainsKey(gameId))
+                throw new ArgumentException("Cannot update the away team for a non-existent game.");
+            Ensure.NotEmptyGuid(awayTeamId, nameof(awayTeamId));
+            if (!_teams.Contains(awayTeamId))
+                throw new ArgumentException("Cannot update the away team with a non-existent team.");
+            Raise(new GameMsgs.AwayTeamUpdated(
+                        Id,
+                        gameId,
+                        awayTeamId));
+        }
+
+        public void AssignRefereeToGame(
+            Guid gameId,
+            Guid refereeId)
+        {
+            Ensure.NotEmptyGuid(gameId, nameof(gameId));
+            if (!_games.ContainsKey(gameId))
+                throw new ArgumentException("Cannot assign a referee to a non-existent game.");
+            Ensure.NotEmptyGuid(refereeId, nameof(refereeId));
+            if (!_referees.Contains(refereeId))
+                throw new ArgumentException("Cannot assign a non-existent referee to a game.");
+            Raise(new GameMsgs.RefereeAssigned(
+                        Id,
+                        gameId,
+                        refereeId));
+        }
+
+        public void RemoveRefereeFromGame(Guid gameId)
+        {
+            Ensure.NotEmptyGuid(gameId, nameof(gameId));
+            if (!_games.ContainsKey(gameId))
+                throw new ArgumentException("Cannot assign a referee to a non-existent game.");
+            if (!_games[gameId]) return;
+            Raise(new GameMsgs.RefereeRemoved(
+                        Id,
+                        gameId));
+        }
+
+        public void ConfirmRefereeForGame(Guid gameId)
+        {
+            Ensure.NotEmptyGuid(gameId, nameof(gameId));
+            if (!_games.ContainsKey(gameId))
+                throw new ArgumentException("Cannot confirm referee assignment for a non-existent game.");
+            if (!_games[gameId])
+                throw new ArgumentException("Cannot confirm referee assignment for a game with no assigned referee.");
+            Raise(new GameMsgs.RefereeConfirmed(
+                        Id,
+                        gameId));
+        }
 
         #endregion
     }
