@@ -34,7 +34,7 @@ namespace TournamentManager.Tests.Presentation
 
             vm.RefereeGrade = RefereeMsgs.Grade.Regional;
             vm.Save.Execute().Subscribe();
-            Fixture.TestQueue.WaitFor<RefereeMsgs.UpdateGrade>(TimeSpan.FromMilliseconds(200));
+            Fixture.TestQueue.WaitFor<RefereeMsgs.UpdateGrade>(TimeSpan.FromMilliseconds(300));
             Fixture
                 .TestQueue
                 .AssertNext<RefereeMsgs.UpdateGrade>(cmd => cmd.RefereeId == refereeId &&
@@ -54,7 +54,7 @@ namespace TournamentManager.Tests.Presentation
             vm.RefereeGrade = RefereeMsgs.Grade.Intramural;
             vm.Save.Execute().Subscribe();
             Assert.Throws<TimeoutException>(
-                () => Fixture.TestQueue.WaitFor<RefereeMsgs.UpdateGrade>(TimeSpan.FromMilliseconds(200)));
+                () => Fixture.TestQueue.WaitFor<RefereeMsgs.UpdateGrade>(TimeSpan.FromMilliseconds(300)));
             Fixture.TestQueue.AssertEmpty();
             Fixture.RepositoryEvents.AssertEmpty();
         }
@@ -72,7 +72,7 @@ namespace TournamentManager.Tests.Presentation
             const ushort newAge = RefereeTestHelper.IntramuralAge + 1;
             vm.CurrentAge = newAge;
             vm.Save.Execute().Subscribe();
-            Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateAge>(TimeSpan.FromMilliseconds(200));
+            Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateAge>(TimeSpan.FromMilliseconds(300));
             Fixture
                 .TestQueue
                 .AssertNext<RefereeMsgs.AddOrUpdateAge>(cmd => cmd.RefereeId == refereeId &&
@@ -95,7 +95,7 @@ namespace TournamentManager.Tests.Presentation
             vm.CurrentAge = newAge;
             vm.Save.Execute().Subscribe();
             Assert.Throws<TimeoutException>(
-                () => Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateAge>(TimeSpan.FromMilliseconds(200)));
+                () => Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateAge>(TimeSpan.FromMilliseconds(300)));
             Fixture.TestQueue.AssertEmpty();
             Fixture.RepositoryEvents.AssertEmpty();
         }
@@ -113,7 +113,7 @@ namespace TournamentManager.Tests.Presentation
             vm.CurrentAge = newAge;
             vm.Save.Execute().Subscribe();
             Assert.Throws<TimeoutException>(
-                () => Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateAge>(TimeSpan.FromMilliseconds(200)));
+                () => Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateAge>(TimeSpan.FromMilliseconds(300)));
             Fixture.TestQueue.AssertEmpty();
             Fixture.RepositoryEvents.AssertEmpty();
         }
@@ -130,7 +130,7 @@ namespace TournamentManager.Tests.Presentation
 
             vm.Birthdate -= TimeSpan.FromDays(1);
             vm.Save.Execute().Subscribe();
-            Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateBirthdate>(TimeSpan.FromMilliseconds(200));
+            Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateBirthdate>(TimeSpan.FromMilliseconds(300));
             Fixture
                 .TestQueue
                 .AssertNext<RefereeMsgs.AddOrUpdateBirthdate>(cmd => cmd.RefereeId == refereeId &&
@@ -154,7 +154,7 @@ namespace TournamentManager.Tests.Presentation
             vm.Birthdate = RefereeTestHelper.TravelBirthdate;
             vm.Save.Execute().Subscribe();
             Assert.Throws<TimeoutException>(
-                () => Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateBirthdate>(TimeSpan.FromMilliseconds(200)));
+                () => Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateBirthdate>(TimeSpan.FromMilliseconds(300)));
             Fixture.TestQueue.AssertEmpty();
             Fixture.RepositoryEvents.AssertEmpty();
         }
@@ -173,7 +173,7 @@ namespace TournamentManager.Tests.Presentation
             const TeamMsgs.AgeBracket newAgeBracket = TeamMsgs.AgeBracket.Adult;
             vm.MaxAgeBracket = newAgeBracket;
             vm.Save.Execute().Subscribe();
-            Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateMaxAgeBracket>(TimeSpan.FromMilliseconds(200));
+            Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateMaxAgeBracket>(TimeSpan.FromMilliseconds(300));
             Fixture
                 .TestQueue
                 .AssertNext<RefereeMsgs.AddOrUpdateMaxAgeBracket>(cmd => cmd.RefereeId == refereeId &&
@@ -197,7 +197,7 @@ namespace TournamentManager.Tests.Presentation
             vm.MaxAgeBracket = newAgeBracket;
             vm.Save.Execute().Subscribe();
             Assert.Throws<TimeoutException>(
-                () => Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateMaxAgeBracket>(TimeSpan.FromMilliseconds(200)));
+                () => Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateMaxAgeBracket>(TimeSpan.FromMilliseconds(300)));
             Fixture.TestQueue.AssertEmpty();
             Fixture.RepositoryEvents.AssertEmpty();
         }
