@@ -14,12 +14,9 @@ namespace TournamentManager.Presentation
 
             this.WhenActivated(disposables =>
             {
-                // Bind the view model router to RoutedViewHost.Router property.
-                this.OneWayBind(ViewModel, x => x.Router, x => x.RoutedViewHost.Router)
+                this.OneWayBind(ViewModel, vm => vm.RefereesVM, v => v.MainRefereesView.ViewModel)
                     .DisposeWith(disposables);
             });
-
-            Loaded += (sender, args) => ViewModel?.NavigateToInitialView();
         }
     }
 }

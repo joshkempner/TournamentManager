@@ -4,23 +4,13 @@ using Splat;
 
 namespace TournamentManager.Presentation
 {
-    public class MainWindowVM : IScreen
+    public class MainWindowVM
     {
-        private readonly IDispatcher _bus;
-
         public MainWindowVM(IDispatcher bus)
         {
-            _bus = bus;
-            Locator.CurrentMutable.RegisterConstant(this, typeof(IScreen));
+            RefereesVM = new MainRefereesVM(bus);
         }
 
-        public RoutingState Router { get; } = new RoutingState();
-
-        public void NavigateToInitialView()
-        {
-            Router.Navigate.Execute(new ManageRefereesVM(
-                                            _bus,
-                                            this));
-        }
+        public MainRefereesVM RefereesVM { get; }
     }
 }

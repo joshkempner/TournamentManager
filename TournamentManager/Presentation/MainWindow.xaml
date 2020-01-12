@@ -9,6 +9,15 @@
                            mc:Ignorable="d"
                            Title="MainWindow" Height="500" Width="800" SnapsToDevicePixels="True">
     <Grid>
-        <reactiveUi:RoutedViewHost x:Name="RoutedViewHost" />
+        <TabControl TabStripPlacement="Bottom">
+            <TabItem Header="Referees">
+                <Grid>
+                    <presentation:MainReferees x:Name="MainRefereesView" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Tournaments">
+                <reactiveUi:ViewModelViewHost x:Name="TournamentsViewHost" />
+            </TabItem>
+        </TabControl>
     </Grid>
 </reactiveUi:ReactiveWindow>
