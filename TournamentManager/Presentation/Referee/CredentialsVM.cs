@@ -20,6 +20,7 @@ namespace TournamentManager.Presentation
             IScreen screen)
             : base(screen)
         {
+            RefereeId = refereeId;
             FullName = fullName;
             _rm = new CredentialsRM(refereeId);
 
@@ -102,6 +103,8 @@ namespace TournamentManager.Presentation
                 _rm.Dispose();
             base.Dispose(disposing);
         }
+
+        public Guid RefereeId { get; }
 
         public string FullName { get; }
 

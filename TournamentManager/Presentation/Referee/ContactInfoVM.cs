@@ -22,6 +22,7 @@ namespace TournamentManager.Presentation
             IScreen screen)
             : base(screen)
         {
+            RefereeId = refereeId;
             FullName = fullName;
             _rm = new ContactInfoRM(refereeId);
 
@@ -123,6 +124,8 @@ namespace TournamentManager.Presentation
                         }
                     });
         }
+
+        public Guid RefereeId { get; }
 
         protected override void Dispose(bool disposing)
         {

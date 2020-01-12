@@ -19,6 +19,9 @@ namespace TournamentManager.Tests.Presentation
         private readonly MockHostScreen _hostScreen = new MockHostScreen();
         private readonly CorrelatedStreamStoreRepository _repo;
 
+        private readonly Guid _ref1Id = Guid.NewGuid();
+        private readonly Guid _ref2Id = Guid.NewGuid();
+
         public when_managing_referees()
         {
             Locator.CurrentMutable.RegisterConstant(_fixture.StreamStoreConnection, typeof(IStreamStoreConnection));
@@ -26,20 +29,22 @@ namespace TournamentManager.Tests.Presentation
             _repo = new CorrelatedStreamStoreRepository(_fixture.Repository);
             // Add some referees
             var ref1 = new Referee(
-                            Guid.NewGuid(),
+                            _ref1Id,
                             "John",
                             "Smith",
                             RefereeMsgs.Grade.Grassroots,
                             MessageBuilder.New(() => new TestCommands.Command1()));
             ref1.AddOrUpdateEmailAddress("john.smith@aol.com");
+            ref1.AddOrUpdateBirthdate(DateTime.Today.AddYears(-71));
             _repo.Save(ref1);
             var ref2 = new Referee(
-                            Guid.NewGuid(),
+                            _ref2Id,
                             "Janet",
                             "Jones",
                             RefereeMsgs.Grade.Grassroots,
                             MessageBuilder.New(() => new TestCommands.Command1()));
             ref2.AddOrUpdateEmailAddress("janet.jones@aol.com");
+            ref2.AddOrUpdateBirthdate(DateTime.Today.AddYears(-24));
             _repo.Save(ref2);
         }
 
@@ -66,9 +71,10 @@ namespace TournamentManager.Tests.Presentation
                             RefereeMsgs.Grade.Intramural,
                             MessageBuilder.New(() => new TestCommands.Command1()));
             ref3.AddOrUpdateEmailAddress("bob.smith@aol.com");
+            ref3.AddOrUpdateAge(18);
             _repo.Save(ref3);
             // ReSharper disable once AccessToDisposedClosure
-            AssertEx.IsOrBecomesTrue(() => vm.Referees.Count == 3);
+            AssertEx.IsOrBecomesTrue(() => vm.Referees.Count == 3, 1500);
         }
 
         [Fact]

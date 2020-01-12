@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignWidth="750">
     <DockPanel>
-        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
             <Button Name="EditCredentials" Style="{StaticResource ColorHighlightButton}" Padding="10,2">
                 <iconPacks:PackIconFontAwesome Kind="CertificateSolid" Width="24" Height="24" Style="{StaticResource FontAwesomeYellowRollover}" />
             </Button>
@@ -16,6 +16,14 @@
                 <iconPacks:PackIconFontAwesome Kind="AddressCardRegular" Width="32" Height="32" Style="{StaticResource FontAwesomeGreenRollover}" />
             </Button>
         </StackPanel>
-        <TextBlock Name="FullName" Text="Some Name" FontSize="14" VerticalAlignment="Center" />
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock Name="FullName" Text="Some Name" FontSize="18" FontWeight="Bold" />
+            <TextBlock Name="EmailAddress" Text="Some.Name@gmail.com" Margin="0,2" Foreground="DodgerBlue" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Name="AgeRange" Text="Age 19-24" Margin="0,0,20,0" />
+                <TextBlock Name="RefereeGrade" Text="Grassroots" Margin="0,0,20,0" />
+                <TextBlock Name="MaxAgeBracket" Text="Games up to age U18" />
+            </StackPanel>
+        </StackPanel>
     </DockPanel>
 </UserControl>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Mail;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
@@ -8,10 +9,11 @@ using ReactiveUI;
 using Splat;
 using TournamentManager.Helpers;
 using TournamentManager.Messages;
+// ReSharper disable RedundantDefaultMemberInitializer
 
 namespace TournamentManager.Presentation
 {
-    public sealed class RefereeItemVM : ReactiveObject
+    public sealed class RefereeItemVM : ReactiveObject, IActivatableViewModel
     {
         public ReactiveCommand<Unit, Unit> EditContactInfo { get; }
         public ReactiveCommand<Unit, Unit> EditCredentials { get; }
@@ -20,38 +22,55 @@ namespace TournamentManager.Presentation
             IDispatcher bus,
             RefereeModel model)
         {
-            var refereeId = model.RefereeId;
+            RefereeId = model.RefereeId;
             HostScreen = Locator.Current.GetService<IScreen>();
+            Activator = new ViewModelActivator();
 
-            model.WhenAnyValue(
+            this.WhenActivated(disposables =>
+            {
+                model.WhenAnyValue(x => x.Surname)
+                    .ToProperty(this, x => x.Surname, out _surname)
+                    .DisposeWith(disposables);
+
+                model.WhenAnyValue(x => x.GivenName)
+                    .ToProperty(this, x => x.GivenName, out _givenName)
+                    .DisposeWith(disposables);
+
+                model.WhenAnyValue(x => x.EmailAddress)
+                    .Where(x => x != null)
+                    .Select(x => new MailAddress(x, FullName))
+                    .ToProperty(this, x => x.EmailAddress, out _emailAddress)
+                    .DisposeWith(disposables);
+
+                model.WhenAnyValue(x => x.RefereeGrade)
+                    .ToProperty(this, x => x.RefereeGrade, out _refereeGrade)
+                    .DisposeWith(disposables);
+
+                model.WhenAnyValue(x => x.CurrentAge)
+                    .ToProperty(this, x => x.CurrentAge, out _currentAge)
+                    .DisposeWith(disposables);
+
+                model.WhenAnyValue(x => x.MaxAgeBracket)
+                    .ToProperty(this, x => x.MaxAgeBracket, out _maxAgeBracket)
+                    .DisposeWith(disposables);
+            });
+
+            this.WhenAnyValue(
                     x => x.GivenName,
                     x => x.Surname,
                     (first, last) => $"{first} {last}")
                 .ToProperty(this, x => x.FullName, out _fullName);
 
-            model.WhenAnyValue(x => x.Surname)
-                .ToProperty(this, x => x.Surname, out _surname);
-
-            model.WhenAnyValue(x => x.EmailAddress)
-                .Where(x => x != null)
-                .Select(x => new MailAddress(x, FullName))
-                .ToProperty(this, x => x.EmailAddress, out _emailAddress);
-
-            model.WhenAnyValue(x => x.RefereeGrade)
-                .ToProperty(this, x => x.RefereeGrade, out _refereeGrade);
-
-            model.WhenAnyValue(x => x.CurrentAge)
-                .ToProperty(this, x => x.CurrentAge, out _currentAge);
-
-            model.WhenAnyValue(x => x.MaxAgeBracket)
-                .ToProperty(this, x => x.MaxAgeBracket, out _maxAgeBracket);
+            this.WhenAnyValue(x => x.CurrentAge)
+                .Select(AgeToAgeRange)
+                .ToProperty(this, x => x.AgeRange, out _ageRange);
 
             EditContactInfo = CommandBuilder.FromAction(
                                 () => Threading.RunOnUiThread(() =>
                                 {
                                     HostScreen.Router.Navigate
                                         .Execute(new ContactInfoVM(
-                                                        refereeId,
+                                                        RefereeId,
                                                         FullName,
                                                         bus,
                                                         HostScreen))
@@ -63,7 +82,7 @@ namespace TournamentManager.Presentation
                                 {
                                     HostScreen.Router.Navigate
                                         .Execute(new CredentialsVM(
-                                                        refereeId,
+                                                        RefereeId,
                                                         FullName,
                                                         bus,
                                                         HostScreen))
@@ -71,24 +90,52 @@ namespace TournamentManager.Presentation
                                 }));
         }
 
-        public string Surname => _surname.Value ?? string.Empty;
-        private readonly ObservableAsPropertyHelper<string?> _surname;
+        public static string AgeToAgeRange(ushort age)
+        {
+            if (age < 18)
+                return "Under 18";
+            if (age == 18)
+                return "Age 18";
+            if (age < 25)
+                return "Age 19-24";
+            if (age < 40)
+                return "Age 25-39";
+            if (age < 50)
+                return "Age 40-49";
+            if (age < 60)
+                return "Age 50-59";
+            if (age < 70)
+                return "Age 60-69";
+            return "Age 70+";
+        }
 
-        public string FullName => _fullName.Value ?? string.Empty;
-        private readonly ObservableAsPropertyHelper<string?> _fullName;
+        public Guid RefereeId { get; }
+
+        public string Surname => _surname?.Value ?? string.Empty;
+        private ObservableAsPropertyHelper<string?> _surname = ObservableAsPropertyHelper<string?>.Default();
+
+        public string GivenName => _givenName?.Value;
+        private ObservableAsPropertyHelper<string?> _givenName = ObservableAsPropertyHelper<string?>.Default();
+
+        public string FullName => _fullName?.Value ?? string.Empty;
+        private ObservableAsPropertyHelper<string?> _fullName = ObservableAsPropertyHelper<string?>.Default();
 
         public MailAddress? EmailAddress => _emailAddress.Value;
-        private readonly ObservableAsPropertyHelper<MailAddress?> _emailAddress;
+        private ObservableAsPropertyHelper<MailAddress?> _emailAddress = ObservableAsPropertyHelper<MailAddress?>.Default();
 
         public RefereeMsgs.Grade RefereeGrade => _refereeGrade.Value;
-        private readonly ObservableAsPropertyHelper<RefereeMsgs.Grade> _refereeGrade;
+        private ObservableAsPropertyHelper<RefereeMsgs.Grade> _refereeGrade = ObservableAsPropertyHelper<RefereeMsgs.Grade>.Default();
 
-        public ushort CurrentAge => _currentAge.Value;
-        private readonly ObservableAsPropertyHelper<ushort> _currentAge;
+        private ushort CurrentAge => _currentAge.Value;
+        private ObservableAsPropertyHelper<ushort> _currentAge = ObservableAsPropertyHelper<ushort>.Default();
+
+        public string AgeRange => _ageRange.Value ?? string.Empty;
+        private readonly ObservableAsPropertyHelper<string?> _ageRange;
 
         public TeamMsgs.AgeBracket MaxAgeBracket => _maxAgeBracket.Value;
-        private readonly ObservableAsPropertyHelper<TeamMsgs.AgeBracket> _maxAgeBracket;
+        private ObservableAsPropertyHelper<TeamMsgs.AgeBracket> _maxAgeBracket = ObservableAsPropertyHelper<TeamMsgs.AgeBracket>.Default();
 
         public IScreen HostScreen { get; }
+        public ViewModelActivator Activator { get; }
     }
 }

@@ -37,10 +37,12 @@ namespace TournamentManager.Presentation
 
         public void Handle(RefereeMsgs.RefereeAdded message)
         {
-            Referees.AddOrUpdate(new RefereeModel(
-                                        message.RefereeId,
-                                        message.GivenName,
-                                        message.Surname));
+            var model = new RefereeModel(
+                                message.RefereeId,
+                                message.GivenName,
+                                message.Surname);
+            model.RefereeGrade = message.RefereeGrade;
+            Referees.AddOrUpdate(model);
         }
 
         public void Handle(RefereeMsgs.EmailAddressChanged message)
