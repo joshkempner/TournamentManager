@@ -44,7 +44,7 @@ namespace TournamentManager.Tests.Presentation
             AssertEx.IsOrBecomesTrue(() => _model.RefereeId == _vm.RefereeId);
             AssertEx.IsOrBecomesTrue(() => _model.Surname == _vm.Surname);
             AssertEx.IsOrBecomesTrue(() => _model.GivenName == _vm.GivenName);
-            AssertEx.IsOrBecomesTrue(() => _model.EmailAddress == _vm.EmailAddress.Address);
+            AssertEx.IsOrBecomesTrue(() => _model.EmailAddress == _vm.EmailAddress);
             AssertEx.IsOrBecomesTrue(() => _model.RefereeGrade == _vm.RefereeGrade);
             AssertEx.IsOrBecomesTrue(() => _model.MaxAgeBracket == _vm.MaxAgeBracket);
             AssertEx.IsOrBecomesTrue(() => RefereeItemVM.AgeToAgeRange(_model.CurrentAge) == _vm.AgeRange);
@@ -61,7 +61,7 @@ namespace TournamentManager.Tests.Presentation
             _model.MaxAgeBracket = TeamMsgs.AgeBracket.Adult;
             AssertEx.IsOrBecomesTrue(() => _model.Surname == _vm.Surname);
             AssertEx.IsOrBecomesTrue(() => _model.GivenName == _vm.GivenName);
-            AssertEx.IsOrBecomesTrue(() => _model.EmailAddress == _vm.EmailAddress.Address);
+            AssertEx.IsOrBecomesTrue(() => _model.EmailAddress == _vm.FullEmail?.Address);
             AssertEx.IsOrBecomesTrue(() => _model.RefereeGrade == _vm.RefereeGrade);
             AssertEx.IsOrBecomesTrue(() => _model.MaxAgeBracket == _vm.MaxAgeBracket);
             AssertEx.IsOrBecomesTrue(() => RefereeItemVM.AgeToAgeRange(_model.CurrentAge) == _vm.AgeRange);

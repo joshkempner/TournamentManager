@@ -17,7 +17,7 @@ namespace TournamentManager.Presentation
             {
                 this.OneWayBind(ViewModel, vm => vm.FullName, v => v.FullName.Text)
                     .DisposeWith(disposables);
-                this.OneWayBind(ViewModel, vm => vm.EmailAddress, v => v.EmailAddress.Text)
+                this.OneWayBind(ViewModel, vm => vm.FullEmail, v => v.EmailAddress.Text)
                     .DisposeWith(disposables);
                 this.OneWayBind(ViewModel, vm => vm.AgeRange, v => v.AgeRange.Text)
                     .DisposeWith(disposables);

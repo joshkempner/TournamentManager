@@ -11,7 +11,7 @@ namespace TournamentManager.Presentation
         public MainWindowVM(IDispatcher bus)
         {
             _bus = bus;
-            Locator.CurrentMutable.RegisterLazySingleton(() => this, typeof(IScreen));
+            Locator.CurrentMutable.RegisterConstant(this, typeof(IScreen));
         }
 
         public RoutingState Router { get; } = new RoutingState();

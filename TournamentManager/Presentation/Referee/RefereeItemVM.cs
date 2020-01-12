@@ -37,8 +37,6 @@ namespace TournamentManager.Presentation
                     .DisposeWith(disposables);
 
                 model.WhenAnyValue(x => x.EmailAddress)
-                    .Where(x => x != null)
-                    .Select(x => new MailAddress(x, FullName))
                     .ToProperty(this, x => x.EmailAddress, out _emailAddress)
                     .DisposeWith(disposables);
 
@@ -57,9 +55,17 @@ namespace TournamentManager.Presentation
 
             this.WhenAnyValue(
                     x => x.GivenName,
-                    x => x.Surname,
-                    (first, last) => $"{first} {last}")
+                    x => x.Surname)
+                .Where(x => !string.IsNullOrWhiteSpace(x.Item1) && !string.IsNullOrWhiteSpace(x.Item2))
+                .Select(x => $"{x.Item1} {x.Item2}")
                 .ToProperty(this, x => x.FullName, out _fullName);
+
+            this.WhenAnyValue(
+                    x => x.EmailAddress,
+                    x => x.FullName)
+                .Where(x => !string.IsNullOrWhiteSpace(x.Item1))
+                .Select(x => new MailAddress(x.Item1, x.Item2))
+                .ToProperty(this, x => x.FullEmail, out _fullEmail);
 
             this.WhenAnyValue(x => x.CurrentAge)
                 .Select(AgeToAgeRange)
@@ -114,14 +120,17 @@ namespace TournamentManager.Presentation
         public string Surname => _surname?.Value ?? string.Empty;
         private ObservableAsPropertyHelper<string?> _surname = ObservableAsPropertyHelper<string?>.Default();
 
-        public string GivenName => _givenName?.Value;
+        public string GivenName => _givenName?.Value ?? string.Empty;
         private ObservableAsPropertyHelper<string?> _givenName = ObservableAsPropertyHelper<string?>.Default();
 
         public string FullName => _fullName?.Value ?? string.Empty;
-        private ObservableAsPropertyHelper<string?> _fullName = ObservableAsPropertyHelper<string?>.Default();
+        private readonly ObservableAsPropertyHelper<string?> _fullName;
 
-        public MailAddress? EmailAddress => _emailAddress.Value;
-        private ObservableAsPropertyHelper<MailAddress?> _emailAddress = ObservableAsPropertyHelper<MailAddress?>.Default();
+        public string EmailAddress => _emailAddress.Value ?? string.Empty;
+        private ObservableAsPropertyHelper<string?> _emailAddress = ObservableAsPropertyHelper<string?>.Default();
+
+        public MailAddress? FullEmail => _fullEmail?.Value;
+        private readonly ObservableAsPropertyHelper<MailAddress?> _fullEmail;
 
         public RefereeMsgs.Grade RefereeGrade => _refereeGrade.Value;
         private ObservableAsPropertyHelper<RefereeMsgs.Grade> _refereeGrade = ObservableAsPropertyHelper<RefereeMsgs.Grade>.Default();

@@ -107,7 +107,7 @@ namespace TournamentManager.Tests.Presentation
             var referee = vm.Referees.First(x => x.RefereeId == _ref1Id);
             AssertEx.IsOrBecomesTrue(() => referee.GivenName == givenName);
             AssertEx.IsOrBecomesTrue(() => referee.Surname == surname);
-            AssertEx.IsOrBecomesTrue(() => referee.EmailAddress.Address == emailAddress);
+            AssertEx.IsOrBecomesTrue(() => referee.FullEmail.Address == emailAddress);
             AssertEx.IsOrBecomesTrue(() => referee.RefereeGrade == refereeGrade);
             AssertEx.IsOrBecomesTrue(() => referee.AgeRange == RefereeItemVM.AgeToAgeRange((ushort)birthdate.YearsAgo()));
             AssertEx.IsOrBecomesTrue(() => referee.MaxAgeBracket == maxAge);
