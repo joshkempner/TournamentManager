@@ -40,6 +40,5 @@ namespace TournamentManager.Presentation
             get => ViewModel;
             set => ViewModel = (MainRefereesVM)value;
         }
-
     }
 }

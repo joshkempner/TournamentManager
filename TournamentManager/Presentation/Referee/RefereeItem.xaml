@@ -18,7 +18,11 @@
         </StackPanel>
         <StackPanel VerticalAlignment="Center">
             <TextBlock Name="FullName" Text="Some Name" FontSize="22" FontWeight="Bold" />
-            <TextBlock Name="EmailAddress" Text="Some.Name@gmail.com" Margin="0,2" FontSize="14" Foreground="DodgerBlue" />
+            <TextBlock Margin="0,2" FontSize="14">
+                <Hyperlink Name="MailReferee" RequestNavigate="OpenUri">
+                    <TextBlock Name="EmailAddress" Text="Some.Name@gmail.com" />
+                </Hyperlink>
+            </TextBlock>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Name="AgeRange" Text="Age 19-24" FontSize="14" Margin="0,0,20,0" />
                 <TextBlock Name="RefereeGrade" Text="Grassroots" FontSize="14" Margin="0,0,20,0" />

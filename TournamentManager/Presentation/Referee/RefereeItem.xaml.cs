@@ -1,5 +1,8 @@
-﻿using System.Reactive.Disposables;
+﻿using System;
+using System.Diagnostics;
+using System.Reactive.Disposables;
 using System.Windows;
+using System.Windows.Navigation;
 using ReactiveUI;
 
 namespace TournamentManager.Presentation
@@ -19,6 +22,10 @@ namespace TournamentManager.Presentation
                     .DisposeWith(disposables);
                 this.OneWayBind(ViewModel, vm => vm.FullEmail, v => v.EmailAddress.Text)
                     .DisposeWith(disposables);
+                this.OneWayBind(ViewModel, vm => vm.FullEmail, v => v.MailReferee.NavigateUri,
+                        m => new Uri($"mailto:{m.Address}"))
+                    .DisposeWith(disposables);
+
                 this.OneWayBind(ViewModel, vm => vm.AgeRange, v => v.AgeRange.Text)
                     .DisposeWith(disposables);
                 this.OneWayBind(ViewModel, vm => vm.RefereeGrade, v => v.RefereeGrade.Text)
@@ -49,6 +56,17 @@ namespace TournamentManager.Presentation
         {
             get => ViewModel;
             set => ViewModel = (RefereeItemVM)value;
+        }
+
+        private void OpenUri(object sender, RequestNavigateEventArgs e)
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName =  e.Uri.AbsoluteUri,
+                UseShellExecute = true
+            };
+            Process.Start(psi);
+            e.Handled = true;
         }
     }
 }
