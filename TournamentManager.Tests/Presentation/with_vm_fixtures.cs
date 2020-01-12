@@ -14,7 +14,7 @@ namespace TournamentManager.Tests.Presentation
         protected with_vm_fixtures()
         {
             RefereeTestHelper = new RefereeTestHelper(Fixture);
-            Locator.CurrentMutable.RegisterLazySingleton(() => Fixture.StreamStoreConnection, typeof(IStreamStoreConnection));
+            Locator.CurrentMutable.RegisterConstant(Fixture.StreamStoreConnection, typeof(IStreamStoreConnection));
         }
     }
 }
