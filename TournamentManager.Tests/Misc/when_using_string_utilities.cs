@@ -20,6 +20,13 @@ namespace TournamentManager.Tests.Misc
         }
 
         [Fact]
+        public void empty_email_address_is_invalid()
+        {
+            Assert.False(StringUtilities.IsValidEmailAddress(string.Empty));
+            Assert.False(StringUtilities.IsValidEmailAddress(" "));
+        }
+
+        [Fact]
         public void correct_zip_validates()
         {
             Assert.True(StringUtilities.IsValidUSZipCode("01234"));

@@ -53,10 +53,10 @@ namespace TournamentManager.Tests.Presentation
         [Fact]
         public void displays_updated_data()
         {
-            _model.EmailAddress = "Jon.Smyth@gmail.com";
-            _model.RefereeGrade = RefereeMsgs.Grade.Regional;
             _model.GivenName = "Jonathan";
             _model.Surname = "Smyth";
+            _model.EmailAddress = "Jon.Smyth@gmail.com";
+            _model.RefereeGrade = RefereeMsgs.Grade.Regional;
             _model.CurrentAge = 40;
             _model.MaxAgeBracket = TeamMsgs.AgeBracket.Adult;
             AssertEx.IsOrBecomesTrue(() => _model.Surname == _vm.Surname);

@@ -1,7 +1,9 @@
 ﻿using System;
+using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.Testing;
+using TournamentManager.Domain;
 using TournamentManager.Messages;
 using TournamentManager.Presentation;
 using Xunit;
@@ -18,6 +20,58 @@ namespace TournamentManager.Tests.Presentation
         {
             Fixture.Dispatcher.Subscribe<RefereeMsgs.AddOrUpdateEmailAddress>(this);
             Fixture.Dispatcher.Subscribe<RefereeMsgs.AddOrUpdateMailingAddress>(this);
+        }
+
+        [Fact]
+        public void initial_information_is_correct()
+        {
+            var refereeId = Guid.NewGuid();
+            RefereeTestHelper.AddIntramuralReferee(refereeId);
+            using var vm = new ContactInfoVM(
+                                refereeId,
+                                RefereeTestHelper.FullName,
+                                Fixture.Dispatcher,
+                                Screen);
+            // ReSharper disable once AccessToDisposedClosure
+            AssertEx.IsOrBecomesTrue(() => vm.FullName == RefereeTestHelper.FullName);
+        }
+
+        [Fact]
+        public void initial_information_with_updates_is_correct()
+        {
+            var refereeId = Guid.NewGuid();
+            var emailAddress = $"{RefereeTestHelper.FullName}@aol.com";
+            const string streetAddress1 = "221 Baker St";
+            const string streetAddress2 = "Apt B";
+            const string city = "Springfield";
+            const string state = "MA";
+            const string zip = "01234";
+
+            RefereeTestHelper.AddIntramuralReferee(refereeId);
+            var repo = new CorrelatedStreamStoreRepository(Fixture.Repository);
+            var referee = repo.GetById<Referee>(refereeId, MessageBuilder.New(() => new TestCommands.Command1()));
+            referee.AddOrUpdateEmailAddress(emailAddress);
+            referee.AddOrUpdateMailingAddress(
+                streetAddress1,
+                streetAddress2,
+                city,
+                state,
+                zip);
+            repo.Save(referee);
+            using var vm = new ContactInfoVM(
+                refereeId,
+                RefereeTestHelper.FullName,
+                Fixture.Dispatcher,
+                Screen);
+            // ReSharper disable AccessToDisposedClosure
+            AssertEx.IsOrBecomesTrue(() => vm.FullName == RefereeTestHelper.FullName);
+            AssertEx.IsOrBecomesTrue(() => vm.EmailAddress == emailAddress);
+            AssertEx.IsOrBecomesTrue(() => vm.StreetAddress1 == streetAddress1);
+            AssertEx.IsOrBecomesTrue(() => vm.StreetAddress2 == streetAddress2);
+            AssertEx.IsOrBecomesTrue(() => vm.City == city);
+            AssertEx.IsOrBecomesTrue(() => vm.StateAbbreviation == state);
+            AssertEx.IsOrBecomesTrue(() => vm.ZipCode == zip);
+            // ReSharper restore AccessToDisposedClosure
         }
 
         [Fact]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using ReactiveDomain;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging;
@@ -6,6 +7,7 @@ using ReactiveDomain.Testing;
 using ReactiveUI;
 using Splat;
 using TournamentManager.Domain;
+using TournamentManager.Helpers;
 using TournamentManager.Messages;
 using TournamentManager.Presentation;
 using TournamentManager.Tests.Helpers;
@@ -75,6 +77,40 @@ namespace TournamentManager.Tests.Presentation
             _repo.Save(ref3);
             // ReSharper disable once AccessToDisposedClosure
             AssertEx.IsOrBecomesTrue(() => vm.Referees.Count == 3, 1500);
+        }
+
+        [Fact]
+        public void can_display_updates_to_referee_data()
+        {
+            using var vm = new ManageRefereesVM(
+                                _fixture.Dispatcher,
+                                _hostScreen);
+            // ReSharper disable once AccessToDisposedClosure
+            AssertEx.IsOrBecomesTrue(() => vm.Referees.Count == 2);
+            foreach (var refereeItemVM in vm.Referees) refereeItemVM.Activator.Activate();
+
+            const string givenName = "Jonathan";
+            const string surname = "Smyth";
+            const string emailAddress = "jon.smyth@gmail.com";
+            const RefereeMsgs.Grade refereeGrade = RefereeMsgs.Grade.Regional;
+            var birthdate = DateTime.Today.AddYears(-72);
+            const TeamMsgs.AgeBracket maxAge = TeamMsgs.AgeBracket.Adult;
+            var ref1 = _repo.GetById<Referee>(_ref1Id, MessageBuilder.New(() => new TestCommands.Command1()));
+            ref1.UpdateGivenName(givenName);
+            ref1.UpdateSurname(surname);
+            ref1.AddOrUpdateEmailAddress(emailAddress);
+            ref1.UpdateRefereeGrade(refereeGrade);
+            ref1.AddOrUpdateBirthdate(birthdate);
+            ref1.AddOrUpdateMaxAgeBracket(maxAge);
+            _repo.Save(ref1);
+
+            var referee = vm.Referees.First(x => x.RefereeId == _ref1Id);
+            AssertEx.IsOrBecomesTrue(() => referee.GivenName == givenName);
+            AssertEx.IsOrBecomesTrue(() => referee.Surname == surname);
+            AssertEx.IsOrBecomesTrue(() => referee.EmailAddress.Address == emailAddress);
+            AssertEx.IsOrBecomesTrue(() => referee.RefereeGrade == refereeGrade);
+            AssertEx.IsOrBecomesTrue(() => referee.AgeRange == RefereeItemVM.AgeToAgeRange((ushort)birthdate.YearsAgo()));
+            AssertEx.IsOrBecomesTrue(() => referee.MaxAgeBracket == maxAge);
         }
 
         [Fact]

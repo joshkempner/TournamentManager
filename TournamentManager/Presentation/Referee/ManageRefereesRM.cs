@@ -13,6 +13,8 @@ namespace TournamentManager.Presentation
     public class ManageRefereesRM :
         ReadModelBase,
         IHandle<RefereeMsgs.RefereeAdded>,
+        IHandle<RefereeMsgs.GivenNameChanged>,
+        IHandle<RefereeMsgs.SurnameChanged>,
         IHandle<RefereeMsgs.EmailAddressChanged>,
         IHandle<RefereeMsgs.GradeChanged>,
         IHandle<RefereeMsgs.AgeChanged>,
@@ -25,6 +27,8 @@ namespace TournamentManager.Presentation
                 () => Locator.Current.GetService<IStreamStoreConnection>().GetListener(nameof(ManageRefereesRM)))
         {
             EventStream.Subscribe<RefereeMsgs.RefereeAdded>(this);
+            EventStream.Subscribe<RefereeMsgs.GivenNameChanged>(this);
+            EventStream.Subscribe<RefereeMsgs.SurnameChanged>(this);
             EventStream.Subscribe<RefereeMsgs.EmailAddressChanged>(this);
             EventStream.Subscribe<RefereeMsgs.GradeChanged>(this);
             EventStream.Subscribe<RefereeMsgs.AgeChanged>(this);
@@ -40,9 +44,25 @@ namespace TournamentManager.Presentation
             var model = new RefereeModel(
                                 message.RefereeId,
                                 message.GivenName,
-                                message.Surname);
-            model.RefereeGrade = message.RefereeGrade;
+                                message.Surname)
+                                {
+                                    RefereeGrade = message.RefereeGrade
+                                };
             Referees.AddOrUpdate(model);
+        }
+
+        public void Handle(RefereeMsgs.GivenNameChanged message)
+        {
+            var referee = Referees.Items.First(x => x.RefereeId == message.RefereeId);
+            referee.GivenName = message.GivenName;
+            Referees.AddOrUpdate(referee);
+        }
+
+        public void Handle(RefereeMsgs.SurnameChanged message)
+        {
+            var referee = Referees.Items.First(x => x.RefereeId == message.RefereeId);
+            referee.Surname = message.Surname;
+            Referees.AddOrUpdate(referee);
         }
 
         public void Handle(RefereeMsgs.EmailAddressChanged message)

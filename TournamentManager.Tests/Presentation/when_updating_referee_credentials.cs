@@ -1,7 +1,9 @@
 ﻿using System;
+using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.Testing;
+using TournamentManager.Domain;
 using TournamentManager.Helpers;
 using TournamentManager.Messages;
 using TournamentManager.Presentation;
@@ -22,6 +24,42 @@ namespace TournamentManager.Tests.Presentation
             Fixture.Dispatcher.Subscribe<RefereeMsgs.UpdateGrade>(this);
             Fixture.Dispatcher.Subscribe<RefereeMsgs.AddOrUpdateAge>(this);
             Fixture.Dispatcher.Subscribe<RefereeMsgs.AddOrUpdateMaxAgeBracket>(this);
+        }
+
+        [Fact]
+        public void initial_values_are_correct()
+        {
+            var refereeId = Guid.NewGuid();
+            RefereeTestHelper.AddTravelReferee(refereeId);
+            using var vm = new CredentialsVM(refereeId, RefereeTestHelper.FullName, Fixture.Dispatcher, Screen);
+            // ReSharper disable AccessToDisposedClosure
+            AssertEx.IsOrBecomesTrue(() => vm.RefereeId == refereeId);
+            AssertEx.IsOrBecomesTrue(() => vm.RefereeGrade == RefereeMsgs.Grade.Grassroots);
+            AssertEx.IsOrBecomesTrue(() => vm.Birthdate == RefereeTestHelper.TravelBirthdate);
+            AssertEx.IsOrBecomesTrue(() => vm.CurrentAge == (ushort)RefereeTestHelper.TravelBirthdate.YearsAgo());
+            AssertEx.IsOrBecomesTrue(() => vm.MaxAgeBracket == RefereeTestHelper.TravelMaxAgeBracket);
+            AssertEx.IsOrBecomesTrue(() => vm.FullName == RefereeTestHelper.FullName);
+            // ReSharper restore AccessToDisposedClosure
+        }
+
+        [Fact]
+        public void initial_values_are_correct_after_updates()
+        {
+            var refereeId = Guid.NewGuid();
+            RefereeTestHelper.AddTravelReferee(refereeId);
+            var repo = new CorrelatedStreamStoreRepository(Fixture.Repository);
+            var referee = repo.GetById<Referee>(refereeId, MessageBuilder.New(() => new TestCommands.Command1()));
+            referee.UpdateRefereeGrade(RefereeMsgs.Grade.Regional);
+            referee.AddOrUpdateBirthdate(RefereeTestHelper.TravelBirthdate.AddYears(-1));
+            referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.Adult);
+            repo.Save(referee);
+            using var vm = new CredentialsVM(refereeId, RefereeTestHelper.FullName, Fixture.Dispatcher, Screen);
+            // ReSharper disable AccessToDisposedClosure
+            AssertEx.IsOrBecomesTrue(() => vm.RefereeGrade == RefereeMsgs.Grade.Regional);
+            AssertEx.IsOrBecomesTrue(() => vm.Birthdate == RefereeTestHelper.TravelBirthdate.AddYears(-1));
+            AssertEx.IsOrBecomesTrue(() => vm.CurrentAge == (ushort)RefereeTestHelper.TravelBirthdate.AddYears(-1).YearsAgo());
+            AssertEx.IsOrBecomesTrue(() => vm.MaxAgeBracket == TeamMsgs.AgeBracket.Adult);
+            // ReSharper restore AccessToDisposedClosure
         }
 
         [Fact]
