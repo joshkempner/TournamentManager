@@ -16,6 +16,8 @@ namespace TournamentManager.Presentation
             {
                 this.OneWayBind(ViewModel, vm => vm.RefereesVM, v => v.MainRefereesView.ViewModel)
                     .DisposeWith(disposables);
+                this.OneWayBind(ViewModel, vm => vm.TournamentVM, v => v.MainTournamentsView.ViewModel)
+                    .DisposeWith(disposables);
             });
         }
     }

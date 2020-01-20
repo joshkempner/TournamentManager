@@ -13,8 +13,4 @@
     <PackageReference Include="ReactiveUI.WPF" Version="11.1.6" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Presentation\Tournament\" />
-  </ItemGroup>
-
 </Project>

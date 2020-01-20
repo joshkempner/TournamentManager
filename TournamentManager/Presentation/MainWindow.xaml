@@ -16,7 +16,9 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Tournaments">
-                <reactiveUi:ViewModelViewHost x:Name="TournamentsViewHost" />
+                <Grid>
+                    <presentation:MainTournament x:Name="MainTournamentsView" />
+                </Grid>
             </TabItem>
         </TabControl>
     </Grid>

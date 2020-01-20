@@ -1,6 +1,4 @@
 ﻿using ReactiveDomain.Messaging.Bus;
-using ReactiveUI;
-using Splat;
 
 namespace TournamentManager.Presentation
 {
@@ -9,8 +7,11 @@ namespace TournamentManager.Presentation
         public MainWindowVM(IDispatcher bus)
         {
             RefereesVM = new MainRefereesVM(bus);
+            TournamentVM = new MainTournamentVM(bus);
         }
 
         public MainRefereesVM RefereesVM { get; }
+
+        public MainTournamentVM TournamentVM { get; }
     }
 }
