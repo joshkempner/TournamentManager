@@ -20,7 +20,6 @@ namespace TournamentManager.Tests.Presentation
         public when_managing_a_referee()
         {
             Locator.CurrentMutable.RegisterConstant(_fixture.StreamStoreConnection, typeof(IStreamStoreConnection));
-            Locator.CurrentMutable.RegisterConstant(_hostScreen, typeof(IScreen));
 
             _model = new RefereeModel(
                             Guid.NewGuid(),
@@ -34,7 +33,8 @@ namespace TournamentManager.Tests.Presentation
                             };
             _vm = new RefereeItemVM(
                         _fixture.Dispatcher,
-                        _model);
+                        _model,
+                        _hostScreen);
             _vm.Activator.Activate();
         }
 

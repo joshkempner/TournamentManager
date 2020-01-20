@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reactive;
 using ReactiveUI;
-using Splat;
 
 namespace TournamentManager.Presentation
 {
@@ -12,7 +11,7 @@ namespace TournamentManager.Presentation
 
         protected TransientViewModel(IScreen screen)
         {
-            HostScreen = screen ?? Locator.Current.GetService<IScreen>();
+            HostScreen = screen;
 
             this.WhenAnyObservable(x => x.Save)
                 .InvokeCommand(HostScreen.Router.NavigateBack);

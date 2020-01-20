@@ -6,7 +6,6 @@ using System.Reactive.Linq;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
 using ReactiveUI;
-using Splat;
 using TournamentManager.Helpers;
 using TournamentManager.Messages;
 // ReSharper disable RedundantDefaultMemberInitializer
@@ -20,10 +19,11 @@ namespace TournamentManager.Presentation
 
         public RefereeItemVM(
             IDispatcher bus,
-            RefereeModel model)
+            RefereeModel model,
+            IScreen screen)
         {
             RefereeId = model.RefereeId;
-            HostScreen = Locator.Current.GetService<IScreen>();
+            HostScreen = screen;
             Activator = new ViewModelActivator();
 
             this.WhenActivated(disposables =>

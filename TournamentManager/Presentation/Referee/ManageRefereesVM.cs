@@ -6,7 +6,6 @@ using DynamicData.Binding;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
 using ReactiveUI;
-using Splat;
 using TournamentManager.Helpers;
 
 namespace TournamentManager.Presentation
@@ -21,14 +20,14 @@ namespace TournamentManager.Presentation
             IDispatcher bus,
             IScreen screen)
         {
-            HostScreen = screen ?? Locator.Current.GetService<IScreen>();
+            HostScreen = screen;
 
             _rm = new ManageRefereesRM();
 
             _rm.Referees
                 .Connect()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Transform(x => new RefereeItemVM(bus, x))
+                .Transform(x => new RefereeItemVM(bus, x, screen))
                 .Sort(SortExpressionComparer<RefereeItemVM>.Ascending(x => x.Surname))
                 .Bind(Referees)
                 .Subscribe();
