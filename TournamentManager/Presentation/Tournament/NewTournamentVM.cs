@@ -16,6 +16,7 @@ namespace TournamentManager.Presentation
             : base(screen)
         {
             this.WhenAnyValue(x => x.LastDay)
+                .Where(x => x >= FirstDay)
                 .Select(x => (int)(x - FirstDay).TotalDays + 1) // 1-day tournament has same first and last days
                 .ToProperty(this, x => x.TournamentLength, out _tournamentLength);
 
@@ -23,7 +24,22 @@ namespace TournamentManager.Presentation
                 .Select(x => x.AddDays(TournamentLength - 1)) // 1-day tournament has same first and last days
                 .Subscribe(lastDay => LastDay = lastDay);
 
+            this.WhenAnyValue(x => x.FirstDay)
+                .ToProperty(this, x => x.EarliestAllowedLastDay, out _earliestAllowedLastDay);
+
+            this.WhenAnyValue(x => x.LastDay)
+                .Where(x => x < EarliestAllowedLastDay)
+                .Subscribe(_ => LastDay = EarliestAllowedLastDay);
+
+            this.WhenAnyValue(
+                    x => x.Name,
+                    x => x.FirstDay,
+                    x => x.LastDay,
+                    (name, first, last) => !string.IsNullOrWhiteSpace(name) && last >= first)
+                .ToProperty(this, x => x.CanAddTournament, out _canAddTournament);
+
             Save = bus.BuildSendCommand(
+                    this.WhenAnyValue(x => x.CanAddTournament),
                     () => MessageBuilder.New(
                             () => new TournamentMsgs.AddTournament(
                                         Guid.NewGuid(),
@@ -54,6 +70,12 @@ namespace TournamentManager.Presentation
             set => this.RaiseAndSetIfChanged(ref _lastDay, value);
         }
         private DateTime _lastDay;
+
+        public DateTime EarliestAllowedLastDay => _earliestAllowedLastDay.Value;
+        private readonly ObservableAsPropertyHelper<DateTime> _earliestAllowedLastDay;
+
+        public bool CanAddTournament => _canAddTournament.Value;
+        private readonly ObservableAsPropertyHelper<bool> _canAddTournament;
 
         public int TournamentLength => _tournamentLength.Value;
         private readonly ObservableAsPropertyHelper<int> _tournamentLength;
