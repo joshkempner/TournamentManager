@@ -3,11 +3,11 @@ using ReactiveUI;
 
 namespace TournamentManager.Presentation
 {
-    public class MainTournamentVM : IScreen
+    public class TournamentsHostVM : IScreen
     {
         private readonly IDispatcher _bus;
 
-        public MainTournamentVM(IDispatcher bus)
+        public TournamentsHostVM(IDispatcher bus)
         {
             _bus = bus;
         }

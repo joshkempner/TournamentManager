@@ -10,14 +10,14 @@
                            Title="MainWindow" Height="500" Width="800" SnapsToDevicePixels="True">
     <Grid>
         <TabControl TabStripPlacement="Bottom">
-            <TabItem Header="Referees">
-                <Grid>
-                    <presentation:MainReferees x:Name="MainRefereesView" />
-                </Grid>
-            </TabItem>
             <TabItem Header="Tournaments">
                 <Grid>
-                    <presentation:MainTournament x:Name="MainTournamentsView" />
+                    <presentation:TournamentsHost x:Name="MainTournamentsView" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Referees">
+                <Grid>
+                    <presentation:RefereesHost x:Name="MainRefereesView" />
                 </Grid>
             </TabItem>
         </TabControl>

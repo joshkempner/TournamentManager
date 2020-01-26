@@ -129,7 +129,7 @@ namespace TournamentManager.Presentation
         public string EmailAddress => _emailAddress.Value ?? string.Empty;
         private ObservableAsPropertyHelper<string?> _emailAddress = ObservableAsPropertyHelper<string?>.Default();
 
-        public MailAddress? FullEmail => _fullEmail?.Value;
+        public MailAddress FullEmail => _fullEmail?.Value ?? new MailAddress("invalid@email");
         private readonly ObservableAsPropertyHelper<MailAddress?> _fullEmail;
 
         public RefereeMsgs.Grade RefereeGrade => _refereeGrade.Value;

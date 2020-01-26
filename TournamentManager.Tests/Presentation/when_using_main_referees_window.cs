@@ -11,12 +11,12 @@ namespace TournamentManager.Tests.Presentation
     public sealed class when_using_main_referees_window
     {
         private readonly MockRepositorySpecification _fixture = new MockRepositorySpecification();
-        private readonly MainRefereesVM _vm;
+        private readonly RefereesHostVM _vm;
 
         public when_using_main_referees_window()
         {
             Locator.CurrentMutable.RegisterConstant(_fixture.StreamStoreConnection, typeof(IStreamStoreConnection));
-            _vm = new MainRefereesVM(_fixture.Dispatcher);
+            _vm = new RefereesHostVM(_fixture.Dispatcher);
         }
 
         [Fact]

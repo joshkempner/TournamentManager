@@ -5,11 +5,11 @@ using ReactiveUI;
 namespace TournamentManager.Presentation
 {
     /// <summary>
-    /// Interaction logic for MainReferees.xaml
+    /// Interaction logic for RefereesHost.xaml
     /// </summary>
-    public partial class MainReferees : IViewFor<MainRefereesVM>
+    public partial class RefereesHost : IViewFor<RefereesHostVM>
     {
-        public MainReferees()
+        public RefereesHost()
         {
             InitializeComponent();
 
@@ -25,20 +25,20 @@ namespace TournamentManager.Presentation
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
             "ViewModel",
-            typeof(MainRefereesVM),
-            typeof(MainReferees),
-            new PropertyMetadata(default(MainRefereesVM)));
+            typeof(RefereesHostVM),
+            typeof(RefereesHost),
+            new PropertyMetadata(default(RefereesHostVM)));
 
-        public MainRefereesVM ViewModel
+        public RefereesHostVM ViewModel
         {
-            get => (MainRefereesVM)GetValue(ViewModelProperty);
+            get => (RefereesHostVM)GetValue(ViewModelProperty);
             set => SetValue(ViewModelProperty, value);
         }
 
         object IViewFor.ViewModel
         {
             get => ViewModel;
-            set => ViewModel = (MainRefereesVM)value;
+            set => ViewModel = (RefereesHostVM)value;
         }
     }
 }

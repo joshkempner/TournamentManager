@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Reactive.Disposables;
+using System.Windows;
 using ReactiveUI;
 
 namespace TournamentManager.Presentation
@@ -11,6 +12,14 @@ namespace TournamentManager.Presentation
         public ManageTournaments()
         {
             InitializeComponent();
+
+            this.WhenActivated(disposables =>
+            {
+                this.OneWayBind(ViewModel, vm => vm.Tournaments, v => v.Tournaments.ItemsSource)
+                    .DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.AddTournament, v => v.AddTournament)
+                    .DisposeWith(disposables);
+            });
         }
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(

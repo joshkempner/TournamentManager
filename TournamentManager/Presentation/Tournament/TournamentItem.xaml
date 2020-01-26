@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="TournamentManager.Presentation.TournamentItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TournamentManager.Presentation"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d" 
+             d:DesignWidth="750">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+            <Button Name="EditTournament" Style="{StaticResource ColorHighlightButton}" Padding="10,2">
+                <iconPacks:PackIconFontAwesome Kind="EditRegular" Width="36" Height="36" Style="{StaticResource FontAwesomeYellowRollover}" />
+            </Button>
+        </StackPanel>
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock Name="TournamentName" Text="Some Tournament" FontSize="22" FontWeight="Bold" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Name="TournamentDates" Text="June 15, 2020 &#x2013; June 16, 2020" FontSize="14" />
+            </StackPanel>
+        </StackPanel>
+    </DockPanel>
+</UserControl>

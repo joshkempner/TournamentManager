@@ -21,6 +21,7 @@ namespace TournamentManager
         private IDispatcher? _mainBus;
 
         private RefereeSvc? _refereeSvc;
+        private TournamentSvc? _tournamentSvc;
         private MainWindowVM? _mainVM;
 
         internal Bootstrap()
@@ -51,12 +52,14 @@ namespace TournamentManager
             Locator.CurrentMutable.RegisterConstant(_esConnection, typeof(IStreamStoreConnection));
 
             _refereeSvc = new RefereeSvc(bus, _repo);
+            _tournamentSvc = new TournamentSvc(bus, _repo);
 
             RegisterViews();
         }
 
         internal void Shutdown()
         {
+            _tournamentSvc?.Dispose();
             _refereeSvc?.Dispose();
         }
 

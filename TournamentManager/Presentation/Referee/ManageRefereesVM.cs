@@ -30,6 +30,7 @@ namespace TournamentManager.Presentation
                 .Transform(x => new RefereeItemVM(bus, x, screen))
                 .Sort(SortExpressionComparer<RefereeItemVM>.Ascending(x => x.Surname))
                 .Bind(Referees)
+                .DisposeMany()
                 .Subscribe();
 
             AddReferee = CommandBuilder.FromAction(() =>

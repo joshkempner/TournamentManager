@@ -6,12 +6,12 @@ namespace TournamentManager.Presentation
     {
         public MainWindowVM(IDispatcher bus)
         {
-            RefereesVM = new MainRefereesVM(bus);
-            TournamentVM = new MainTournamentVM(bus);
+            RefereesVM = new RefereesHostVM(bus);
+            TournamentVM = new TournamentsHostVM(bus);
         }
 
-        public MainRefereesVM RefereesVM { get; }
+        public RefereesHostVM RefereesVM { get; }
 
-        public MainTournamentVM TournamentVM { get; }
+        public TournamentsHostVM TournamentVM { get; }
     }
 }
