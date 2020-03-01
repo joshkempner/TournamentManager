@@ -13,13 +13,14 @@ namespace TournamentManager.Presentation
     {
         private readonly TournamentInfoRM _rm;
 
+        public ReactiveCommand<Unit, Unit> Save { get; }
+
         public TournamentInfoVM(
             Guid tournamentId,
             IDispatcher bus,
             IScreen screen)
             : base(screen)
         {
-            Id = tournamentId;
             _rm = new TournamentInfoRM(tournamentId);
 
             _rm.TournamentName
@@ -47,6 +48,14 @@ namespace TournamentManager.Presentation
                 });
 
             Save = CommandBuilder.FromAction(
+                    this.WhenAnyValue(
+                        x => x.Name,
+                        x => x.LastSavedName,
+                        x => x.FirstDay,
+                        x => x.LastSavedFirstDay,
+                        x => x.LastDay,
+                        x => x.LastSavedLastDay,
+                        (n, sn, f, sf, l, sl) => n != sn || f != sf || l != sl),
                     () =>
                     {
                         if (Name != LastSavedName)
@@ -59,6 +68,9 @@ namespace TournamentManager.Presentation
                                                                     FirstDay,
                                                                     LastDay)));
                     });
+
+            this.WhenAnyObservable(x => x.Save)
+                .InvokeCommand(Complete);
         }
 
         private bool _disposed;
@@ -70,8 +82,6 @@ namespace TournamentManager.Presentation
                 _rm.Dispose();
             _disposed = true;
         }
-
-        private Guid Id { get; }
 
         public string Name
         {

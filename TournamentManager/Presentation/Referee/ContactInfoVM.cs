@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
@@ -14,6 +15,8 @@ namespace TournamentManager.Presentation
     public class ContactInfoVM : TransientViewModel
     {
         private readonly ContactInfoRM _rm;
+
+        public ReactiveCommand<Unit, Unit> Save { get; }
 
         public ContactInfoVM(
             Guid refereeId,
@@ -123,6 +126,9 @@ namespace TournamentManager.Presentation
                                                     EmailAddress)));
                         }
                     });
+
+            this.WhenAnyObservable(x => x.Save)
+                .InvokeCommand(Complete);
         }
 
         public Guid RefereeId { get; }

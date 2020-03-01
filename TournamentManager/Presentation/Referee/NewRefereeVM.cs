@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Mail;
+using System.Reactive;
 using System.Reactive.Linq;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
@@ -11,6 +12,8 @@ namespace TournamentManager.Presentation
 {
     public class NewRefereeVM : TransientViewModel
     {
+        public ReactiveCommand<Unit, Unit> Save { get; }
+
         public NewRefereeVM(
             IDispatcher bus,
             IScreen screen)
@@ -87,6 +90,9 @@ namespace TournamentManager.Presentation
                                                                 refId,
                                                                 MaxAgeBracket)));
                     });
+
+            this.WhenAnyObservable(x => x.Save)
+                .InvokeCommand(Complete);
 
             // Default values
             Age = 12;

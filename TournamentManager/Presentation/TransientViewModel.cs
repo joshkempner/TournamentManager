@@ -6,16 +6,14 @@ namespace TournamentManager.Presentation
 {
     public abstract class TransientViewModel : ReactiveObject, IRoutableViewModel, IDisposable
     {
-        public ReactiveCommand<Unit, Unit>? Save { get; protected set; }
+        public ReactiveCommand<Unit, Unit>? Complete { get; protected set; }
         public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         protected TransientViewModel(IScreen screen)
         {
             HostScreen = screen;
 
-            this.WhenAnyObservable(x => x.Save)
-                .InvokeCommand(HostScreen.Router.NavigateBack);
-
+            Complete = HostScreen.Router.NavigateBack;
             Cancel = HostScreen.Router.NavigateBack;
 
             this.WhenAnyObservable(x => x.HostScreen.Router.NavigateBack)

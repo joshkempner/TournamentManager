@@ -7,7 +7,7 @@
                            xmlns:reactiveUi="http://reactiveui.net"
                            xmlns:presentation="clr-namespace:TournamentManager.Presentation"
                            mc:Ignorable="d"
-                           Title="MainWindow" Height="500" Width="800" SnapsToDevicePixels="True">
+                           Title="Tournament Manager" Height="500" Width="800" SnapsToDevicePixels="True">
     <Grid>
         <TabControl TabStripPlacement="Bottom">
             <TabItem Header="Tournaments">

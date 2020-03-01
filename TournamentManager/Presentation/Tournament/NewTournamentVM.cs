@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Linq;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
@@ -10,6 +11,8 @@ namespace TournamentManager.Presentation
 {
     public sealed class NewTournamentVM : TransientViewModel
     {
+        public ReactiveCommand<Unit, Unit> Save { get; }
+
         public NewTournamentVM(
             IDispatcher bus,
             IScreen screen)
@@ -46,6 +49,9 @@ namespace TournamentManager.Presentation
                                         Name,
                                         FirstDay,
                                         LastDay)));
+
+            this.WhenAnyObservable(x => x.Save)
+                .InvokeCommand(Complete);
 
             FirstDay = DateTime.Today;
         }

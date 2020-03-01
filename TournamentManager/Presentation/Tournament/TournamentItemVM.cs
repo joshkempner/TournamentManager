@@ -38,7 +38,7 @@ namespace TournamentManager.Presentation
             this.WhenAnyValue(
                     x => x.FirstDay,
                     x => x.LastDay,
-                    (f, l) => $"{f:MMMM d, yyyy}{(l != f ? $" &#x2013; {l:MMMM d, yyyy}" : "")}")
+                    (f, l) => $"{f:MMMM d, yyyy}{(l != f ? $" \u2013 {l:MMMM d, yyyy}" : "")}")
                 .ToProperty(this, x => x.TournamentDates, out _tournamentDates);
 
             EditTournament = CommandBuilder.FromAction(

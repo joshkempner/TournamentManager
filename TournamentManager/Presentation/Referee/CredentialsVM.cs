@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Linq;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
@@ -12,6 +13,8 @@ namespace TournamentManager.Presentation
     public sealed class CredentialsVM : TransientViewModel
     {
         private readonly CredentialsRM _rm;
+
+        public ReactiveCommand<Unit, Unit> Save { get; }
 
         public CredentialsVM(
             Guid refereeId,
@@ -95,6 +98,9 @@ namespace TournamentManager.Presentation
                                                                     MaxAgeBracket)));
                         }
                     });
+
+            this.WhenAnyObservable(x => x.Save)
+                .InvokeCommand(Complete);
         }
 
         protected override void Dispose(bool disposing)
