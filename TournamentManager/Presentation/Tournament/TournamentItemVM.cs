@@ -53,7 +53,7 @@ namespace TournamentManager.Presentation
                                 }));
         }
 
-        private Guid Id { get; }
+        public Guid Id { get; }
 
         public string Name => _name?.Value ?? string.Empty;
         private ObservableAsPropertyHelper<string?> _name = ObservableAsPropertyHelper<string?>.Default();
@@ -64,7 +64,7 @@ namespace TournamentManager.Presentation
         public DateTime LastDay => _lastDay.Value;
         private ObservableAsPropertyHelper<DateTime> _lastDay = ObservableAsPropertyHelper<DateTime>.Default();
 
-        public string TournamentDates => _tournamentDates?.Value ?? string.Empty;
+        public string TournamentDates => _tournamentDates.Value ?? string.Empty;
         private readonly ObservableAsPropertyHelper<string?> _tournamentDates;
 
         public override string UrlPathSegment => "Tournament";
