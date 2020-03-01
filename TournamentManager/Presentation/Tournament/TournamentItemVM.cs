@@ -45,7 +45,7 @@ namespace TournamentManager.Presentation
                                 () => Threading.RunOnUiThread(() =>
                                 {
                                     HostScreen.Router.Navigate
-                                        .Execute(new TournamentMainVM(
+                                        .Execute(new TournamentInfoVM(
                                                         Id,
                                                         bus,
                                                         HostScreen))
