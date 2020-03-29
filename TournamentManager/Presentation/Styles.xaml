@@ -258,10 +258,6 @@
                             <Setter TargetName="Border" Property="BorderBrush" Value="DodgerBlue" />
                             <Setter Property="Foreground" Value="DodgerBlue" />
                         </Trigger>
-                        <!--<Trigger Property="IsSelected" Value="False">
-                            <Setter TargetName="Border" Property="BorderBrush" Value="Transparent" />
-                            <Setter Property="Foreground" Value="DarkGray" />
-                        </Trigger>-->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="True" />
