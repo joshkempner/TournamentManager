@@ -9,6 +9,9 @@
              d:DesignWidth="750">
     <DockPanel>
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+            <Button Name="ManageTournament" Style="{StaticResource ColorHighlightButton}" Padding="10,2">
+                <iconPacks:PackIconMaterial Kind="Tournament" Width="36" Height="36" Style="{StaticResource MaterialGreenRollover}" />
+            </Button>
             <Button Name="EditTournament" Style="{StaticResource ColorHighlightButton}" Padding="10,2">
                 <iconPacks:PackIconFontAwesome Kind="EditRegular" Width="36" Height="36" Style="{StaticResource FontAwesomeYellowRollover}" />
             </Button>

@@ -30,7 +30,7 @@ namespace TournamentManager.Tests.Presentation
             Locator.CurrentMutable.RegisterConstant(_fixture.StreamStoreConnection, typeof(IStreamStoreConnection));
 
             _repo = new CorrelatedStreamStoreRepository(_fixture.Repository);
-            // Add some referees
+            // Add some tournaments
             var tourney1 = new Tournament(
                                 _t1Id,
                                 "Tourney 1",

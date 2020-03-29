@@ -9,6 +9,11 @@
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro.IconPacks.Material;component/Themes/PackIconMaterial.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <Style TargetType="TabControl">
+        <Setter Property="TabStripPlacement" Value="Bottom" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
     <Style TargetType="TextBlock" x:Key="FieldLabel">
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Foreground" Value="#aaaaaa" />

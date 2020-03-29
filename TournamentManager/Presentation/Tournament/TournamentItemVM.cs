@@ -11,6 +11,7 @@ namespace TournamentManager.Presentation
     public sealed class TournamentItemVM : TransientViewModel, IActivatableViewModel
     {
         public ReactiveCommand<Unit, Unit> EditTournament { get; }
+        public ReactiveCommand<Unit, Unit> ManageTournament { get; }
 
         public TournamentItemVM(
             IDispatcher bus,
@@ -46,6 +47,17 @@ namespace TournamentManager.Presentation
                                 {
                                     HostScreen.Router.Navigate
                                         .Execute(new TournamentInfoVM(
+                                                        Id,
+                                                        bus,
+                                                        HostScreen))
+                                        .Subscribe();
+                                }));
+
+            ManageTournament = CommandBuilder.FromAction(
+                                () => Threading.RunOnUiThread(() =>
+                                {
+                                    HostScreen.Router.Navigate
+                                        .Execute(new TournamentScheduleVM(
                                                         Id,
                                                         bus,
                                                         HostScreen))

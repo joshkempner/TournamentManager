@@ -9,7 +9,7 @@
                            mc:Ignorable="d"
                            Title="Tournament Manager" Height="500" Width="800" SnapsToDevicePixels="True">
     <Grid>
-        <TabControl TabStripPlacement="Bottom" BorderThickness="0">
+        <TabControl>
             <TabItem Header="Tournaments">
                 <Grid>
                     <presentation:TournamentsHost x:Name="MainTournamentsView" />

@@ -21,6 +21,8 @@ namespace TournamentManager.Presentation
                     .DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.EditTournament, v => v.EditTournament)
                     .DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.ManageTournament, v => v.ManageTournament)
+                    .DisposeWith(disposables);
             });
         }
 
