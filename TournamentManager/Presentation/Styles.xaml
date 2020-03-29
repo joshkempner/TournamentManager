@@ -6,6 +6,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro.IconPacks.BoxIcons;component/Themes/PackIconBoxIcons.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro.IconPacks.FontAwesome;component/Themes/PackIconFontAwesome.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MahApps.Metro.IconPacks.Material;component/Themes/PackIconMaterial.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style TargetType="TextBlock" x:Key="FieldLabel">
@@ -240,6 +241,53 @@
         </Setter>
     </Style>
 
+    <Style TargetType="TabItem">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="DarkGray" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Border Name="Border" BorderThickness="0,2,0,0" Margin="2,0" Padding="10,2">
+                        <ContentPresenter x:Name="ContentSite"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            ContentSource="Header" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="DodgerBlue" />
+                            <Setter Property="Foreground" Value="DodgerBlue" />
+                        </Trigger>
+                        <!--<Trigger Property="IsSelected" Value="False">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="Transparent" />
+                            <Setter Property="Foreground" Value="DarkGray" />
+                        </Trigger>-->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsSelected" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.Setters>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="DodgerBlue" />
+                                <Setter Property="Foreground" Value="DodgerBlue" />
+                            </MultiTrigger.Setters>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="False" />
+                                <Condition Property="IsSelected" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.Setters>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="Transparent" />
+                                <Setter Property="Foreground" Value="DarkGray" />
+                            </MultiTrigger.Setters>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="{x:Type iconPacks:PackIconFontAwesome}" BasedOn="{StaticResource MahApps.Styles.PackIconFontAwesome}" x:Key="FontAwesomeGreenRollover">
         <Setter Property="Foreground" Value="Transparent" />
         <Style.Triggers>
@@ -264,6 +312,18 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="{x:Type iconPacks:PackIconMaterial}" BasedOn="{StaticResource MahApps.Styles.PackIconMaterial}" x:Key="MaterialGreenRollover">
+        <Setter Property="Foreground" Value="Transparent" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem,AncestorLevel=1}, Path=IsMouseOver}" Value="True" >
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button,AncestorLevel=1}, Path=IsMouseOver}" Value="True">
+                <Setter Property="Foreground" Value="DarkGreen"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <Style TargetType="{x:Type iconPacks:PackIconFontAwesome}" BasedOn="{StaticResource MahApps.Styles.PackIconFontAwesome}" x:Key="FontAwesomeYellowRollover">
         <Setter Property="Foreground" Value="Transparent" />
         <Style.Triggers>
@@ -277,6 +337,18 @@
     </Style>
 
     <Style TargetType="{x:Type iconPacks:PackIconBoxIcons}" BasedOn="{StaticResource MahApps.Styles.PackIconBoxIcons}" x:Key="BoxIconsYellowRollover">
+        <Setter Property="Foreground" Value="Transparent" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem,AncestorLevel=1}, Path=IsMouseOver}" Value="True" >
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button,AncestorLevel=1}, Path=IsMouseOver}" Value="True">
+                <Setter Property="Foreground" Value="Goldenrod"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type iconPacks:PackIconMaterial}" BasedOn="{StaticResource MahApps.Styles.PackIconBoxIcons}" x:Key="MaterialYellowRollover">
         <Setter Property="Foreground" Value="Transparent" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem,AncestorLevel=1}, Path=IsMouseOver}" Value="True" >
