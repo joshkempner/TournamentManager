@@ -17,7 +17,7 @@ namespace TournamentManager.Domain
         /// <summary>
         /// Games, indexed by ID, with value indicating whether a referee is assigned.
         /// </summary>
-        private readonly Dictionary<Guid, bool> _games = new Dictionary<Guid, bool>();
+        private readonly Dictionary<Guid, bool> _gameReferees = new Dictionary<Guid, bool>();
         private readonly HashSet<Guid> _referees = new HashSet<Guid>();
 
         private Tournament()
@@ -42,11 +42,11 @@ namespace TournamentManager.Domain
             Register<TournamentMsgs.GameSlotAdded>(e => _gameSlots.Add(e.GameSlotId));
             Register<TeamMsgs.TeamAdded>(e => _teams.Add(e.TeamId));
             Register<TeamMsgs.TeamRemoved>(e => _teams.Remove(e.TeamId));
-            Register<GameMsgs.GameAdded>(e => _games.Add(e.GameId, false));
-            Register<GameMsgs.GameCancelled>(e => _games.Remove(e.GameId));
+            Register<GameMsgs.GameAdded>(e => _gameReferees.Add(e.GameId, false));
+            Register<GameMsgs.GameCancelled>(e => _gameReferees.Remove(e.GameId));
             Register<TournamentMsgs.RefereeAddedToTournament>(e => _referees.Add(e.RefereeId));
-            Register<GameMsgs.RefereeAssigned>(e => _games[e.GameId] = true);
-            Register<GameMsgs.RefereeRemoved>(e => _games[e.GameId] = false);
+            Register<GameMsgs.RefereeAssigned>(e => _gameReferees[e.GameId] = true);
+            Register<GameMsgs.RefereeRemoved>(e => _gameReferees[e.GameId] = false);
         }
 
         public Tournament(
@@ -231,7 +231,7 @@ namespace TournamentManager.Domain
         public void CancelGame(Guid gameId)
         {
             Ensure.NotEmptyGuid(gameId, nameof(gameId));
-            if (!_games.ContainsKey(gameId)) return;
+            if (!_gameReferees.ContainsKey(gameId)) return;
             Raise(new GameMsgs.GameCancelled(
                         Id,
                         gameId));
@@ -242,7 +242,7 @@ namespace TournamentManager.Domain
             Guid homeTeamId)
         {
             Ensure.NotEmptyGuid(gameId, nameof(gameId));
-            if (!_games.ContainsKey(gameId))
+            if (!_gameReferees.ContainsKey(gameId))
                 throw new ArgumentException("Cannot update the home team for a non-existent game.");
             Ensure.NotEmptyGuid(homeTeamId, nameof(homeTeamId));
             if (!_teams.Contains(homeTeamId))
@@ -258,7 +258,7 @@ namespace TournamentManager.Domain
             Guid awayTeamId)
         {
             Ensure.NotEmptyGuid(gameId, nameof(gameId));
-            if (!_games.ContainsKey(gameId))
+            if (!_gameReferees.ContainsKey(gameId))
                 throw new ArgumentException("Cannot update the away team for a non-existent game.");
             Ensure.NotEmptyGuid(awayTeamId, nameof(awayTeamId));
             if (!_teams.Contains(awayTeamId))
@@ -274,7 +274,7 @@ namespace TournamentManager.Domain
             Guid refereeId)
         {
             Ensure.NotEmptyGuid(gameId, nameof(gameId));
-            if (!_games.ContainsKey(gameId))
+            if (!_gameReferees.ContainsKey(gameId))
                 throw new ArgumentException("Cannot assign a referee to a non-existent game.");
             Ensure.NotEmptyGuid(refereeId, nameof(refereeId));
             if (!_referees.Contains(refereeId))
@@ -288,9 +288,9 @@ namespace TournamentManager.Domain
         public void RemoveRefereeFromGame(Guid gameId)
         {
             Ensure.NotEmptyGuid(gameId, nameof(gameId));
-            if (!_games.ContainsKey(gameId))
+            if (!_gameReferees.ContainsKey(gameId))
                 throw new ArgumentException("Cannot assign a referee to a non-existent game.");
-            if (!_games[gameId]) return;
+            if (!_gameReferees[gameId]) return;
             Raise(new GameMsgs.RefereeRemoved(
                         Id,
                         gameId));
@@ -299,9 +299,9 @@ namespace TournamentManager.Domain
         public void ConfirmRefereeForGame(Guid gameId)
         {
             Ensure.NotEmptyGuid(gameId, nameof(gameId));
-            if (!_games.ContainsKey(gameId))
+            if (!_gameReferees.ContainsKey(gameId))
                 throw new ArgumentException("Cannot confirm referee assignment for a non-existent game.");
-            if (!_games[gameId])
+            if (!_gameReferees[gameId])
                 throw new ArgumentException("Cannot confirm referee assignment for a game with no assigned referee.");
             Raise(new GameMsgs.RefereeConfirmed(
                         Id,
