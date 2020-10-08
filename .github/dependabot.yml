@@ -12,5 +12,5 @@ updates:
     reviewers:
       - "joshkempner"
     commit-message:
-      prefix: "dependencies"
+      prefix: "bot "
       include: "scope"
