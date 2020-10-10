@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="MahApps.Metro.IconPacks" Version="3.1.0" />
-    <PackageReference Include="ReactiveDomain.UI" Version="0.8.21.8" />
+    <PackageReference Include="ReactiveDomain.UI" Version="0.8.22" />
     <PackageReference Include="ReactiveUI.WPF" Version="11.1.6" />
   </ItemGroup>
 
