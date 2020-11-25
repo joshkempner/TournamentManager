@@ -40,8 +40,8 @@ namespace TournamentManager.Domain
             });
             Register<TournamentMsgs.FieldAdded>(e => _fields.Add(e.FieldId));
             Register<TournamentMsgs.GameSlotAdded>(e => _gameSlots.Add(e.GameSlotId));
-            Register<TeamMsgs.TeamAdded>(e => _teams.Add(e.TeamId));
-            Register<TeamMsgs.TeamRemoved>(e => _teams.Remove(e.TeamId));
+            Register<TournamentMsgs.TeamAddedToTournament>(e => _teams.Add(e.TeamId));
+            Register<TournamentMsgs.TeamRemovedFromTournament>(e => _teams.Remove(e.TeamId));
             Register<GameMsgs.GameAdded>(e => _gameReferees.Add(e.GameId, false));
             Register<GameMsgs.GameCancelled>(e => _gameReferees.Remove(e.GameId));
             Register<TournamentMsgs.RefereeAddedToTournament>(e => _referees.Add(e.RefereeId));
@@ -141,58 +141,21 @@ namespace TournamentManager.Domain
 
         #region Teams
 
-        public void AddTeam(
-            Guid teamId,
-            string teamName,
-            TeamMsgs.AgeBracket ageBracket)
+        public void AddTeamToTournament(Guid teamId)
         {
             Ensure.NotEmptyGuid(teamId, nameof(teamId));
-            Ensure.NotNullOrEmpty(teamName, nameof(teamName));
-            Ensure.False(() => string.IsNullOrWhiteSpace(teamName), nameof(teamName));
-            if (_teams.Contains(teamId))
-                throw new ArgumentException("Cannot add a second team with the same ID.");
-            Raise(new TeamMsgs.TeamAdded(
-                        Id,
-                        teamId,
-                        teamName,
-                        ageBracket));
-        }
-
-        public void RemoveTeam(Guid teamId)
-        {
-            Ensure.NotEmptyGuid(teamId, nameof(teamId));
-            if (!_teams.Contains(teamId)) return;
-            Raise(new TeamMsgs.TeamRemoved(
+            if (_teams.Contains(teamId)) return; // Add is idempotent
+            Raise(new TournamentMsgs.TeamAddedToTournament(
                         Id,
                         teamId));
         }
 
-        public void RenameTeam(
-            Guid teamId,
-            string newName)
+        public void RemoveTeamFromTournament(Guid teamId)
         {
-            Ensure.NotEmptyGuid(teamId, nameof(teamId));
-            Ensure.NotNullOrEmpty(newName, nameof(newName));
-            Ensure.False(() => string.IsNullOrWhiteSpace(newName), nameof(newName));
-            if (!_teams.Contains(teamId))
-                throw new ArgumentException("Cannot rename a non-existent team.");
-            Raise(new TeamMsgs.TeamRenamed(
+            if (!_teams.Contains(teamId)) return; // Remove is idempotent
+            Raise(new TournamentMsgs.TeamRemovedFromTournament(
                         Id,
-                        teamId,
-                        newName));
-        }
-
-        public void UpdateAgeBracket(
-            Guid teamId,
-            TeamMsgs.AgeBracket ageBracket)
-        {
-            Ensure.NotEmptyGuid(teamId, nameof(teamId));
-            if (!_teams.Contains(teamId))
-                throw new ArgumentException("Cannot change the age bracket for a non-existent team.");
-            Raise(new TeamMsgs.AgeBracketUpdated(
-                        Id,
-                        teamId,
-                        ageBracket));
+                        teamId));
         }
 
         #endregion

@@ -14,10 +14,8 @@ namespace TournamentManager.Domain
         IHandleCommand<TournamentMsgs.AddField>,
         IHandleCommand<TournamentMsgs.AddGameSlot>,
         IHandleCommand<TournamentMsgs.AddRefereeToTournament>,
-        IHandleCommand<TeamMsgs.AddTeam>,
-        IHandleCommand<TeamMsgs.RemoveTeam>,
-        IHandleCommand<TeamMsgs.RenameTeam>,
-        IHandleCommand<TeamMsgs.UpdateAgeBracket>,
+        IHandleCommand<TournamentMsgs.AddTeamToTournament>,
+        IHandleCommand<TournamentMsgs.RemoveTeamFromTournament>,
         IHandleCommand<GameMsgs.AddGame>,
         IHandleCommand<GameMsgs.CancelGame>,
         IHandleCommand<GameMsgs.UpdateHomeTeam>,
@@ -41,11 +39,8 @@ namespace TournamentManager.Domain
             Subscribe<TournamentMsgs.AddField>(this);
             Subscribe<TournamentMsgs.AddGameSlot>(this);
             Subscribe<TournamentMsgs.AddRefereeToTournament>(this);
-
-            Subscribe<TeamMsgs.AddTeam>(this);
-            Subscribe<TeamMsgs.RemoveTeam>(this);
-            Subscribe<TeamMsgs.RenameTeam>(this);
-            Subscribe<TeamMsgs.UpdateAgeBracket>(this);
+            Subscribe<TournamentMsgs.AddTeamToTournament>(this);
+            Subscribe<TournamentMsgs.RemoveTeamFromTournament>(this);
 
             Subscribe<GameMsgs.AddGame>(this);
             Subscribe<GameMsgs.CancelGame>(this);
@@ -123,41 +118,18 @@ namespace TournamentManager.Domain
 
         #region TeamMsgs
 
-        public CommandResponse Handle(TeamMsgs.AddTeam command)
+        public CommandResponse Handle(TournamentMsgs.AddTeamToTournament command)
         {
             var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
-            tournament.AddTeam(
-                command.TeamId,
-                command.Name,
-                command.AgeBracket);
+            tournament.AddTeamToTournament(command.TeamId);
             _repository.Save(tournament);
             return command.Succeed();
         }
 
-        public CommandResponse Handle(TeamMsgs.RemoveTeam command)
+        public CommandResponse Handle(TournamentMsgs.RemoveTeamFromTournament command)
         {
             var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
-            tournament.RemoveTeam(command.TeamId);
-            _repository.Save(tournament);
-            return command.Succeed();
-        }
-
-        public CommandResponse Handle(TeamMsgs.RenameTeam command)
-        {
-            var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
-            tournament.RenameTeam(
-                command.TeamId,
-                command.Name);
-            _repository.Save(tournament);
-            return command.Succeed();
-        }
-
-        public CommandResponse Handle(TeamMsgs.UpdateAgeBracket command)
-        {
-            var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
-            tournament.UpdateAgeBracket(
-                command.TeamId,
-                command.AgeBracket);
+            tournament.RemoveTeamFromTournament(command.TeamId);
             _repository.Save(tournament);
             return command.Succeed();
         }

@@ -14,7 +14,6 @@ namespace TournamentManager.Tests.Domain
         private readonly Guid _gameId = Guid.NewGuid();
         private readonly Guid _gameSlotId = Guid.NewGuid();
         private readonly Guid _fieldId = Guid.NewGuid();
-        private const TeamMsgs.AgeBracket AgeBracket = TeamMsgs.AgeBracket.U10;
         private readonly Guid _homeTeamId = Guid.NewGuid();
         private readonly Guid _awayTeamId = Guid.NewGuid();
         private readonly Guid _thirdTeamId = Guid.NewGuid();
@@ -36,18 +35,9 @@ namespace TournamentManager.Tests.Domain
                 _gameSlotId,
                 new DateTime(2020, 6, 1, 9, 0, 0),
                 new DateTime(2020, 6, 1, 10, 0, 0));
-            tournament.AddTeam(
-                _homeTeamId,
-                "Team 1",
-                AgeBracket);
-            tournament.AddTeam(
-                _awayTeamId,
-                "Team 2",
-                AgeBracket);
-            tournament.AddTeam(
-                _thirdTeamId,
-                "Team 3",
-                AgeBracket);
+            tournament.AddTeamToTournament(_homeTeamId);
+            tournament.AddTeamToTournament(_awayTeamId);
+            tournament.AddTeamToTournament(_thirdTeamId);
             tournament.AddReferee(_referee1Id);
             tournament.AddReferee(_referee2Id);
             // Take events and reset the Source so we can continue to use the aggregate as "pre-hydrated"

@@ -16,86 +16,69 @@ namespace TournamentManager.Messages
             Adult
         }
 
-        public class AddTeam : Command
+        public class CreateTeam : Command
         {
-            public readonly Guid TournamentId;
             public readonly Guid TeamId;
             public readonly string Name;
             public readonly AgeBracket AgeBracket;
 
-            public AddTeam(
-                Guid tournamentId,
+            public CreateTeam(
                 Guid teamId,
                 string name,
                 AgeBracket ageBracket)
             {
-                TournamentId = tournamentId;
                 TeamId = teamId;
                 Name = name;
                 AgeBracket = ageBracket;
             }
         }
 
-        public class TeamAdded : Event
+        public class TeamCreated : Event
         {
-            public readonly Guid TournamentId;
             public readonly Guid TeamId;
             public readonly string Name;
             public readonly AgeBracket AgeBracket;
 
-            public TeamAdded(
-                Guid tournamentId,
+            public TeamCreated(
                 Guid teamId,
                 string name,
                 AgeBracket ageBracket)
             {
-                TournamentId = tournamentId;
                 TeamId = teamId;
                 Name = name;
                 AgeBracket = ageBracket;
             }
         }
 
-        public class RemoveTeam : Command
+        public class DeleteTeam : Command
         {
-            public readonly Guid TournamentId;
             public readonly Guid TeamId;
 
-            public RemoveTeam(
-                Guid tournamentId,
-                Guid teamId)
+            public DeleteTeam(Guid teamId)
             {
-                TournamentId = tournamentId;
                 TeamId = teamId;
             }
         }
 
-        public class TeamRemoved : Event
+        public class TeamDeleted : Event
         {
-            public readonly Guid TournamentId;
             public readonly Guid TeamId;
 
-            public TeamRemoved(
-                Guid tournamentId,
-                Guid teamId)
+            public TeamDeleted(Guid teamId)
             {
-                TournamentId = tournamentId;
                 TeamId = teamId;
             }
         }
 
         public class RenameTeam : Command
         {
-            public readonly Guid TournamentId;
             public readonly Guid TeamId;
             public readonly string Name;
 
             public RenameTeam(
-                Guid tournamentId,
                 Guid teamId,
                 string name)
             {
-                TournamentId = tournamentId;
                 TeamId = teamId;
                 Name = name;
             }
@@ -103,16 +86,13 @@ namespace TournamentManager.Messages
 
         public class TeamRenamed : Event
         {
-            public readonly Guid TournamentId;
             public readonly Guid TeamId;
             public readonly string Name;
 
             public TeamRenamed(
-                Guid tournamentId,
                 Guid teamId,
                 string name)
             {
-                TournamentId = tournamentId;
                 TeamId = teamId;
                 Name = name;
             }
@@ -120,16 +100,13 @@ namespace TournamentManager.Messages
 
         public class UpdateAgeBracket : Command
         {
-            public readonly Guid TournamentId;
             public readonly Guid TeamId;
             public readonly AgeBracket AgeBracket;
 
             public UpdateAgeBracket(
-                Guid tournamentId,
                 Guid teamId,
                 AgeBracket ageBracket)
             {
-                TournamentId = tournamentId;
                 TeamId = teamId;
                 AgeBracket = ageBracket;
             }
@@ -137,16 +114,13 @@ namespace TournamentManager.Messages
 
         public class AgeBracketUpdated : Event
         {
-            public readonly Guid TournamentId;
             public readonly Guid TeamId;
             public readonly AgeBracket AgeBracket;
 
             public AgeBracketUpdated(
-                Guid tournamentId,
                 Guid teamId,
                 AgeBracket ageBracket)
             {
-                TournamentId = tournamentId;
                 TeamId = teamId;
                 AgeBracket = ageBracket;
             }

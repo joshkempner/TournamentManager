@@ -10,201 +10,154 @@ namespace TournamentManager.Tests.Domain
 {
     public sealed class when_managing_teams
     {
-        private readonly Guid _tournamentId = Guid.NewGuid();
         private readonly Guid _teamId = Guid.NewGuid();
         private const string TeamName = "Springfield United";
         private const TeamMsgs.AgeBracket AgeBracket = TeamMsgs.AgeBracket.U14;
 
-        private Tournament AddTournament()
+        private Team AddTeam()
         {
-            var tournament = new Tournament(
-                                    _tournamentId,
-                                    "The Milk Cup",
-                                    new DateTime(2020, 6, 1),
-                                    new DateTime(2020, 6, 1),
-                                    MessageBuilder.New(() => new TestCommands.Command1()));
+            var team = new Team(
+                            _teamId,
+                            TeamName,
+                            AgeBracket,
+                            MessageBuilder.New(() => new TestCommands.Command1()));
             // Take events and reset the Source so we can continue to use the aggregate as "pre-hydrated"
-            tournament.TakeEvents();
-            ((ICorrelatedEventSource)tournament).Source = MessageBuilder.New(() => new TestCommands.Command1());
-            return tournament;
+            team.TakeEvents();
+            ((ICorrelatedEventSource)team).Source = MessageBuilder.New(() => new TestCommands.Command1());
+            return team;
         }
 
-        private Tournament AddTournamentWithTeam()
+        private Team AddAndDeleteTeam()
         {
-            var tournament = AddTournament();
-            tournament.AddTeam(
-                _teamId,
-                TeamName,
-                AgeBracket);
-            // Take events and reset the Source so we can continue to use the aggregate as "pre-hydrated"
-            tournament.TakeEvents();
-            ((ICorrelatedEventSource)tournament).Source = MessageBuilder.New(() => new TestCommands.Command1());
-            return tournament;
+            var team = AddTeam();
+            team.DeleteTeam();
+            team.TakeEvents();
+            ((ICorrelatedEventSource)team).Source = MessageBuilder.New(() => new TestCommands.Command1());
+            return team;
         }
 
         [Fact]
-        public void can_add_team()
+        public void can_create_team()
         {
-            var tournament = AddTournament();
-            tournament.AddTeam(
-                _teamId,
-                TeamName,
-                AgeBracket);
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
+            var team = new Team(
+                            _teamId,
+                            TeamName,
+                            AgeBracket,
+                            MessageBuilder.New(() => new TestCommands.Command1()));
+            Assert.True(team.HasRecordedEvents);
+            var events = team.TakeEvents();
             Assert.Collection(
                 events,
-                e => Assert.True(e is TeamMsgs.TeamAdded evt &&
-                                 evt.TournamentId == _tournamentId &&
+                e => Assert.True(e is TeamMsgs.TeamCreated evt &&
                                  evt.TeamId == _teamId &&
                                  evt.Name == TeamName &&
                                  evt.AgeBracket == AgeBracket));
         }
 
         [Fact]
-        public void cannot_add_team_with_invalid_id()
+        public void cannot_create_team_with_invalid_id()
         {
-            var tournament = AddTournament();
             Assert.Throws<ArgumentException>(
-                () => tournament.AddTeam(
-                        Guid.Empty,
-                        TeamName,
-                        AgeBracket));
-            Assert.False(tournament.HasRecordedEvents);
+                () => new Team(
+                            Guid.Empty,
+                            TeamName,
+                            AgeBracket,
+                            MessageBuilder.New(() => new TestCommands.Command1())));
         }
 
         [Fact]
-        public void cannot_add_team_with_duplicate_id()
+        public void cannot_create_team_with_invalid_name()
         {
-            var tournament = AddTournamentWithTeam();
-            Assert.Throws<ArgumentException>(
-                () => tournament.AddTeam(
-                        _teamId,
-                        TeamName,
-                        AgeBracket));
-            Assert.False(tournament.HasRecordedEvents);
-        }
-
-        [Fact]
-        public void cannot_add_team_with_invalid_name()
-        {
-            var tournament = AddTournament();
             Assert.Throws<ArgumentNullException>(
-                () => tournament.AddTeam(
-                        _teamId,
-                        string.Empty,
-                        AgeBracket));
+                () => new Team(
+                            _teamId,
+                            string.Empty,
+                            AgeBracket,
+                            MessageBuilder.New(() => new TestCommands.Command1())));
             Assert.Throws<ArgumentException>(
-                () => tournament.AddTeam(
-                        _teamId,
-                        " ",
-                        AgeBracket));
-            Assert.False(tournament.HasRecordedEvents);
+                () => new Team(
+                            _teamId,
+                            " ",
+                            AgeBracket,
+                            MessageBuilder.New(() => new TestCommands.Command1())));
         }
 
         [Fact]
-        public void can_remove_team()
+        public void can_delete_team()
         {
-            var tournament = AddTournamentWithTeam();
-            tournament.RemoveTeam(_teamId);
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
+            var team = AddTeam();
+            team.DeleteTeam();
+            Assert.True(team.HasRecordedEvents);
+            var events = team.TakeEvents();
             Assert.Collection(
                 events,
-                e => Assert.True(e is TeamMsgs.TeamRemoved evt &&
-                                 evt.TournamentId == _tournamentId &&
+                e => Assert.True(e is TeamMsgs.TeamDeleted evt &&
                                  evt.TeamId == _teamId));
         }
 
         [Fact]
-        public void removing_nonexistent_team_succeeds_implicitly()
+        public void delete_team_is_idempotent()
         {
-            var tournament = AddTournament();
-            tournament.RemoveTeam(_teamId);
-            Assert.False(tournament.HasRecordedEvents);
-        }
-
-        [Fact]
-        public void cannot_remove_team_with_empty_id()
-        {
-            var tournament = AddTournamentWithTeam();
-            Assert.Throws<ArgumentException>(() => tournament.RemoveTeam(Guid.Empty));
-            Assert.False(tournament.HasRecordedEvents);
+            var team = AddAndDeleteTeam();
+            team.DeleteTeam();
+            Assert.False(team.HasRecordedEvents);
         }
 
         [Fact]
         public void can_rename_team()
         {
             const string newName = "Springfield Divided";
-            var tournament = AddTournamentWithTeam();
-            tournament.RenameTeam(
-                _teamId,
-                newName);
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
+            var team = AddTeam();
+            team.RenameTeam(newName);
+            Assert.True(team.HasRecordedEvents);
+            var events = team.TakeEvents();
             Assert.Collection(
                 events,
                 e => Assert.True(e is TeamMsgs.TeamRenamed evt &&
-                                 evt.TournamentId == _tournamentId &&
                                  evt.TeamId == _teamId &&
                                  evt.Name == newName));
         }
 
         [Fact]
-        public void cannot_rename_team_with_invalid_team_id()
+        public void cannot_rename_team_with_invalid_name()
         {
-            const string newName = "Springfield Divided";
-            var tournament = AddTournamentWithTeam();
+            var team = AddTeam();
+            Assert.Throws<ArgumentNullException>(
+                () => team.RenameTeam(string.Empty));
             Assert.Throws<ArgumentException>(
-                () => tournament.RenameTeam(
-                    Guid.NewGuid(),
-                    newName));
-            Assert.False(tournament.HasRecordedEvents);
+                () => team.RenameTeam(" "));
+            Assert.False(team.HasRecordedEvents);
         }
 
         [Fact]
-        public void cannot_rename_team_with_invalid_name()
+        public void cannot_rename_deleted_team()
         {
-            var tournament = AddTournamentWithTeam();
-            Assert.Throws<ArgumentNullException>(
-                () => tournament.RenameTeam(
-                        _teamId,
-                        string.Empty));
-            Assert.Throws<ArgumentException>(
-                () => tournament.RenameTeam(
-                        _teamId,
-                        " "));
-            Assert.False(tournament.HasRecordedEvents);
+            const string newName = "Springfield Divided";
+            var team = AddAndDeleteTeam();
+            Assert.Throws<InvalidOperationException>(() => team.RenameTeam(newName));
         }
 
         [Fact]
         public void can_change_age_bracket()
         {
-            var ageBracket = TeamMsgs.AgeBracket.U16;
-            var tournament = AddTournamentWithTeam();
-            tournament.UpdateAgeBracket(
-                _teamId,
-                ageBracket);
-            Assert.True(tournament.HasRecordedEvents);
-            var events = tournament.TakeEvents();
+            const TeamMsgs.AgeBracket ageBracket = TeamMsgs.AgeBracket.U16;
+            var team = AddTeam();
+            team.UpdateAgeBracket(ageBracket);
+            Assert.True(team.HasRecordedEvents);
+            var events = team.TakeEvents();
             Assert.Collection(
                 events,
                 e => Assert.True(e is TeamMsgs.AgeBracketUpdated evt &&
-                                 evt.TournamentId == _tournamentId &&
                                  evt.TeamId == _teamId &&
                                  evt.AgeBracket == ageBracket));
         }
 
         [Fact]
-        public void cannot_change_age_bracket_with_invalid_team_id()
+        public void cannot_change_age_bracket_of_deleted_team()
         {
-            var ageBracket = TeamMsgs.AgeBracket.U16;
-            var tournament = AddTournamentWithTeam();
-            Assert.Throws<ArgumentException>(
-                () => tournament.UpdateAgeBracket(
-                        Guid.NewGuid(),
-                        ageBracket));
-            Assert.False(tournament.HasRecordedEvents);
+            const TeamMsgs.AgeBracket newAgeBracket = TeamMsgs.AgeBracket.U16;
+            var team = AddAndDeleteTeam();
+            Assert.Throws<InvalidOperationException>(() => team.UpdateAgeBracket(newAgeBracket));
         }
     }
 }

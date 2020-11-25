@@ -10,17 +10,36 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ReactiveUI;
 
 namespace TournamentManager.Presentation
 {
     /// <summary>
     /// Interaction logic for TournamentSchedule.xaml
     /// </summary>
-    public partial class TournamentSchedule : UserControl
+    public partial class TournamentSchedule : IViewFor<TournamentScheduleVM>
     {
         public TournamentSchedule()
         {
             InitializeComponent();
+        }
+
+        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
+            "ViewModel",
+            typeof(TournamentScheduleVM),
+            typeof(TournamentSchedule),
+            new PropertyMetadata(default(TournamentScheduleVM)));
+
+        public TournamentScheduleVM ViewModel
+        {
+            get => (TournamentScheduleVM)GetValue(ViewModelProperty);
+            set => SetValue(ViewModelProperty, value);
+        }
+
+        object IViewFor.ViewModel
+        {
+            get => ViewModel;
+            set => ViewModel = (TournamentScheduleVM)value;
         }
     }
 }

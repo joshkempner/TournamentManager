@@ -2,6 +2,7 @@
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Testing;
+using TournamentManager.Domain;
 using TournamentManager.Messages;
 using Xunit;
 
@@ -256,6 +257,86 @@ namespace TournamentManager.Tests.Domain
             Fixture
                 .TestQueue
                 .AssertNext<TournamentMsgs.AddRefereeToTournament>(cmd.CorrelationId)
+                .AssertEmpty();
+            Fixture.RepositoryEvents.AssertEmpty();
+        }
+
+        [Fact]
+        public void can_add_team_to_tournament()
+        {
+            var teamId = Guid.NewGuid();
+            AddTournament();
+            var cmd = MessageBuilder.New(() => new TournamentMsgs.AddTeamToTournament(
+                                                    TournamentId,
+                                                    teamId));
+            Fixture.Dispatcher.Send(cmd);
+            Fixture.RepositoryEvents.WaitFor<TournamentMsgs.TeamAddedToTournament>(TimeSpan.FromMilliseconds(200));
+            Fixture
+                .TestQueue
+                .AssertNext<TournamentMsgs.AddTeamToTournament>(cmd.CorrelationId)
+                .AssertEmpty();
+            Fixture
+                .RepositoryEvents
+                .AssertNext<TournamentMsgs.TeamAddedToTournament>(cmd.CorrelationId, out var evt)
+                .AssertEmpty();
+            Assert.Equal(TournamentId, evt.TournamentId);
+            Assert.Equal(teamId, evt.TeamId);
+        }
+
+        [Fact]
+        public void cannot_add_team_to_invalid_tournament()
+        {
+            AddTournament();
+            var cmd = MessageBuilder.New(() => new TournamentMsgs.AddTeamToTournament(
+                                                    Guid.NewGuid(),
+                                                    Guid.NewGuid()));
+            AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
+            Fixture
+                .TestQueue
+                .AssertNext<TournamentMsgs.AddTeamToTournament>(cmd.CorrelationId)
+                .AssertEmpty();
+            Fixture.RepositoryEvents.AssertEmpty();
+        }
+
+        [Fact]
+        public void can_remove_team_from_tournament()
+        {
+            var teamId = Guid.NewGuid();
+            AddTournament();
+            var repo = new CorrelatedStreamStoreRepository(Fixture.Repository);
+            var tournament = repo.GetById<Tournament>(TournamentId, MessageBuilder.New(() => new TestCommands.Command1()));
+            tournament.AddTeamToTournament(teamId);
+            repo.Save(tournament);
+            Fixture.RepositoryEvents.WaitFor<TournamentMsgs.TeamAddedToTournament>(TimeSpan.FromMilliseconds(200));
+            Fixture.ClearQueues();
+            var cmd = MessageBuilder.New(() => new TournamentMsgs.RemoveTeamFromTournament(
+                                                     TournamentId,
+                                                     teamId));
+            Fixture.Dispatcher.Send(cmd);
+            Fixture.RepositoryEvents.WaitFor<TournamentMsgs.TeamRemovedFromTournament>(TimeSpan.FromMilliseconds(200));
+            Fixture
+                .TestQueue
+                .AssertNext<TournamentMsgs.RemoveTeamFromTournament>(cmd.CorrelationId)
+                .AssertEmpty();
+            Fixture
+                .RepositoryEvents
+                .AssertNext<TournamentMsgs.TeamRemovedFromTournament>(cmd.CorrelationId, out var evt)
+                .AssertEmpty();
+            Assert.Equal(TournamentId, evt.TournamentId);
+            Assert.Equal(teamId, evt.TeamId);
+        }
+
+        [Fact]
+        public void cannot_remove_team_from_invalid_tournament()
+        {
+            AddTournament();
+            var cmd = MessageBuilder.New(() => new TournamentMsgs.RemoveTeamFromTournament(
+                                                    Guid.NewGuid(),
+                                                    Guid.NewGuid()));
+            AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
+            Fixture
+                .TestQueue
+                .AssertNext<TournamentMsgs.RemoveTeamFromTournament>(cmd.CorrelationId)
                 .AssertEmpty();
             Fixture.RepositoryEvents.AssertEmpty();
         }

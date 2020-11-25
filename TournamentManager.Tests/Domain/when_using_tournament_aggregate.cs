@@ -335,9 +335,35 @@ namespace TournamentManager.Tests.Domain
         public void cannot_add_game_slot_outside_tournament_days()
         {
             var gameSlotId = Guid.NewGuid();
+            // start and end time after end of tournament
             var startTime = _lastDay.AddDays(1).AddHours(9);
             var endTime = startTime.AddHours(1);
             var tournament = AddTournament();
+            Assert.Throws<ArgumentException>(
+                () => tournament.AddGameSlot(
+                        gameSlotId,
+                        startTime,
+                        endTime));
+            // start and end time before start of tournament
+            endTime = _firstDay.AddHours(-2);
+            startTime = endTime.AddHours(-1);
+            tournament = AddTournament();
+            Assert.Throws<ArgumentException>(
+                () => tournament.AddGameSlot(
+                        gameSlotId,
+                        startTime,
+                        endTime));
+            // valid start time, invalid end time
+            startTime = _lastDay.AddDays(1).AddHours(-0.5);
+            endTime = startTime.AddHours(1);
+            Assert.Throws<ArgumentException>(
+                () => tournament.AddGameSlot(
+                        gameSlotId,
+                        startTime,
+                        endTime));
+            // invalid start time, valid end time
+            startTime = _firstDay.AddHours(-0.5);
+            endTime = startTime.AddHours(1);
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGameSlot(
                         gameSlotId,
@@ -393,6 +419,100 @@ namespace TournamentManager.Tests.Domain
             tournament.TakeEvents();
             ((ICorrelatedEventSource)tournament).Source = MessageBuilder.New(() => new TestCommands.Command1());
             Assert.Throws<ArgumentException>(() => tournament.AddReferee(refereeId));
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void can_add_team_to_tournament()
+        {
+            var teamId = Guid.NewGuid();
+            var tournament = AddTournament();
+            tournament.AddTeamToTournament(teamId);
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Collection(
+                events,
+                e => Assert.True(e is TournamentMsgs.TeamAddedToTournament evt &&
+                                 evt.TournamentId == tournament.Id &&
+                                 evt.TeamId == teamId));
+        }
+
+        [Fact]
+        public void adding_team_is_idempotent()
+        {
+            var teamId = Guid.NewGuid();
+            var tournament = AddTournament();
+            tournament.AddTeamToTournament(teamId);
+            tournament.AddTeamToTournament(teamId); // Add the same team a second time
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Collection(
+                events,
+                e => Assert.True(e is TournamentMsgs.TeamAddedToTournament evt &&
+                                 evt.TournamentId == tournament.Id &&
+                                 evt.TeamId == teamId));
+        }
+
+        [Fact]
+        public void cannot_add_team_with_empty_id()
+        {
+            var tournament = AddTournament();
+            Assert.Throws<ArgumentException>(() => tournament.AddTeamToTournament(Guid.Empty));
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        private Tournament AddTournamentWithTeam(Guid teamId)
+        {
+            var tournament = new Tournament(
+                                    _tournamentId,
+                                    TournamentName,
+                                    _firstDay,
+                                    _lastDay,
+                                    MessageBuilder.New(() => new TestCommands.Command1()));
+            tournament.AddTeamToTournament(teamId);
+            // Take events and reset the Source so we can continue to use the aggregate as "pre-hydrated"
+            tournament.TakeEvents();
+            ((ICorrelatedEventSource)tournament).Source = MessageBuilder.New(() => new TestCommands.Command1());
+            return tournament;
+        }
+
+        [Fact]
+        public void can_remove_team_from_tournament()
+        {
+            var teamId = Guid.NewGuid();
+            var tournament = AddTournamentWithTeam(teamId);
+            tournament.RemoveTeamFromTournament(teamId);
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Collection(
+                events,
+                e => Assert.True(e is TournamentMsgs.TeamRemovedFromTournament evt &&
+                                 evt.TournamentId == tournament.Id &&
+                                 evt.TeamId == teamId));
+        }
+
+        [Fact]
+        public void removing_team_is_idempotent()
+        {
+            var teamId = Guid.NewGuid();
+            var tournament = AddTournamentWithTeam(teamId);
+            tournament.RemoveTeamFromTournament(teamId);
+            tournament.RemoveTeamFromTournament(teamId); // Remove the same team a second time
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Collection(
+                events,
+                e => Assert.True(e is TournamentMsgs.TeamRemovedFromTournament evt &&
+                                 evt.TournamentId == tournament.Id &&
+                                 evt.TeamId == teamId));
+        }
+
+        [Fact]
+        public void removing_nonexistent_team_succeeds_implicitly()
+        {
+            var tournament = AddTournament();
+            tournament.RemoveTeamFromTournament(Guid.NewGuid());
+            tournament.RemoveTeamFromTournament(Guid.Empty);
             Assert.False(tournament.HasRecordedEvents);
         }
     }

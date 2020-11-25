@@ -2,108 +2,77 @@
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Testing;
-using TournamentManager.Domain;
 using TournamentManager.Messages;
 using Xunit;
 
 namespace TournamentManager.Tests.Domain
 {
-    public sealed class when_managing_teams_through_service : with_tournament_service
+    public sealed class when_managing_teams_through_service : with_team_service
     {
-        private readonly Guid _teamId = Guid.NewGuid();
-        private const string TeamName = "Springfield United";
-        private const TeamMsgs.AgeBracket AgeBracket = TeamMsgs.AgeBracket.U14;
-
-        public when_managing_teams_through_service()
-        {
-            AddTournament();
-        }
-
-        private void AddTeam()
-        {
-            var repo = new CorrelatedStreamStoreRepository(Fixture.Repository);
-            var tournament = repo.GetById<Tournament>(TournamentId, MessageBuilder.New(() => new TestCommands.Command1()));
-            tournament.AddTeam(
-                _teamId,
-                TeamName,
-                AgeBracket);
-            repo.Save(tournament);
-            Fixture.RepositoryEvents.WaitFor<TeamMsgs.TeamAdded>(TimeSpan.FromMilliseconds(200));
-            Fixture.ClearQueues();
-        }
-
         [Fact]
         public void can_add_team()
         {
-            var cmd = MessageBuilder.New(() => new TeamMsgs.AddTeam(
-                                                    TournamentId,
-                                                    _teamId,
+            var cmd = MessageBuilder.New(() => new TeamMsgs.CreateTeam(
+                                                    TeamId,
                                                     TeamName,
                                                     AgeBracket));
             Fixture.Dispatcher.Send(cmd);
-            Fixture.RepositoryEvents.WaitFor<TeamMsgs.TeamAdded>(TimeSpan.FromMilliseconds(200));
+            Fixture.RepositoryEvents.WaitFor<TeamMsgs.TeamCreated>(TimeSpan.FromMilliseconds(200));
             Fixture
                 .TestQueue
-                .AssertNext<TeamMsgs.AddTeam>(cmd.CorrelationId)
+                .AssertNext<TeamMsgs.CreateTeam>(cmd.CorrelationId)
                 .AssertEmpty();
             Fixture
                 .RepositoryEvents
-                .AssertNext<TeamMsgs.TeamAdded>(cmd.CorrelationId, out var evt)
+                .AssertNext<TeamMsgs.TeamCreated>(cmd.CorrelationId, out var evt)
                 .AssertEmpty();
-            Assert.Equal(TournamentId, evt.TournamentId);
-            Assert.Equal(_teamId, evt.TeamId);
+            Assert.Equal(TeamId, evt.TeamId);
             Assert.Equal(TeamName, evt.Name);
             Assert.Equal(AgeBracket, evt.AgeBracket);
         }
 
         [Fact]
-        public void cannot_add_team_to_invalid_tournament()
+        public void cannot_create_team_with_duplicate_id()
         {
-            var cmd = MessageBuilder.New(() => new TeamMsgs.AddTeam(
-                                                    Guid.NewGuid(),
-                                                    _teamId,
+            AddTeam();
+            var cmd = MessageBuilder.New(() => new TeamMsgs.CreateTeam(
+                                                    TeamId,
                                                     TeamName,
                                                     AgeBracket));
-            AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
+            AssertEx.CommandThrows<Exception>(() => Fixture.Dispatcher.Send(cmd));
             Fixture
                 .TestQueue
-                .AssertNext<TeamMsgs.AddTeam>(cmd.CorrelationId)
+                .AssertNext<TeamMsgs.CreateTeam>(cmd.CorrelationId)
                 .AssertEmpty();
             Fixture.RepositoryEvents.AssertEmpty();
         }
 
         [Fact]
-        public void can_remove_team()
+        public void can_delete_team()
         {
             AddTeam();
-            var cmd = MessageBuilder.New(() => new TeamMsgs.RemoveTeam(
-                                                    TournamentId,
-                                                    _teamId));
+            var cmd = MessageBuilder.New(() => new TeamMsgs.DeleteTeam(TeamId));
             Fixture.Dispatcher.Send(cmd);
-            Fixture.RepositoryEvents.WaitFor<TeamMsgs.TeamRemoved>(TimeSpan.FromMilliseconds(200));
+            Fixture.RepositoryEvents.WaitFor<TeamMsgs.TeamDeleted>(TimeSpan.FromMilliseconds(200));
             Fixture
                 .TestQueue
-                .AssertNext<TeamMsgs.RemoveTeam>(cmd.CorrelationId)
+                .AssertNext<TeamMsgs.DeleteTeam>(cmd.CorrelationId)
                 .AssertEmpty();
             Fixture
                 .RepositoryEvents
-                .AssertNext<TeamMsgs.TeamRemoved>(cmd.CorrelationId, out var evt)
+                .AssertNext<TeamMsgs.TeamDeleted>(cmd.CorrelationId, out var evt)
                 .AssertEmpty();
-            Assert.Equal(TournamentId, evt.TournamentId);
-            Assert.Equal(_teamId, evt.TeamId);
+            Assert.Equal(TeamId, evt.TeamId);
         }
 
         [Fact]
-        public void cannot_remove_team_from_invalid_tournament()
+        public void deleting_nonexistent_team_succeeds_implicitly()
         {
-            AddTeam();
-            var cmd = MessageBuilder.New(() => new TeamMsgs.RemoveTeam(
-                                                    Guid.NewGuid(),
-                                                    _teamId));
-            AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
+            var cmd = MessageBuilder.New(() => new TeamMsgs.DeleteTeam(TeamId));
+            Fixture.Dispatcher.Send(cmd);
             Fixture
                 .TestQueue
-                .AssertNext<TeamMsgs.RemoveTeam>(cmd.CorrelationId)
+                .AssertNext<TeamMsgs.DeleteTeam>(cmd.CorrelationId)
                 .AssertEmpty();
             Fixture.RepositoryEvents.AssertEmpty();
         }
@@ -114,8 +83,7 @@ namespace TournamentManager.Tests.Domain
             const string newName = "Springfield Divided";
             AddTeam();
             var cmd = MessageBuilder.New(() => new TeamMsgs.RenameTeam(
-                                                    TournamentId,
-                                                    _teamId,
+                                                    TeamId,
                                                     newName));
             Fixture.Dispatcher.Send(cmd);
             Fixture.RepositoryEvents.WaitFor<TeamMsgs.TeamRenamed>(TimeSpan.FromMilliseconds(200));
@@ -127,19 +95,16 @@ namespace TournamentManager.Tests.Domain
                 .RepositoryEvents
                 .AssertNext<TeamMsgs.TeamRenamed>(cmd.CorrelationId, out var evt)
                 .AssertEmpty();
-            Assert.Equal(TournamentId, evt.TournamentId);
-            Assert.Equal(_teamId, evt.TeamId);
+            Assert.Equal(TeamId, evt.TeamId);
             Assert.Equal(newName, evt.Name);
         }
 
         [Fact]
-        public void cannot_rename_team_from_invalid_tournament()
+        public void cannot_rename_nonexistent_team()
         {
             const string newName = "Springfield Divided";
-            AddTeam();
             var cmd = MessageBuilder.New(() => new TeamMsgs.RenameTeam(
-                                                    Guid.NewGuid(),
-                                                    _teamId,
+                                                    TeamId,
                                                     newName));
             AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
             Fixture
@@ -155,8 +120,7 @@ namespace TournamentManager.Tests.Domain
             const TeamMsgs.AgeBracket newBracket = TeamMsgs.AgeBracket.U16;
             AddTeam();
             var cmd = MessageBuilder.New(() => new TeamMsgs.UpdateAgeBracket(
-                                                    TournamentId,
-                                                    _teamId,
+                                                    TeamId,
                                                     newBracket));
             Fixture.Dispatcher.Send(cmd);
             Fixture.RepositoryEvents.WaitFor<TeamMsgs.AgeBracketUpdated>(TimeSpan.FromMilliseconds(200));
@@ -168,19 +132,16 @@ namespace TournamentManager.Tests.Domain
                 .RepositoryEvents
                 .AssertNext<TeamMsgs.AgeBracketUpdated>(cmd.CorrelationId, out var evt)
                 .AssertEmpty();
-            Assert.Equal(TournamentId, evt.TournamentId);
-            Assert.Equal(_teamId, evt.TeamId);
+            Assert.Equal(TeamId, evt.TeamId);
             Assert.Equal(newBracket, evt.AgeBracket);
         }
 
         [Fact]
-        public void cannot_update_team_age_bracket_with_invalid_tournament()
+        public void cannot_update_age_bracket_for_nonexistent_team()
         {
             const TeamMsgs.AgeBracket newBracket = TeamMsgs.AgeBracket.U16;
-            AddTeam();
             var cmd = MessageBuilder.New(() => new TeamMsgs.UpdateAgeBracket(
-                                                    Guid.NewGuid(),
-                                                    _teamId,
+                                                    TeamId,
                                                     newBracket));
             AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
             Fixture

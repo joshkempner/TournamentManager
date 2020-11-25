@@ -208,5 +208,61 @@ namespace TournamentManager.Messages
                 RefereeId = refereeId;
             }
         }
+
+        public class AddTeamToTournament : Command
+        {
+            public readonly Guid TournamentId;
+            public readonly Guid TeamId;
+
+            public AddTeamToTournament(
+                Guid tournamentId,
+                Guid teamId)
+            {
+                TournamentId = tournamentId;
+                TeamId = teamId;
+            }
+        }
+
+        public class TeamAddedToTournament : Event
+        {
+            public readonly Guid TournamentId;
+            public readonly Guid TeamId;
+
+            public TeamAddedToTournament(
+                Guid tournamentId,
+                Guid teamId)
+            {
+                TournamentId = tournamentId;
+                TeamId = teamId;
+            }
+        }
+
+        public class RemoveTeamFromTournament : Command
+        {
+            public readonly Guid TournamentId;
+            public readonly Guid TeamId;
+
+            public RemoveTeamFromTournament(
+                Guid tournamentId,
+                Guid teamId)
+            {
+                TournamentId = tournamentId;
+                TeamId = teamId;
+            }
+        }
+
+        public class TeamRemovedFromTournament : Event
+        {
+            public readonly Guid TournamentId;
+            public readonly Guid TeamId;
+
+            public TeamRemovedFromTournament(
+                Guid tournamentId,
+                Guid teamId)
+            {
+                TournamentId = tournamentId;
+                TeamId = teamId;
+            }
+        }
     }
 }
