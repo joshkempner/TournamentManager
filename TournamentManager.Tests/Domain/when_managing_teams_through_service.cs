@@ -14,8 +14,7 @@ namespace TournamentManager.Tests.Domain
         {
             var cmd = MessageBuilder.New(() => new TeamMsgs.CreateTeam(
                                                     TeamId,
-                                                    TeamName,
-                                                    AgeBracket));
+                                                    TeamName));
             Fixture.Dispatcher.Send(cmd);
             Fixture.RepositoryEvents.WaitFor<TeamMsgs.TeamCreated>(TimeSpan.FromMilliseconds(200));
             Fixture
@@ -28,7 +27,6 @@ namespace TournamentManager.Tests.Domain
                 .AssertEmpty();
             Assert.Equal(TeamId, evt.TeamId);
             Assert.Equal(TeamName, evt.Name);
-            Assert.Equal(AgeBracket, evt.AgeBracket);
         }
 
         [Fact]
@@ -37,8 +35,7 @@ namespace TournamentManager.Tests.Domain
             AddTeam();
             var cmd = MessageBuilder.New(() => new TeamMsgs.CreateTeam(
                                                     TeamId,
-                                                    TeamName,
-                                                    AgeBracket));
+                                                    TeamName));
             AssertEx.CommandThrows<Exception>(() => Fixture.Dispatcher.Send(cmd));
             Fixture
                 .TestQueue
@@ -110,43 +107,6 @@ namespace TournamentManager.Tests.Domain
             Fixture
                 .TestQueue
                 .AssertNext<TeamMsgs.RenameTeam>(cmd.CorrelationId)
-                .AssertEmpty();
-            Fixture.RepositoryEvents.AssertEmpty();
-        }
-
-        [Fact]
-        public void can_update_team_age_bracket()
-        {
-            const TeamMsgs.AgeBracket newBracket = TeamMsgs.AgeBracket.U16;
-            AddTeam();
-            var cmd = MessageBuilder.New(() => new TeamMsgs.UpdateAgeBracket(
-                                                    TeamId,
-                                                    newBracket));
-            Fixture.Dispatcher.Send(cmd);
-            Fixture.RepositoryEvents.WaitFor<TeamMsgs.AgeBracketUpdated>(TimeSpan.FromMilliseconds(200));
-            Fixture
-                .TestQueue
-                .AssertNext<TeamMsgs.UpdateAgeBracket>(cmd.CorrelationId)
-                .AssertEmpty();
-            Fixture
-                .RepositoryEvents
-                .AssertNext<TeamMsgs.AgeBracketUpdated>(cmd.CorrelationId, out var evt)
-                .AssertEmpty();
-            Assert.Equal(TeamId, evt.TeamId);
-            Assert.Equal(newBracket, evt.AgeBracket);
-        }
-
-        [Fact]
-        public void cannot_update_age_bracket_for_nonexistent_team()
-        {
-            const TeamMsgs.AgeBracket newBracket = TeamMsgs.AgeBracket.U16;
-            var cmd = MessageBuilder.New(() => new TeamMsgs.UpdateAgeBracket(
-                                                    TeamId,
-                                                    newBracket));
-            AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
-            Fixture
-                .TestQueue
-                .AssertNext<TeamMsgs.UpdateAgeBracket>(cmd.CorrelationId)
                 .AssertEmpty();
             Fixture.RepositoryEvents.AssertEmpty();
         }

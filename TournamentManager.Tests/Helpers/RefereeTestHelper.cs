@@ -13,9 +13,9 @@ namespace TournamentManager.Tests.Helpers
         private readonly CorrelatedStreamStoreRepository _repo;
 
         internal const ushort IntramuralAge = 12;
-        internal const TeamMsgs.AgeBracket IntramuralMaxAgeBracket = TeamMsgs.AgeBracket.U8;
+        internal const TournamentMsgs.AgeBracket IntramuralMaxAgeBracket = TournamentMsgs.AgeBracket.U8;
         internal readonly DateTime TravelBirthdate = new DateTime(1990, 1, 1);
-        internal const TeamMsgs.AgeBracket TravelMaxAgeBracket = TeamMsgs.AgeBracket.U16;
+        internal const TournamentMsgs.AgeBracket TravelMaxAgeBracket = TournamentMsgs.AgeBracket.U16;
         internal const string GivenName = "John";
         internal const string Surname = "Smith";
         internal readonly string FullName = $"{GivenName} {Surname}";

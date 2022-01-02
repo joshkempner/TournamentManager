@@ -9,11 +9,17 @@
              d:DesignWidth="750">
     <DockPanel>
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-            <Button Name="ManageTournament" Style="{StaticResource ColorHighlightButton}" Padding="10,2">
+            <Button Name="ManageTeams" Style="{StaticResource ColorHighlightButton}" Padding="10,2"
+                    ToolTip="Edit which teams are participating in the tournament">
+                <iconPacks:PackIconMaterial Kind="ViewList" Width="36" Height="36" Style="{StaticResource MaterialBlueRollover}" />
+            </Button>
+            <Button Name="ManageTournament" Style="{StaticResource ColorHighlightButton}" Padding="10,2"
+                    ToolTip="Edit the tournament schedule">
                 <iconPacks:PackIconMaterial Kind="Tournament" Width="36" Height="36" Style="{StaticResource MaterialGreenRollover}" />
             </Button>
-            <Button Name="EditTournament" Style="{StaticResource ColorHighlightButton}" Padding="10,2">
-                <iconPacks:PackIconFontAwesome Kind="EditRegular" Width="36" Height="36" Style="{StaticResource FontAwesomeYellowRollover}" />
+            <Button Name="EditTournament" Style="{StaticResource ColorHighlightButton}" Padding="10,2"
+                    ToolTip="Edit the tournament name and dates">
+                <iconPacks:PackIconMaterial Kind="SquareEditOutline" Width="36" Height="36" Style="{StaticResource MaterialYellowRollover}" />
             </Button>
         </StackPanel>
         <StackPanel VerticalAlignment="Center">

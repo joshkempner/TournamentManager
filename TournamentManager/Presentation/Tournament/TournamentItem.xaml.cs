@@ -23,6 +23,8 @@ namespace TournamentManager.Presentation
                     .DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.ManageTournament, v => v.ManageTournament)
                     .DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.ManageTeams, v => v.ManageTeams)
+                    .DisposeWith(disposables);
             });
         }
 
@@ -32,16 +34,16 @@ namespace TournamentManager.Presentation
             typeof(TournamentItem),
             new PropertyMetadata(default(TournamentItemVM)));
 
-        public TournamentItemVM ViewModel
+        public TournamentItemVM? ViewModel
         {
-            get => (TournamentItemVM) GetValue(ViewModelProperty);
+            get => (TournamentItemVM)GetValue(ViewModelProperty);
             set => SetValue(ViewModelProperty, value);
         }
 
-        object IViewFor.ViewModel
+        object? IViewFor.ViewModel
         {
             get => ViewModel;
-            set => ViewModel = (TournamentItemVM) value;
+            set => ViewModel = value as TournamentItemVM;
         }
     }
 }

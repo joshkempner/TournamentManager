@@ -30,16 +30,16 @@ namespace TournamentManager.Presentation
             typeof(TournamentsHost),
             new PropertyMetadata(default(TournamentsHostVM)));
 
-        public TournamentsHostVM ViewModel
+        public TournamentsHostVM? ViewModel
         {
             get => (TournamentsHostVM)GetValue(ViewModelProperty);
             set => SetValue(ViewModelProperty, value);
         }
 
-        object IViewFor.ViewModel
+        object? IViewFor.ViewModel
         {
             get => ViewModel;
-            set => ViewModel = (TournamentsHostVM)value;
+            set => ViewModel = value as TournamentsHostVM;
         }
     }
 }

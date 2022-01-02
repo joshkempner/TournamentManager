@@ -4,9 +4,7 @@ using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
 using ReactiveDomain.Messaging.Bus;
-using ReactiveDomain.UI;
 using ReactiveUI;
-using TournamentManager.Helpers;
 
 namespace TournamentManager.Presentation
 {
@@ -14,7 +12,7 @@ namespace TournamentManager.Presentation
     {
         private readonly ManageTournamentsRM _rm;
 
-        public ReactiveCommand<Unit, Unit> AddTournament { get; }
+        public ReactiveCommand<Unit, IRoutableViewModel> AddTournament { get; }
 
         public ManageTournamentsVM(
             IDispatcher bus,
@@ -33,13 +31,7 @@ namespace TournamentManager.Presentation
                 .DisposeMany()
                 .Subscribe();
 
-            AddTournament = CommandBuilder.FromAction(() =>
-            {
-                Threading.RunOnUiThread(
-                    () => HostScreen.Router.Navigate
-                            .Execute(new NewTournamentVM(bus, HostScreen))
-                            .Subscribe());
-            });
+            AddTournament = ReactiveCommand.CreateFromObservable(() => HostScreen.Router.Navigate.Execute(new NewTournamentVM(bus, HostScreen)));
         }
 
         public IObservableCollection<TournamentItemVM> Tournaments { get; } = new ObservableCollectionExtended<TournamentItemVM>();

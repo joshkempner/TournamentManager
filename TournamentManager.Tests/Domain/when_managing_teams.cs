@@ -12,14 +12,12 @@ namespace TournamentManager.Tests.Domain
     {
         private readonly Guid _teamId = Guid.NewGuid();
         private const string TeamName = "Springfield United";
-        private const TeamMsgs.AgeBracket AgeBracket = TeamMsgs.AgeBracket.U14;
 
         private Team AddTeam()
         {
             var team = new Team(
                             _teamId,
                             TeamName,
-                            AgeBracket,
                             MessageBuilder.New(() => new TestCommands.Command1()));
             // Take events and reset the Source so we can continue to use the aggregate as "pre-hydrated"
             team.TakeEvents();
@@ -42,7 +40,6 @@ namespace TournamentManager.Tests.Domain
             var team = new Team(
                             _teamId,
                             TeamName,
-                            AgeBracket,
                             MessageBuilder.New(() => new TestCommands.Command1()));
             Assert.True(team.HasRecordedEvents);
             var events = team.TakeEvents();
@@ -50,8 +47,7 @@ namespace TournamentManager.Tests.Domain
                 events,
                 e => Assert.True(e is TeamMsgs.TeamCreated evt &&
                                  evt.TeamId == _teamId &&
-                                 evt.Name == TeamName &&
-                                 evt.AgeBracket == AgeBracket));
+                                 evt.Name == TeamName));
         }
 
         [Fact]
@@ -61,7 +57,6 @@ namespace TournamentManager.Tests.Domain
                 () => new Team(
                             Guid.Empty,
                             TeamName,
-                            AgeBracket,
                             MessageBuilder.New(() => new TestCommands.Command1())));
         }
 
@@ -72,13 +67,11 @@ namespace TournamentManager.Tests.Domain
                 () => new Team(
                             _teamId,
                             string.Empty,
-                            AgeBracket,
                             MessageBuilder.New(() => new TestCommands.Command1())));
             Assert.Throws<ArgumentException>(
                 () => new Team(
                             _teamId,
                             " ",
-                            AgeBracket,
                             MessageBuilder.New(() => new TestCommands.Command1())));
         }
 
@@ -135,29 +128,6 @@ namespace TournamentManager.Tests.Domain
             const string newName = "Springfield Divided";
             var team = AddAndDeleteTeam();
             Assert.Throws<InvalidOperationException>(() => team.RenameTeam(newName));
-        }
-
-        [Fact]
-        public void can_change_age_bracket()
-        {
-            const TeamMsgs.AgeBracket ageBracket = TeamMsgs.AgeBracket.U16;
-            var team = AddTeam();
-            team.UpdateAgeBracket(ageBracket);
-            Assert.True(team.HasRecordedEvents);
-            var events = team.TakeEvents();
-            Assert.Collection(
-                events,
-                e => Assert.True(e is TeamMsgs.AgeBracketUpdated evt &&
-                                 evt.TeamId == _teamId &&
-                                 evt.AgeBracket == ageBracket));
-        }
-
-        [Fact]
-        public void cannot_change_age_bracket_of_deleted_team()
-        {
-            const TeamMsgs.AgeBracket newAgeBracket = TeamMsgs.AgeBracket.U16;
-            var team = AddAndDeleteTeam();
-            Assert.Throws<InvalidOperationException>(() => team.UpdateAgeBracket(newAgeBracket));
         }
     }
 }

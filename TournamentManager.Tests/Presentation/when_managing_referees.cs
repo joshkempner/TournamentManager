@@ -94,7 +94,7 @@ namespace TournamentManager.Tests.Presentation
             const string emailAddress = "jon.smyth@gmail.com";
             const RefereeMsgs.Grade refereeGrade = RefereeMsgs.Grade.Regional;
             var birthdate = DateTime.Today.AddYears(-72);
-            const TeamMsgs.AgeBracket maxAge = TeamMsgs.AgeBracket.Adult;
+            const TournamentMsgs.AgeBracket maxAge = TournamentMsgs.AgeBracket.Adult;
             var ref1 = _repo.GetById<Referee>(_ref1Id, MessageBuilder.New(() => new TestCommands.Command1()));
             ref1.UpdateGivenName(givenName);
             ref1.UpdateSurname(surname);

@@ -427,14 +427,16 @@ namespace TournamentManager.Tests.Domain
         {
             var teamId = Guid.NewGuid();
             var tournament = AddTournament();
-            tournament.AddTeamToTournament(teamId);
+            const TournamentMsgs.AgeBracket ageBracket = TournamentMsgs.AgeBracket.U14;
+            tournament.AddTeamToTournament(teamId, ageBracket);
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
             Assert.Collection(
                 events,
                 e => Assert.True(e is TournamentMsgs.TeamAddedToTournament evt &&
                                  evt.TournamentId == tournament.Id &&
-                                 evt.TeamId == teamId));
+                                 evt.TeamId == teamId &&
+                                 evt.AgeBracket == ageBracket));
         }
 
         [Fact]
@@ -442,22 +444,24 @@ namespace TournamentManager.Tests.Domain
         {
             var teamId = Guid.NewGuid();
             var tournament = AddTournament();
-            tournament.AddTeamToTournament(teamId);
-            tournament.AddTeamToTournament(teamId); // Add the same team a second time
+            const TournamentMsgs.AgeBracket ageBracket = TournamentMsgs.AgeBracket.U14;
+            tournament.AddTeamToTournament(teamId, ageBracket);
+            tournament.AddTeamToTournament(teamId, ageBracket); // Add the same team a second time
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
             Assert.Collection(
                 events,
                 e => Assert.True(e is TournamentMsgs.TeamAddedToTournament evt &&
                                  evt.TournamentId == tournament.Id &&
-                                 evt.TeamId == teamId));
+                                 evt.TeamId == teamId &&
+                                 evt.AgeBracket == ageBracket));
         }
 
         [Fact]
         public void cannot_add_team_with_empty_id()
         {
             var tournament = AddTournament();
-            Assert.Throws<ArgumentException>(() => tournament.AddTeamToTournament(Guid.Empty));
+            Assert.Throws<ArgumentException>(() => tournament.AddTeamToTournament(Guid.Empty, TournamentMsgs.AgeBracket.U14));
             Assert.False(tournament.HasRecordedEvents);
         }
 
@@ -469,7 +473,7 @@ namespace TournamentManager.Tests.Domain
                                     _firstDay,
                                     _lastDay,
                                     MessageBuilder.New(() => new TestCommands.Command1()));
-            tournament.AddTeamToTournament(teamId);
+            tournament.AddTeamToTournament(teamId, TournamentMsgs.AgeBracket.U14);
             // Take events and reset the Source so we can continue to use the aggregate as "pre-hydrated"
             tournament.TakeEvents();
             ((ICorrelatedEventSource)tournament).Source = MessageBuilder.New(() => new TestCommands.Command1());
@@ -514,6 +518,41 @@ namespace TournamentManager.Tests.Domain
             tournament.RemoveTeamFromTournament(Guid.NewGuid());
             tournament.RemoveTeamFromTournament(Guid.Empty);
             Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void can_change_team_age_bracket()
+        {
+            var teamId = Guid.NewGuid();
+            var tournament = AddTournamentWithTeam(teamId);
+            const TournamentMsgs.AgeBracket newAgeBracket = TournamentMsgs.AgeBracket.U16;
+            tournament.ChangeTeamAgeBracket(teamId, newAgeBracket);
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Collection(
+                events,
+                e => Assert.True(e is TournamentMsgs.TeamAgeBracketChanged evt &&
+                                 evt.TournamentId == tournament.Id &&
+                                 evt.TeamId == teamId &&
+                                 evt.AgeBracket == newAgeBracket));
+        }
+
+        [Fact]
+        public void cannot_change_age_bracket_of_team_with_invalid_id()
+        {
+            var teamId = Guid.NewGuid();
+            var tournament = AddTournamentWithTeam(teamId);
+            const TournamentMsgs.AgeBracket newAgeBracket = TournamentMsgs.AgeBracket.U16;
+            Assert.Throws<ArgumentException>(() => tournament.ChangeTeamAgeBracket(Guid.Empty, newAgeBracket));
+        }
+
+        [Fact]
+        public void cannot_change_age_bracket_of_team_not_in_tournament()
+        {
+            var teamId = Guid.NewGuid();
+            var tournament = AddTournamentWithTeam(teamId);
+            const TournamentMsgs.AgeBracket newAgeBracket = TournamentMsgs.AgeBracket.U16;
+            Assert.Throws<Exception>(() => tournament.ChangeTeamAgeBracket(Guid.NewGuid(), newAgeBracket));
         }
     }
 }

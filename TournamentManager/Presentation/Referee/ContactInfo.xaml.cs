@@ -45,16 +45,16 @@ namespace TournamentManager.Presentation
             typeof(ContactInfo),
             new PropertyMetadata(default(ContactInfoVM)));
 
-        public ContactInfoVM ViewModel
+        public ContactInfoVM? ViewModel
         {
             get => (ContactInfoVM)GetValue(ViewModelProperty);
             set => SetValue(ViewModelProperty, value);
         }
 
-        object IViewFor.ViewModel
+        object? IViewFor.ViewModel
         {
             get => ViewModel;
-            set => ViewModel = (ContactInfoVM)value;
+            set => ViewModel = value as ContactInfoVM;
         }
     }
 }

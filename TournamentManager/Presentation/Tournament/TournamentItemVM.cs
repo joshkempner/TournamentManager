@@ -2,16 +2,15 @@
 using System.Reactive;
 using System.Reactive.Disposables;
 using ReactiveDomain.Messaging.Bus;
-using ReactiveDomain.UI;
 using ReactiveUI;
-using TournamentManager.Helpers;
 
 namespace TournamentManager.Presentation
 {
     public sealed class TournamentItemVM : TransientViewModel, IActivatableViewModel
     {
-        public ReactiveCommand<Unit, Unit> EditTournament { get; }
-        public ReactiveCommand<Unit, Unit> ManageTournament { get; }
+        public ReactiveCommand<Unit, IRoutableViewModel> EditTournament { get; }
+        public ReactiveCommand<Unit, IRoutableViewModel> ManageTournament { get; }
+        public ReactiveCommand<Unit, IRoutableViewModel> ManageTeams { get; }
 
         public TournamentItemVM(
             IDispatcher bus,
@@ -42,27 +41,32 @@ namespace TournamentManager.Presentation
                     (f, l) => $"{f:MMMM d, yyyy}{(l != f ? $" \u2013 {l:MMMM d, yyyy}" : "")}")
                 .ToProperty(this, x => x.TournamentDates, out _tournamentDates);
 
-            EditTournament = CommandBuilder.FromAction(
-                                () => Threading.RunOnUiThread(() =>
-                                {
-                                    HostScreen.Router.Navigate
+            EditTournament = ReactiveCommand.CreateFromObservable(
+                                () => HostScreen
+                                        .Router
+                                        .Navigate
                                         .Execute(new TournamentInfoVM(
                                                         Id,
                                                         bus,
-                                                        HostScreen))
-                                        .Subscribe();
-                                }));
+                                                        HostScreen)));
 
-            ManageTournament = CommandBuilder.FromAction(
-                                () => Threading.RunOnUiThread(() =>
-                                {
-                                    HostScreen.Router.Navigate
+            ManageTournament = ReactiveCommand.CreateFromObservable(
+                                () => HostScreen
+                                        .Router
+                                        .Navigate
                                         .Execute(new TournamentScheduleVM(
                                                         Id,
                                                         bus,
-                                                        HostScreen))
-                                        .Subscribe();
-                                }));
+                                                        HostScreen)));
+
+            ManageTeams = ReactiveCommand.CreateFromObservable(
+                                () => HostScreen
+                                        .Router
+                                        .Navigate
+                                        .Execute(new TournamentTeamsVM(
+                                                        bus,
+                                                        Id,
+                                                        HostScreen)));
         }
 
         public Guid Id { get; }

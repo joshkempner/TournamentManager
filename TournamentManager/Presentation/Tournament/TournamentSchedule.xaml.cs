@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows;
 using ReactiveUI;
 
 namespace TournamentManager.Presentation
@@ -30,16 +19,16 @@ namespace TournamentManager.Presentation
             typeof(TournamentSchedule),
             new PropertyMetadata(default(TournamentScheduleVM)));
 
-        public TournamentScheduleVM ViewModel
+        public TournamentScheduleVM? ViewModel
         {
             get => (TournamentScheduleVM)GetValue(ViewModelProperty);
             set => SetValue(ViewModelProperty, value);
         }
 
-        object IViewFor.ViewModel
+        object? IViewFor.ViewModel
         {
             get => ViewModel;
-            set => ViewModel = (TournamentScheduleVM)value;
+            set => ViewModel = value as TournamentScheduleVM;
         }
     }
 }

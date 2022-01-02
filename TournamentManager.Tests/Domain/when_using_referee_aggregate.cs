@@ -336,8 +336,8 @@ namespace TournamentManager.Tests.Domain
         [Fact]
         public void can_add_or_update_max_age_bracket()
         {
-            const TeamMsgs.AgeBracket bracket1 = TeamMsgs.AgeBracket.U14;
-            const TeamMsgs.AgeBracket bracket2 = TeamMsgs.AgeBracket.U18;
+            const TournamentMsgs.AgeBracket bracket1 = TournamentMsgs.AgeBracket.U14;
+            const TournamentMsgs.AgeBracket bracket2 = TournamentMsgs.AgeBracket.U18;
             var referee = AddReferee();
             referee.AddOrUpdateMaxAgeBracket(bracket1);
             referee.AddOrUpdateMaxAgeBracket(bracket2);
@@ -356,12 +356,12 @@ namespace TournamentManager.Tests.Domain
         public void cannot_set_max_age_above_u8_for_intramural_referee()
         {
             var referee = AddReferee(RefereeMsgs.Grade.Intramural);
-            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.U10));
-            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.U12));
-            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.U14));
-            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.U16));
-            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.U18));
-            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.Adult));
+            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TournamentMsgs.AgeBracket.U10));
+            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TournamentMsgs.AgeBracket.U12));
+            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TournamentMsgs.AgeBracket.U14));
+            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TournamentMsgs.AgeBracket.U16));
+            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TournamentMsgs.AgeBracket.U18));
+            Assert.Throws<ArgumentOutOfRangeException>(() => referee.AddOrUpdateMaxAgeBracket(TournamentMsgs.AgeBracket.Adult));
             Assert.False(referee.HasRecordedEvents);
         }
     }

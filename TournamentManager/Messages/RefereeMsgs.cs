@@ -275,11 +275,11 @@ namespace TournamentManager.Messages
         public class AddOrUpdateMaxAgeBracket : Command
         {
             public readonly Guid RefereeId;
-            public readonly TeamMsgs.AgeBracket MaxAgeBracket;
+            public readonly TournamentMsgs.AgeBracket MaxAgeBracket;
 
             public AddOrUpdateMaxAgeBracket(
                 Guid refereeId,
-                TeamMsgs.AgeBracket maxAgeBracket)
+                TournamentMsgs.AgeBracket maxAgeBracket)
             {
                 RefereeId = refereeId;
                 MaxAgeBracket = maxAgeBracket;
@@ -289,11 +289,11 @@ namespace TournamentManager.Messages
         public class MaxAgeBracketChanged : Event
         {
             public readonly Guid RefereeId;
-            public readonly TeamMsgs.AgeBracket MaxAgeBracket;
+            public readonly TournamentMsgs.AgeBracket MaxAgeBracket;
 
             public MaxAgeBracketChanged(
                 Guid refereeId,
-                TeamMsgs.AgeBracket maxAgeBracket)
+                TournamentMsgs.AgeBracket maxAgeBracket)
             {
                 RefereeId = refereeId;
                 MaxAgeBracket = maxAgeBracket;

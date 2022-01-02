@@ -141,14 +141,14 @@ namespace TournamentManager.Presentation
         }
         private DateTime _birthdate;
 
-        private TeamMsgs.AgeBracket LastSavedMaxAgeBracket { get; set; }
+        private TournamentMsgs.AgeBracket LastSavedMaxAgeBracket { get; set; }
 
-        public TeamMsgs.AgeBracket MaxAgeBracket
+        public TournamentMsgs.AgeBracket MaxAgeBracket
         {
             get => _maxAgeBracket;
             set => this.RaiseAndSetIfChanged(ref _maxAgeBracket, value);
         }
-        private TeamMsgs.AgeBracket _maxAgeBracket;
+        private TournamentMsgs.AgeBracket _maxAgeBracket;
 
         public override string UrlPathSegment => "Referee Credentials";
     }

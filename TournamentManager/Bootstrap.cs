@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using ReactiveDomain;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Logging;
@@ -6,6 +7,7 @@ using ReactiveDomain.Messaging.Bus;
 using ReactiveUI;
 using Splat;
 using TournamentManager.Domain;
+using TournamentManager.Helpers;
 using TournamentManager.Presentation;
 using ILogger = ReactiveDomain.Logging.ILogger;
 
@@ -22,6 +24,7 @@ namespace TournamentManager
 
         private RefereeSvc? _refereeSvc;
         private TournamentSvc? _tournamentSvc;
+        private TeamSvc? _teamSvc;
         private MainWindowVM? _mainVM;
 
         internal Bootstrap()
@@ -53,6 +56,7 @@ namespace TournamentManager
 
             _refereeSvc = new RefereeSvc(bus, _repo);
             _tournamentSvc = new TournamentSvc(bus, _repo);
+            _teamSvc = new TeamSvc(bus, _repo);
 
             RegisterViews();
         }
@@ -61,6 +65,12 @@ namespace TournamentManager
         {
             _tournamentSvc?.Dispose();
             _refereeSvc?.Dispose();
+            _teamSvc?.Dispose();
+        }
+
+        internal static IListener GetListener(string name)
+        {
+            return _esConnection?.GetListener(name) ?? throw new Exception("Cannot get a listener without a valid ESDB connection.");
         }
 
         private void RegisterViews()

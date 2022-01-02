@@ -4,9 +4,7 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ReactiveDomain.Messaging.Bus;
-using ReactiveDomain.UI;
 using ReactiveUI;
-using TournamentManager.Helpers;
 using TournamentManager.Messages;
 // ReSharper disable RedundantDefaultMemberInitializer
 
@@ -14,8 +12,8 @@ namespace TournamentManager.Presentation
 {
     public sealed class RefereeItemVM : ReactiveObject, IActivatableViewModel
     {
-        public ReactiveCommand<Unit, Unit> EditContactInfo { get; }
-        public ReactiveCommand<Unit, Unit> EditCredentials { get; }
+        public ReactiveCommand<Unit, IRoutableViewModel> EditContactInfo { get; }
+        public ReactiveCommand<Unit, IRoutableViewModel> EditCredentials { get; }
 
         public RefereeItemVM(
             IDispatcher bus,
@@ -71,29 +69,25 @@ namespace TournamentManager.Presentation
                 .Select(AgeToAgeRange)
                 .ToProperty(this, x => x.AgeRange, out _ageRange);
 
-            EditContactInfo = CommandBuilder.FromAction(
-                                () => Threading.RunOnUiThread(() =>
-                                {
-                                    HostScreen.Router.Navigate
+            EditContactInfo = ReactiveCommand.CreateFromObservable(
+                                () => HostScreen
+                                        .Router
+                                        .Navigate
                                         .Execute(new ContactInfoVM(
                                                         RefereeId,
                                                         FullName,
                                                         bus,
-                                                        HostScreen))
-                                        .Subscribe();
-                                }));
+                                                        HostScreen)));
 
-            EditCredentials = CommandBuilder.FromAction(
-                                () => Threading.RunOnUiThread(() =>
-                                {
-                                    HostScreen.Router.Navigate
+            EditCredentials = ReactiveCommand.CreateFromObservable(
+                                () => HostScreen
+                                        .Router
+                                        .Navigate
                                         .Execute(new CredentialsVM(
                                                         RefereeId,
                                                         FullName,
                                                         bus,
-                                                        HostScreen))
-                                        .Subscribe();
-                                }));
+                                                        HostScreen)));
         }
 
         public static string AgeToAgeRange(ushort age)
@@ -141,8 +135,8 @@ namespace TournamentManager.Presentation
         public string AgeRange => _ageRange.Value ?? string.Empty;
         private readonly ObservableAsPropertyHelper<string?> _ageRange;
 
-        public TeamMsgs.AgeBracket MaxAgeBracket => _maxAgeBracket.Value;
-        private ObservableAsPropertyHelper<TeamMsgs.AgeBracket> _maxAgeBracket = ObservableAsPropertyHelper<TeamMsgs.AgeBracket>.Default();
+        public TournamentMsgs.AgeBracket MaxAgeBracket => _maxAgeBracket.Value;
+        private ObservableAsPropertyHelper<TournamentMsgs.AgeBracket> _maxAgeBracket = ObservableAsPropertyHelper<TournamentMsgs.AgeBracket>.Default();
 
         public IScreen HostScreen { get; }
         public ViewModelActivator Activator { get; }

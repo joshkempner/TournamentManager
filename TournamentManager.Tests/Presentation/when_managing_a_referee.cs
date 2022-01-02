@@ -29,7 +29,7 @@ namespace TournamentManager.Tests.Presentation
                                 RefereeGrade = RefereeMsgs.Grade.Grassroots,
                                 EmailAddress = "john.smith@aol.com",
                                 CurrentAge = 16,
-                                MaxAgeBracket = TeamMsgs.AgeBracket.U14
+                                MaxAgeBracket = TournamentMsgs.AgeBracket.U14
                             };
             _vm = new RefereeItemVM(
                         _fixture.Dispatcher,
@@ -58,7 +58,7 @@ namespace TournamentManager.Tests.Presentation
             _model.EmailAddress = "Jon.Smyth@gmail.com";
             _model.RefereeGrade = RefereeMsgs.Grade.Regional;
             _model.CurrentAge = 40;
-            _model.MaxAgeBracket = TeamMsgs.AgeBracket.Adult;
+            _model.MaxAgeBracket = TournamentMsgs.AgeBracket.Adult;
             AssertEx.IsOrBecomesTrue(() => _model.Surname == _vm.Surname);
             AssertEx.IsOrBecomesTrue(() => _model.GivenName == _vm.GivenName);
             AssertEx.IsOrBecomesTrue(() => _model.EmailAddress == _vm.FullEmail?.Address);

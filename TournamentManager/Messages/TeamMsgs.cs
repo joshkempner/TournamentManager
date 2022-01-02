@@ -5,31 +5,17 @@ namespace TournamentManager.Messages
 {
     public class TeamMsgs
     {
-        public enum AgeBracket
-        {
-            U8,
-            U10,
-            U12,
-            U14,
-            U16,
-            U18,
-            Adult
-        }
-
         public class CreateTeam : Command
         {
             public readonly Guid TeamId;
             public readonly string Name;
-            public readonly AgeBracket AgeBracket;
 
             public CreateTeam(
                 Guid teamId,
-                string name,
-                AgeBracket ageBracket)
+                string name)
             {
                 TeamId = teamId;
                 Name = name;
-                AgeBracket = ageBracket;
             }
         }
 
@@ -37,16 +23,13 @@ namespace TournamentManager.Messages
         {
             public readonly Guid TeamId;
             public readonly string Name;
-            public readonly AgeBracket AgeBracket;
 
             public TeamCreated(
                 Guid teamId,
-                string name,
-                AgeBracket ageBracket)
+                string name)
             {
                 TeamId = teamId;
                 Name = name;
-                AgeBracket = ageBracket;
             }
         }
 
@@ -95,34 +78,6 @@ namespace TournamentManager.Messages
             {
                 TeamId = teamId;
                 Name = name;
-            }
-        }
-
-        public class UpdateAgeBracket : Command
-        {
-            public readonly Guid TeamId;
-            public readonly AgeBracket AgeBracket;
-
-            public UpdateAgeBracket(
-                Guid teamId,
-                AgeBracket ageBracket)
-            {
-                TeamId = teamId;
-                AgeBracket = ageBracket;
-            }
-        }
-
-        public class AgeBracketUpdated : Event
-        {
-            public readonly Guid TeamId;
-            public readonly AgeBracket AgeBracket;
-
-            public AgeBracketUpdated(
-                Guid teamId,
-                AgeBracket ageBracket)
-            {
-                TeamId = teamId;
-                AgeBracket = ageBracket;
             }
         }
     }

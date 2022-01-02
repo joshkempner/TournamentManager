@@ -4,9 +4,7 @@ using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
 using ReactiveDomain.Messaging.Bus;
-using ReactiveDomain.UI;
 using ReactiveUI;
-using TournamentManager.Helpers;
 
 namespace TournamentManager.Presentation
 {
@@ -14,7 +12,7 @@ namespace TournamentManager.Presentation
     {
         private readonly ManageRefereesRM _rm;
 
-        public ReactiveCommand<Unit, Unit> AddReferee { get; }
+        public ReactiveCommand<Unit, IRoutableViewModel> AddReferee { get; }
 
         public ManageRefereesVM(
             IDispatcher bus,
@@ -33,10 +31,7 @@ namespace TournamentManager.Presentation
                 .DisposeMany()
                 .Subscribe();
 
-            AddReferee = CommandBuilder.FromAction(() =>
-            {
-                Threading.RunOnUiThread(() => HostScreen.Router.Navigate.Execute(new NewRefereeVM(bus, HostScreen)).Subscribe());
-            });
+            AddReferee = ReactiveCommand.CreateFromObservable(() => HostScreen.Router.Navigate.Execute(new NewRefereeVM(bus, HostScreen)));
         }
 
         public IObservableCollection<RefereeItemVM> Referees { get; } = new ObservableCollectionExtended<RefereeItemVM>();

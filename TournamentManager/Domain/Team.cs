@@ -24,7 +24,6 @@ namespace TournamentManager.Domain
         public Team(
             Guid teamId,
             string teamName,
-            TeamMsgs.AgeBracket ageBracket,
             ICorrelatedMessage source)
             : this()
         {
@@ -38,8 +37,7 @@ namespace TournamentManager.Domain
             ((ICorrelatedEventSource)this).Source = source;
             Raise(new TeamMsgs.TeamCreated(
                         teamId,
-                        teamName,
-                        ageBracket));
+                        teamName));
         }
 
         public void DeleteTeam()
@@ -56,14 +54,6 @@ namespace TournamentManager.Domain
             Raise(new TeamMsgs.TeamRenamed(
                         Id,
                         newName));
-        }
-
-        public void UpdateAgeBracket(TeamMsgs.AgeBracket ageBracket)
-        {
-            if (_isDeleted) throw new InvalidOperationException("Cannot change the age bracket for a team that has been deleted.");
-            Raise(new TeamMsgs.AgeBracketUpdated(
-                        Id,
-                        ageBracket));
         }
     }
 }

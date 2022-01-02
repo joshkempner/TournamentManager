@@ -53,16 +53,16 @@ namespace TournamentManager.Presentation
             typeof(NewReferee),
             new PropertyMetadata(default(NewRefereeVM)));
 
-        public NewRefereeVM ViewModel
+        public NewRefereeVM? ViewModel
         {
             get => (NewRefereeVM)GetValue(ViewModelProperty);
             set => SetValue(ViewModelProperty, value);
         }
 
-        object IViewFor.ViewModel
+        object? IViewFor.ViewModel
         {
             get => ViewModel;
-            set => ViewModel = (NewRefereeVM)value;
+            set => ViewModel = value as NewRefereeVM;
         }
     }
 }

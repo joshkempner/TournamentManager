@@ -28,16 +28,16 @@ namespace TournamentManager.Presentation
             typeof(ManageReferees),
             new PropertyMetadata(default(ManageRefereesVM)));
 
-        public ManageRefereesVM ViewModel
+        public ManageRefereesVM? ViewModel
         {
             get => (ManageRefereesVM)GetValue(ViewModelProperty);
             set => SetValue(ViewModelProperty, value);
         }
 
-        object IViewFor.ViewModel
+        object? IViewFor.ViewModel
         {
             get => ViewModel;
-            set => ViewModel = (ManageRefereesVM)value;
+            set => ViewModel = value as ManageRefereesVM;
         }
     }
 }

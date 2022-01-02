@@ -209,17 +209,31 @@ namespace TournamentManager.Messages
             }
         }
 
+        public enum AgeBracket
+        {
+            U8,
+            U10,
+            U12,
+            U14,
+            U16,
+            U18,
+            Adult
+        }
+
         public class AddTeamToTournament : Command
         {
             public readonly Guid TournamentId;
             public readonly Guid TeamId;
+            public readonly AgeBracket AgeBracket;
 
             public AddTeamToTournament(
                 Guid tournamentId,
-                Guid teamId)
+                Guid teamId,
+                AgeBracket ageBracket)
             {
                 TournamentId = tournamentId;
                 TeamId = teamId;
+                AgeBracket = ageBracket;
             }
         }
 
@@ -227,13 +241,16 @@ namespace TournamentManager.Messages
         {
             public readonly Guid TournamentId;
             public readonly Guid TeamId;
+            public readonly AgeBracket AgeBracket;
 
             public TeamAddedToTournament(
                 Guid tournamentId,
-                Guid teamId)
+                Guid teamId,
+                AgeBracket ageBracket)
             {
                 TournamentId = tournamentId;
                 TeamId = teamId;
+                AgeBracket = ageBracket;
             }
         }
 
@@ -262,6 +279,40 @@ namespace TournamentManager.Messages
             {
                 TournamentId = tournamentId;
                 TeamId = teamId;
+            }
+        }
+
+        public class ChangeTeamAgeBracket : Command
+        {
+            public readonly Guid TournamentId;
+            public readonly Guid TeamId;
+            public readonly AgeBracket AgeBracket;
+
+            public ChangeTeamAgeBracket(
+                Guid tournamentId,
+                Guid teamId,
+                AgeBracket ageBracket)
+            {
+                TournamentId = tournamentId;
+                TeamId = teamId;
+                AgeBracket = ageBracket;
+            }
+        }
+
+        public class TeamAgeBracketChanged : Event
+        {
+            public readonly Guid TournamentId;
+            public readonly Guid TeamId;
+            public readonly AgeBracket AgeBracket;
+
+            public TeamAgeBracketChanged(
+                Guid tournamentId,
+                Guid teamId,
+                AgeBracket ageBracket)
+            {
+                TournamentId = tournamentId;
+                TeamId = teamId;
+                AgeBracket = ageBracket;
             }
         }
     }

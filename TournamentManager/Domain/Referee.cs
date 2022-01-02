@@ -117,9 +117,9 @@ namespace TournamentManager.Domain
                         zipCode));
         }
 
-        public void AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket ageBracket)
+        public void AddOrUpdateMaxAgeBracket(TournamentMsgs.AgeBracket ageBracket)
         {
-            if (_refereeGrade == RefereeMsgs.Grade.Intramural && ageBracket > TeamMsgs.AgeBracket.U8)
+            if (_refereeGrade == RefereeMsgs.Grade.Intramural && ageBracket > TournamentMsgs.AgeBracket.U8)
                 throw new ArgumentOutOfRangeException(nameof(ageBracket),
                     "Intramural referees cannot do games above U8.");
             Raise(new RefereeMsgs.MaxAgeBracketChanged(

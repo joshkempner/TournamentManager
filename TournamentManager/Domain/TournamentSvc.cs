@@ -16,6 +16,7 @@ namespace TournamentManager.Domain
         IHandleCommand<TournamentMsgs.AddRefereeToTournament>,
         IHandleCommand<TournamentMsgs.AddTeamToTournament>,
         IHandleCommand<TournamentMsgs.RemoveTeamFromTournament>,
+        IHandleCommand<TournamentMsgs.ChangeTeamAgeBracket>,
         IHandleCommand<GameMsgs.AddGame>,
         IHandleCommand<GameMsgs.CancelGame>,
         IHandleCommand<GameMsgs.UpdateHomeTeam>,
@@ -41,6 +42,7 @@ namespace TournamentManager.Domain
             Subscribe<TournamentMsgs.AddRefereeToTournament>(this);
             Subscribe<TournamentMsgs.AddTeamToTournament>(this);
             Subscribe<TournamentMsgs.RemoveTeamFromTournament>(this);
+            Subscribe<TournamentMsgs.ChangeTeamAgeBracket>(this);
 
             Subscribe<GameMsgs.AddGame>(this);
             Subscribe<GameMsgs.CancelGame>(this);
@@ -121,7 +123,7 @@ namespace TournamentManager.Domain
         public CommandResponse Handle(TournamentMsgs.AddTeamToTournament command)
         {
             var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
-            tournament.AddTeamToTournament(command.TeamId);
+            tournament.AddTeamToTournament(command.TeamId, command.AgeBracket);
             _repository.Save(tournament);
             return command.Succeed();
         }
@@ -130,6 +132,14 @@ namespace TournamentManager.Domain
         {
             var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
             tournament.RemoveTeamFromTournament(command.TeamId);
+            _repository.Save(tournament);
+            return command.Succeed();
+        }
+
+        public CommandResponse Handle(TournamentMsgs.ChangeTeamAgeBracket command)
+        {
+            var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
+            tournament.ChangeTeamAgeBracket(command.TeamId, command.AgeBracket);
             _repository.Save(tournament);
             return command.Succeed();
         }

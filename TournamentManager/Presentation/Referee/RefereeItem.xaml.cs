@@ -46,16 +46,16 @@ namespace TournamentManager.Presentation
             typeof(RefereeItem),
             new PropertyMetadata(default(RefereeItemVM)));
 
-        public RefereeItemVM ViewModel
+        public RefereeItemVM? ViewModel
         {
             get => (RefereeItemVM)GetValue(ViewModelProperty);
             set => SetValue(ViewModelProperty, value);
         }
 
-        object IViewFor.ViewModel
+        object? IViewFor.ViewModel
         {
             get => ViewModel;
-            set => ViewModel = (RefereeItemVM)value;
+            set => ViewModel = value as RefereeItemVM;
         }
 
         private void OpenUri(object sender, RequestNavigateEventArgs e)

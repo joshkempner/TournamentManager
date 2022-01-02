@@ -10,7 +10,7 @@
     </ResourceDictionary.MergedDictionaries>
 
     <Style TargetType="TabControl">
-        <Setter Property="TabStripPlacement" Value="Bottom" />
+        <Setter Property="TabStripPlacement" Value="Top" />
         <Setter Property="BorderThickness" Value="0" />
     </Style>
 
@@ -117,7 +117,7 @@
                         <Border Background="White" BorderBrush="{StaticResource InputBorderColor}"
                                     BorderThickness="1" />
                         <ScrollViewer x:Name="PART_ContentHost" Margin="5,0,0,0" VerticalAlignment="Center" />
-                        <Label Margin="5,0,0,0" x:Name="WaterMarkLabel" Content="{TemplateBinding Tag}"
+                        <Label x:Name="WaterMarkLabel" Content="{TemplateBinding Tag}"
                                    HorizontalAlignment="Stretch" VerticalAlignment="Top"
                                    HorizontalContentAlignment="Left" VerticalContentAlignment="Center"
                                    Foreground="{StaticResource WatermarkText}" FontFamily="Arial" FontSize="8" />
@@ -252,7 +252,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabItem">
-                    <Border Name="Border" BorderThickness="0,2,0,0" Margin="2,0" Padding="10,2">
+                    <Border Name="Border" BorderThickness="0,0,0,2" Margin="2,0" Padding="10,2">
                         <ContentPresenter x:Name="ContentSite"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
@@ -325,6 +325,18 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="{x:Type iconPacks:PackIconMaterial}" BasedOn="{StaticResource MahApps.Styles.PackIconMaterial}" x:Key="MaterialBlueRollover">
+        <Setter Property="Foreground" Value="Transparent" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem,AncestorLevel=1}, Path=IsMouseOver}" Value="True" >
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button,AncestorLevel=1}, Path=IsMouseOver}" Value="True">
+                <Setter Property="Foreground" Value="DodgerBlue"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <Style TargetType="{x:Type iconPacks:PackIconFontAwesome}" BasedOn="{StaticResource MahApps.Styles.PackIconFontAwesome}" x:Key="FontAwesomeYellowRollover">
         <Setter Property="Foreground" Value="Transparent" />
         <Style.Triggers>
@@ -349,7 +361,7 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="{x:Type iconPacks:PackIconMaterial}" BasedOn="{StaticResource MahApps.Styles.PackIconBoxIcons}" x:Key="MaterialYellowRollover">
+    <Style TargetType="{x:Type iconPacks:PackIconMaterial}" BasedOn="{StaticResource MahApps.Styles.PackIconMaterial}" x:Key="MaterialYellowRollover">
         <Setter Property="Foreground" Value="Transparent" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem,AncestorLevel=1}, Path=IsMouseOver}" Value="True" >
@@ -357,6 +369,18 @@
             </DataTrigger>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button,AncestorLevel=1}, Path=IsMouseOver}" Value="True">
                 <Setter Property="Foreground" Value="Goldenrod"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type iconPacks:PackIconFontAwesome}" BasedOn="{StaticResource MahApps.Styles.PackIconFontAwesome}" x:Key="FontAwesomeRedRollover">
+        <Setter Property="Foreground" Value="Transparent" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem,AncestorLevel=1}, Path=IsMouseOver}" Value="True" >
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button,AncestorLevel=1}, Path=IsMouseOver}" Value="True">
+                <Setter Property="Foreground" Value="Red"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>

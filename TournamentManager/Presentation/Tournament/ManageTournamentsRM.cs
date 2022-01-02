@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Linq;
 using DynamicData;
-using ReactiveDomain;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging.Bus;
-using Splat;
 using TournamentManager.Domain;
-using TournamentManager.Helpers;
 using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
@@ -20,7 +17,7 @@ namespace TournamentManager.Presentation
         public ManageTournamentsRM()
             : base(
                 nameof(ManageTournamentsRM),
-                () => Locator.Current.GetService<IStreamStoreConnection>().GetListener(nameof(ManageTournamentsRM)))
+                () => Bootstrap.GetListener(nameof(ManageTournamentsRM)))
         {
             EventStream.Subscribe<TournamentMsgs.TournamentAdded>(this);
             EventStream.Subscribe<TournamentMsgs.TournamentRenamed>(this);

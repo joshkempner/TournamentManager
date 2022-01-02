@@ -54,16 +54,16 @@ namespace TournamentManager.Presentation
             typeof(Credentials),
             new PropertyMetadata(default(CredentialsVM)));
 
-        public CredentialsVM ViewModel
+        public CredentialsVM? ViewModel
         {
             get => (CredentialsVM)GetValue(ViewModelProperty);
             set => SetValue(ViewModelProperty, value);
         }
 
-        object IViewFor.ViewModel
+        object? IViewFor.ViewModel
         {
             get => ViewModel;
-            set => ViewModel = (CredentialsVM)value;
+            set => ViewModel = value as CredentialsVM;
         }
     }
 }

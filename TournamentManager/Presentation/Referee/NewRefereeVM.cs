@@ -27,9 +27,9 @@ namespace TournamentManager.Presentation
                 .Subscribe(g =>
                 {
                     if (g == RefereeMsgs.Grade.Intramural)
-                        MaxAgeBracket = TeamMsgs.AgeBracket.U8;
-                    else if (MaxAgeBracket == TeamMsgs.AgeBracket.U8)
-                        MaxAgeBracket = TeamMsgs.AgeBracket.U10;
+                        MaxAgeBracket = TournamentMsgs.AgeBracket.U8;
+                    else if (MaxAgeBracket == TournamentMsgs.AgeBracket.U8)
+                        MaxAgeBracket = TournamentMsgs.AgeBracket.U10;
                 });
 
             this.WhenAnyValue(
@@ -156,12 +156,12 @@ namespace TournamentManager.Presentation
         }
         private ushort _age;
 
-        public TeamMsgs.AgeBracket MaxAgeBracket
+        public TournamentMsgs.AgeBracket MaxAgeBracket
         {
             get => _maxAgeBracket;
             set => this.RaiseAndSetIfChanged(ref _maxAgeBracket, value);
         }
-        private TeamMsgs.AgeBracket _maxAgeBracket;
+        private TournamentMsgs.AgeBracket _maxAgeBracket;
 
         public bool IsEmailAddressValid => _isEmailAddressValid.Value;
         private readonly ObservableAsPropertyHelper<bool> _isEmailAddressValid;

@@ -10,8 +10,7 @@ namespace TournamentManager.Domain
         QueuedSubscriber,
         IHandleCommand<TeamMsgs.CreateTeam>,
         IHandleCommand<TeamMsgs.DeleteTeam>,
-        IHandleCommand<TeamMsgs.RenameTeam>,
-        IHandleCommand<TeamMsgs.UpdateAgeBracket>
+        IHandleCommand<TeamMsgs.RenameTeam>
     {
         private readonly CorrelatedStreamStoreRepository _repository;
 
@@ -25,7 +24,6 @@ namespace TournamentManager.Domain
             Subscribe<TeamMsgs.CreateTeam>(this);
             Subscribe<TeamMsgs.DeleteTeam>(this);
             Subscribe<TeamMsgs.RenameTeam>(this);
-            Subscribe<TeamMsgs.UpdateAgeBracket>(this);
         }
 
         public CommandResponse Handle(TeamMsgs.CreateTeam command)
@@ -35,7 +33,6 @@ namespace TournamentManager.Domain
             var team = new Team(
                             command.TeamId,
                             command.Name,
-                            command.AgeBracket,
                             command);
             _repository.Save(team);
             return command.Succeed();
@@ -54,14 +51,6 @@ namespace TournamentManager.Domain
         {
             var team = _repository.GetById<Team>(command.TeamId, command);
             team.RenameTeam(command.Name);
-            _repository.Save(team);
-            return command.Succeed();
-        }
-
-        public CommandResponse Handle(TeamMsgs.UpdateAgeBracket command)
-        {
-            var team = _repository.GetById<Team>(command.TeamId, command);
-            team.UpdateAgeBracket(command.AgeBracket);
             _repository.Save(team);
             return command.Succeed();
         }

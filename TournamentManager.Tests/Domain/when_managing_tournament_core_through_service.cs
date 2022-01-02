@@ -265,10 +265,12 @@ namespace TournamentManager.Tests.Domain
         public void can_add_team_to_tournament()
         {
             var teamId = Guid.NewGuid();
+            const TournamentMsgs.AgeBracket ageBracket = TournamentMsgs.AgeBracket.U14;
             AddTournament();
             var cmd = MessageBuilder.New(() => new TournamentMsgs.AddTeamToTournament(
                                                     TournamentId,
-                                                    teamId));
+                                                    teamId,
+                                                    ageBracket));
             Fixture.Dispatcher.Send(cmd);
             Fixture.RepositoryEvents.WaitFor<TournamentMsgs.TeamAddedToTournament>(TimeSpan.FromMilliseconds(200));
             Fixture
@@ -281,6 +283,7 @@ namespace TournamentManager.Tests.Domain
                 .AssertEmpty();
             Assert.Equal(TournamentId, evt.TournamentId);
             Assert.Equal(teamId, evt.TeamId);
+            Assert.Equal(ageBracket, evt.AgeBracket);
         }
 
         [Fact]
@@ -289,7 +292,8 @@ namespace TournamentManager.Tests.Domain
             AddTournament();
             var cmd = MessageBuilder.New(() => new TournamentMsgs.AddTeamToTournament(
                                                     Guid.NewGuid(),
-                                                    Guid.NewGuid()));
+                                                    Guid.NewGuid(),
+                                                    TournamentMsgs.AgeBracket.U14));
             AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
             Fixture
                 .TestQueue
@@ -305,7 +309,7 @@ namespace TournamentManager.Tests.Domain
             AddTournament();
             var repo = new CorrelatedStreamStoreRepository(Fixture.Repository);
             var tournament = repo.GetById<Tournament>(TournamentId, MessageBuilder.New(() => new TestCommands.Command1()));
-            tournament.AddTeamToTournament(teamId);
+            tournament.AddTeamToTournament(teamId, TournamentMsgs.AgeBracket.U14);
             repo.Save(tournament);
             Fixture.RepositoryEvents.WaitFor<TournamentMsgs.TeamAddedToTournament>(TimeSpan.FromMilliseconds(200));
             Fixture.ClearQueues();

@@ -53,11 +53,11 @@ namespace TournamentManager.Presentation
         }
         private ushort _currentAge;
 
-        public TeamMsgs.AgeBracket MaxAgeBracket
+        public TournamentMsgs.AgeBracket MaxAgeBracket
         {
             get => _maxAgeBracket;
             set => this.RaiseAndSetIfChanged(ref _maxAgeBracket, value);
         }
-        private TeamMsgs.AgeBracket _maxAgeBracket;
+        private TournamentMsgs.AgeBracket _maxAgeBracket;
     }
 }

@@ -51,14 +51,14 @@ namespace TournamentManager.Tests.Presentation
             var referee = repo.GetById<Referee>(refereeId, MessageBuilder.New(() => new TestCommands.Command1()));
             referee.UpdateRefereeGrade(RefereeMsgs.Grade.Regional);
             referee.AddOrUpdateBirthdate(RefereeTestHelper.TravelBirthdate.AddYears(-1));
-            referee.AddOrUpdateMaxAgeBracket(TeamMsgs.AgeBracket.Adult);
+            referee.AddOrUpdateMaxAgeBracket(TournamentMsgs.AgeBracket.Adult);
             repo.Save(referee);
             using var vm = new CredentialsVM(refereeId, RefereeTestHelper.FullName, Fixture.Dispatcher, Screen);
             // ReSharper disable AccessToDisposedClosure
             AssertEx.IsOrBecomesTrue(() => vm.RefereeGrade == RefereeMsgs.Grade.Regional);
             AssertEx.IsOrBecomesTrue(() => vm.Birthdate == RefereeTestHelper.TravelBirthdate.AddYears(-1));
             AssertEx.IsOrBecomesTrue(() => vm.CurrentAge == (ushort)RefereeTestHelper.TravelBirthdate.AddYears(-1).YearsAgo());
-            AssertEx.IsOrBecomesTrue(() => vm.MaxAgeBracket == TeamMsgs.AgeBracket.Adult);
+            AssertEx.IsOrBecomesTrue(() => vm.MaxAgeBracket == TournamentMsgs.AgeBracket.Adult);
             // ReSharper restore AccessToDisposedClosure
         }
 
@@ -208,7 +208,7 @@ namespace TournamentManager.Tests.Presentation
             AssertEx.IsOrBecomesTrue(() => RefereeTestHelper.TravelMaxAgeBracket == vm.MaxAgeBracket);
             // ReSharper restore AccessToDisposedClosure
 
-            const TeamMsgs.AgeBracket newAgeBracket = TeamMsgs.AgeBracket.Adult;
+            const TournamentMsgs.AgeBracket newAgeBracket = TournamentMsgs.AgeBracket.Adult;
             vm.MaxAgeBracket = newAgeBracket;
             vm.Save.Execute().Subscribe();
             Fixture.TestQueue.WaitFor<RefereeMsgs.AddOrUpdateMaxAgeBracket>(TimeSpan.FromMilliseconds(300));
@@ -231,7 +231,7 @@ namespace TournamentManager.Tests.Presentation
             AssertEx.IsOrBecomesTrue(() => RefereeTestHelper.TravelMaxAgeBracket == vm.MaxAgeBracket);
             // ReSharper restore AccessToDisposedClosure
 
-            const TeamMsgs.AgeBracket newAgeBracket = RefereeTestHelper.TravelMaxAgeBracket;
+            const TournamentMsgs.AgeBracket newAgeBracket = RefereeTestHelper.TravelMaxAgeBracket;
             vm.MaxAgeBracket = newAgeBracket;
             vm.Save.Execute().Subscribe();
             Assert.Throws<TimeoutException>(

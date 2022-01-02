@@ -1,9 +1,7 @@
 ﻿using System;
-using ReactiveDomain;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
-using Splat;
 using TournamentManager.Domain;
 using TournamentManager.Helpers;
 using TournamentManager.Messages;
@@ -21,7 +19,7 @@ namespace TournamentManager.Presentation
         public CredentialsRM(Guid refereeId)
             : base(
                 nameof(CredentialsRM),
-                () => Locator.Current.GetService<IStreamStoreConnection>().GetListener(nameof(CredentialsRM)))
+                () => Bootstrap.GetListener(nameof(CredentialsRM)))
         {
             EventStream.Subscribe<RefereeMsgs.RefereeAdded>(this);
             EventStream.Subscribe<RefereeMsgs.GradeChanged>(this);
@@ -40,8 +38,8 @@ namespace TournamentManager.Presentation
         public IObservable<ushort> CurrentAge => _currentAge;
         private readonly ReadModelProperty<ushort> _currentAge = new ReadModelProperty<ushort>(0);
 
-        public IObservable<TeamMsgs.AgeBracket> MaxAgeBracket => _maxAgeBracket;
-        private readonly ReadModelProperty<TeamMsgs.AgeBracket> _maxAgeBracket = new ReadModelProperty<TeamMsgs.AgeBracket>(TeamMsgs.AgeBracket.U8);
+        public IObservable<TournamentMsgs.AgeBracket> MaxAgeBracket => _maxAgeBracket;
+        private readonly ReadModelProperty<TournamentMsgs.AgeBracket> _maxAgeBracket = new ReadModelProperty<TournamentMsgs.AgeBracket>(TournamentMsgs.AgeBracket.U8);
 
         public void Handle(RefereeMsgs.RefereeAdded message)
         {

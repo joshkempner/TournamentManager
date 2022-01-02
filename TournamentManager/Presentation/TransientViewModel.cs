@@ -6,8 +6,8 @@ namespace TournamentManager.Presentation
 {
     public abstract class TransientViewModel : ReactiveObject, IRoutableViewModel, IDisposable
     {
-        public ReactiveCommand<Unit, Unit>? Complete { get; protected set; }
-        public ReactiveCommand<Unit, Unit> Cancel { get; }
+        protected ReactiveCommand<Unit, IRoutableViewModel?> Complete { get; }
+        public ReactiveCommand<Unit, IRoutableViewModel?> Cancel { get; }
 
         protected TransientViewModel(IScreen screen)
         {

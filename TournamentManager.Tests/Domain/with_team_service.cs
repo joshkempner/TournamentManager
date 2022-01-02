@@ -14,7 +14,6 @@ namespace TournamentManager.Tests.Domain
 
         protected readonly Guid TeamId = Guid.NewGuid();
         protected const string TeamName = "Springfield United";
-        protected const TeamMsgs.AgeBracket AgeBracket = TeamMsgs.AgeBracket.U14;
 
         protected with_team_service()
         {
@@ -26,7 +25,6 @@ namespace TournamentManager.Tests.Domain
             var team = new Team(
                             TeamId,
                             TeamName,
-                            AgeBracket,
                             MessageBuilder.New(() => new TestCommands.Command1()));
             var repo = new CorrelatedStreamStoreRepository(Fixture.Repository);
             repo.Save(team);

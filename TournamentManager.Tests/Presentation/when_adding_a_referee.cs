@@ -61,7 +61,7 @@ namespace TournamentManager.Tests.Presentation
                 .AssertNext<RefereeMsgs.AddOrUpdateMaxAgeBracket>(cmd.CorrelationId, out var maxAgeCmd)
                 .AssertEmpty();
             Assert.Equal(RefereeMsgs.Grade.Intramural, cmd.RefereeGrade);
-            Assert.Equal(TeamMsgs.AgeBracket.U8, maxAgeCmd.MaxAgeBracket);
+            Assert.Equal(TournamentMsgs.AgeBracket.U8, maxAgeCmd.MaxAgeBracket);
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace TournamentManager.Tests.Presentation
                 EmailAddress = "John.Smith@aol.com",
                 RefereeGrade = RefereeMsgs.Grade.Grassroots,
                 Birthdate = birthdate,
-                MaxAgeBracket = TeamMsgs.AgeBracket.U14
+                MaxAgeBracket = TournamentMsgs.AgeBracket.U14
             };
             AssertEx.IsOrBecomesTrue(() => vm.CanAddReferee);
             vm.Save.Execute(Unit.Default).Subscribe();
@@ -89,7 +89,7 @@ namespace TournamentManager.Tests.Presentation
                 .AssertEmpty();
             Assert.Equal(RefereeMsgs.Grade.Grassroots, cmd.RefereeGrade);
             Assert.Equal(birthdate, birthdateCmd.Birthdate);
-            Assert.Equal(TeamMsgs.AgeBracket.U14, maxAgeCmd.MaxAgeBracket);
+            Assert.Equal(TournamentMsgs.AgeBracket.U14, maxAgeCmd.MaxAgeBracket);
         }
 
         [Fact]

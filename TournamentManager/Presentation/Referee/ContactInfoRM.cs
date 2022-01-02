@@ -1,10 +1,7 @@
 ﻿using System;
-using ReactiveDomain;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
-using Splat;
-using TournamentManager.Helpers;
 using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
@@ -17,7 +14,7 @@ namespace TournamentManager.Presentation
         public ContactInfoRM(Guid refereeId)
             : base(
                 nameof(ContactInfoRM),
-                () => Locator.Current.GetService<IStreamStoreConnection>().GetListener(nameof(ContactInfoRM)))
+                () => Bootstrap.GetListener(nameof(ContactInfoRM)))
         {
             EventStream.Subscribe<RefereeMsgs.EmailAddressChanged>(this);
             EventStream.Subscribe<RefereeMsgs.MailingAddressChanged>(this);

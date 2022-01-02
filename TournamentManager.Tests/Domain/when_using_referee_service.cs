@@ -427,7 +427,7 @@ namespace TournamentManager.Tests.Domain
         {
             AddReferee();
 
-            const TeamMsgs.AgeBracket bracket = TeamMsgs.AgeBracket.U14;
+            const TournamentMsgs.AgeBracket bracket = TournamentMsgs.AgeBracket.U14;
             var cmd = MessageBuilder.New(() => new RefereeMsgs.AddOrUpdateMaxAgeBracket(
                                                     _refId,
                                                     bracket));
@@ -450,7 +450,7 @@ namespace TournamentManager.Tests.Domain
         {
             AddReferee();
 
-            const TeamMsgs.AgeBracket bracket = TeamMsgs.AgeBracket.U14;
+            const TournamentMsgs.AgeBracket bracket = TournamentMsgs.AgeBracket.U14;
             var cmd = MessageBuilder.New(() => new RefereeMsgs.AddOrUpdateMaxAgeBracket(
                                                         Guid.NewGuid(),
                                                         bracket));

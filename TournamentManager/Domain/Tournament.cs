@@ -141,13 +141,14 @@ namespace TournamentManager.Domain
 
         #region Teams
 
-        public void AddTeamToTournament(Guid teamId)
+        public void AddTeamToTournament(Guid teamId, TournamentMsgs.AgeBracket ageBracket)
         {
             Ensure.NotEmptyGuid(teamId, nameof(teamId));
             if (_teams.Contains(teamId)) return; // Add is idempotent
             Raise(new TournamentMsgs.TeamAddedToTournament(
                         Id,
-                        teamId));
+                        teamId,
+                        ageBracket));
         }
 
         public void RemoveTeamFromTournament(Guid teamId)
@@ -156,6 +157,17 @@ namespace TournamentManager.Domain
             Raise(new TournamentMsgs.TeamRemovedFromTournament(
                         Id,
                         teamId));
+        }
+
+        public void ChangeTeamAgeBracket(Guid teamId, TournamentMsgs.AgeBracket ageBracket)
+        {
+            Ensure.NotEmptyGuid(teamId, nameof(teamId));
+            if (!_teams.Contains(teamId))
+                throw new Exception($"Cannot change the age bracket for team with ID {teamId} because they are not in the tournament.");
+            Raise(new TournamentMsgs.TeamAgeBracketChanged(
+                        Id,
+                        teamId,
+                        ageBracket));
         }
 
         #endregion

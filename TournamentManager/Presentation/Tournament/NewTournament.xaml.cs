@@ -35,16 +35,16 @@ namespace TournamentManager.Presentation
             typeof(NewTournament),
             new PropertyMetadata(default(NewTournamentVM)));
 
-        public NewTournamentVM ViewModel
+        public NewTournamentVM? ViewModel
         {
             get => (NewTournamentVM)GetValue(ViewModelProperty);
             set => SetValue(ViewModelProperty, value);
         }
 
-        object IViewFor.ViewModel
+        object? IViewFor.ViewModel
         {
             get => ViewModel;
-            set => ViewModel = (NewTournamentVM)value;
+            set => ViewModel = value as NewTournamentVM;
         }
     }
 }
