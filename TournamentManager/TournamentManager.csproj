@@ -13,8 +13,4 @@
     <PackageReference Include="ReactiveUI.WPF" Version="16.4.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Presentation\Converters\" />
-  </ItemGroup>
-
 </Project>

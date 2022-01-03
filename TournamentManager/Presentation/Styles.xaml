@@ -19,6 +19,12 @@
         <Setter Property="Foreground" Value="#aaaaaa" />
     </Style>
 
+    <Style TargetType="TextBlock" x:Key="Header">
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+
     <Style TargetType="ComboBox">
         <Setter Property="FontSize" Value="14" />
     </Style>

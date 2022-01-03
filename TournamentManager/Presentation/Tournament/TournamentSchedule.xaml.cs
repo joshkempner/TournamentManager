@@ -15,6 +15,14 @@ namespace TournamentManager.Presentation
 
             this.WhenActivated(disposables =>
             {
+                this.OneWayBind(ViewModel, vm => vm.TournamentDates, v => v.GameDay.ItemsSource)
+                    .DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedTournamentDateIndex, v => v.GameDay.SelectedIndex)
+                    .DisposeWith(disposables);
+
+                this.OneWayBind(ViewModel, vm => vm.FieldHeaders, v => v.FieldHeaders.ItemsSource)
+                    .DisposeWith(disposables);
+
                 this.BindCommand(ViewModel, vm => vm.AddField, v => v.AddField)
                     .DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.Cancel, v => v.Done)

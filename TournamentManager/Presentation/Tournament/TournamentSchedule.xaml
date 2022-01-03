@@ -8,6 +8,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel LastChildFill="True" Margin="20">
+        <ComboBox Name="GameDay" DockPanel.Dock="Top" Width="200" HorizontalAlignment="Left" Margin="0,0,0,10"
+                  DisplayMemberPath="." />
         <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="0,10,0,0">
             <Button Name="Done" Content="Done" DockPanel.Dock="Right" Style="{StaticResource DialogAction}" />
             <Button Name="AddField" DockPanel.Dock="Left" Width="46"
@@ -46,7 +48,19 @@
                 </Grid>
             </Button>
         </DockPanel>
-        <ItemsControl Name="TimeSlots" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
-
+        <DockPanel>
+            <ItemsControl Name="FieldHeaders" DockPanel.Dock="Top" Height="55"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <ItemsControl Name="Schedule"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Visible" />
+        </DockPanel>
     </DockPanel>
 </UserControl>

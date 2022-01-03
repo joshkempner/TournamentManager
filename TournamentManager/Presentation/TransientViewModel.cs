@@ -4,7 +4,7 @@ using ReactiveUI;
 
 namespace TournamentManager.Presentation
 {
-    public abstract class TransientViewModel : ReactiveObject, IRoutableViewModel, IDisposable
+    public abstract class TransientViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel, IDisposable
     {
         protected ReactiveCommand<Unit, IRoutableViewModel?> Complete { get; }
         public ReactiveCommand<Unit, IRoutableViewModel?> Cancel { get; }
@@ -36,5 +36,7 @@ namespace TournamentManager.Presentation
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        public ViewModelActivator Activator { get; } = new ViewModelActivator();
     }
 }

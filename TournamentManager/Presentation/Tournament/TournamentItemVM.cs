@@ -6,7 +6,7 @@ using ReactiveUI;
 
 namespace TournamentManager.Presentation
 {
-    public sealed class TournamentItemVM : TransientViewModel, IActivatableViewModel
+    public sealed class TournamentItemVM : TransientViewModel
     {
         public ReactiveCommand<Unit, IRoutableViewModel> EditTournament { get; }
         public ReactiveCommand<Unit, IRoutableViewModel> ManageTournament { get; }
@@ -71,7 +71,7 @@ namespace TournamentManager.Presentation
 
         public Guid Id { get; }
 
-        public string Name => _name?.Value ?? string.Empty;
+        public string Name => _name.Value ?? string.Empty;
         private ObservableAsPropertyHelper<string?> _name = ObservableAsPropertyHelper<string?>.Default();
 
         public DateTime FirstDay => _firstDay.Value;
@@ -84,6 +84,5 @@ namespace TournamentManager.Presentation
         private readonly ObservableAsPropertyHelper<string?> _tournamentDates;
 
         public override string UrlPathSegment => "Tournament";
-        public ViewModelActivator Activator { get; } = new ViewModelActivator();
     }
 }
