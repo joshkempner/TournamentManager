@@ -167,6 +167,7 @@ namespace TournamentManager.Domain
         public void AddGame(
             Guid gameId,
             Guid fieldId,
+            uint tournamentDay,
             DateTime startTime,
             DateTime endTime,
             Guid homeTeamId,
@@ -174,10 +175,10 @@ namespace TournamentManager.Domain
         {
             Ensure.NotEmptyGuid(gameId, nameof(gameId));
             Ensure.NotEmptyGuid(fieldId, nameof(fieldId));
+            var duration = _lastDay - _firstDay;
+            Ensure.LessThanOrEqualTo((uint)duration.TotalDays, tournamentDay, nameof(tournamentDay));
             Ensure.False(() => startTime == endTime, "Cannot add a game with identical start and end times.");
             Ensure.True(() => startTime < endTime, "Cannot add a game with a start time before the end time.");
-            Ensure.True(() => startTime.Date >= _firstDay.Date && startTime.Date <= _lastDay.Date, "startTime.Date >= _firstDay.Date && startTime.Date <= _lastDay.Date");
-            Ensure.True(() => endTime.Date >= _firstDay.Date && endTime.Date <= _lastDay.Date, "endTime.Date >= _firstDay.Date && endTime.Date <= _lastDay.Date");
             Ensure.NotEmptyGuid(homeTeamId, nameof(homeTeamId));
             Ensure.NotEmptyGuid(awayTeamId, nameof(awayTeamId));
             if (_gameTimes.ContainsKey(gameId))
@@ -192,6 +193,7 @@ namespace TournamentManager.Domain
                         Id,
                         gameId,
                         fieldId,
+                        tournamentDay,
                         startTime,
                         endTime,
                         homeTeamId,
@@ -209,21 +211,23 @@ namespace TournamentManager.Domain
 
         public void RescheduleGame(
             Guid gameId,
+            uint tournamentDay,
             DateTime startTime,
             DateTime endTime)
         {
             Ensure.NotEmptyGuid(gameId, nameof(gameId));
             if (!_gameTimes.ContainsKey(gameId))
                 throw new ArgumentException("Cannot reschedule a nonexistent game.");
+            var duration = _lastDay - _firstDay;
+            Ensure.LessThanOrEqualTo((uint)duration.TotalDays, tournamentDay, nameof(tournamentDay));
             Ensure.False(() => startTime == endTime, "Cannot reschedule a game with identical start and end times.");
             Ensure.True(() => startTime < endTime, "Cannot reschedule a game with a start time before the end time.");
-            Ensure.True(() => startTime.Date >= _firstDay.Date && startTime.Date <= _lastDay.Date, "startTime.Date >= _firstDay.Date && startTime.Date <= _lastDay.Date");
-            Ensure.True(() => endTime.Date >= _firstDay.Date && endTime.Date <= _lastDay.Date, "endTime.Date >= _firstDay.Date && endTime.Date <= _lastDay.Date");
             var (previousStart, previousEnd) = _gameTimes[gameId];
             if (previousStart == startTime && previousEnd == endTime) return; // reschedule is idempotent
             Raise(new GameMsgs.GameRescheduled(
                         Id,
                         gameId,
+                        tournamentDay,
                         startTime,
                         endTime));
         }

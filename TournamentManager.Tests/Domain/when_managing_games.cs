@@ -19,6 +19,7 @@ namespace TournamentManager.Tests.Domain
         private readonly Guid _referee1Id = Guid.NewGuid();
         private readonly Guid _referee2Id = Guid.NewGuid();
         private const TournamentMsgs.AgeBracket AgeBracket = TournamentMsgs.AgeBracket.U14;
+        private const uint TournamentDay = 0;
         private readonly DateTime _startTime = new DateTime(2020, 6, 1, 9, 0, 0);
         private readonly DateTime _endTime = new DateTime(2020, 6, 1, 10, 0, 0);
 
@@ -50,6 +51,7 @@ namespace TournamentManager.Tests.Domain
             tournament.AddGame(
                 _gameId,
                 _fieldId,
+                TournamentDay,
                 _startTime,
                 _endTime,
                 _homeTeamId,
@@ -67,6 +69,7 @@ namespace TournamentManager.Tests.Domain
             tournament.AddGame(
                 _gameId,
                 _fieldId,
+                TournamentDay,
                 _startTime,
                 _endTime,
                 _homeTeamId,
@@ -93,6 +96,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddGame(
                         _gameId,
                         Guid.Empty,
+                        TournamentDay,
                         _startTime,
                         _endTime,
                         _homeTeamId,
@@ -101,6 +105,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddGame(
                         _gameId,
                         Guid.NewGuid(),
+                        TournamentDay,
                         _startTime,
                         _endTime,
                         _homeTeamId,
@@ -116,6 +121,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddGame(
                         Guid.Empty,
                         _fieldId,
+                        TournamentDay,
                         _startTime,
                         _endTime,
                         _homeTeamId,
@@ -130,6 +136,7 @@ namespace TournamentManager.Tests.Domain
             tournament.AddGame(
                 _gameId,
                 _fieldId,
+                TournamentDay,
                 _startTime,
                 _endTime,
                 _homeTeamId,
@@ -138,6 +145,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddGame(
                         _gameId,
                         _fieldId,
+                        TournamentDay,
                         _startTime,
                         _endTime,
                         _homeTeamId,
@@ -157,6 +165,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddGame(
                         Guid.Empty,
                         _fieldId,
+                        TournamentDay,
                         _startTime,
                         _startTime,
                         _homeTeamId,
@@ -172,6 +181,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddGame(
                         Guid.Empty,
                         _fieldId,
+                        TournamentDay,
                         _endTime,
                         _startTime,
                         _homeTeamId,
@@ -180,23 +190,16 @@ namespace TournamentManager.Tests.Domain
         }
 
         [Fact]
-        public void cannot_add_game_outside_tournament_dates()
+        public void cannot_add_game_after_tournament_ends()
         {
             var tournament = AddTournament();
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGame(
                         Guid.Empty,
                         _fieldId,
-                        _startTime - TimeSpan.FromDays(1),
-                        _endTime - TimeSpan.FromDays(1),
-                        _homeTeamId,
-                        _awayTeamId));
-            Assert.Throws<ArgumentException>(
-                () => tournament.AddGame(
-                        Guid.Empty,
-                        _fieldId,
-                        _startTime + TimeSpan.FromDays(1),
-                        _endTime + TimeSpan.FromDays(1),
+                        TournamentDay + 1,
+                        _startTime,
+                        _endTime,
                         _homeTeamId,
                         _awayTeamId));
             Assert.False(tournament.HasRecordedEvents);
@@ -210,6 +213,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddGame(
                         _gameId,
                         _fieldId,
+                        TournamentDay,
                         _startTime,
                         _endTime,
                         Guid.Empty,
@@ -218,6 +222,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddGame(
                         _gameId,
                         _fieldId,
+                        TournamentDay,
                         _startTime,
                         _endTime,
                         Guid.NewGuid(),
@@ -233,6 +238,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddGame(
                         _gameId,
                         _fieldId,
+                        TournamentDay,
                         _startTime,
                         _endTime,
                         _homeTeamId,
@@ -241,6 +247,7 @@ namespace TournamentManager.Tests.Domain
                 () => tournament.AddGame(
                         _gameId,
                         _fieldId,
+                        TournamentDay,
                         _startTime,
                         _endTime,
                         _homeTeamId,
@@ -286,6 +293,7 @@ namespace TournamentManager.Tests.Domain
             var tournament = AddTournamentWithGame();
             tournament.RescheduleGame(
                 _gameId,
+                TournamentDay,
                 newStart,
                 newEnd);
             Assert.True(tournament.HasRecordedEvents);
@@ -308,16 +316,19 @@ namespace TournamentManager.Tests.Domain
             // rescheduling to initial times should not raise a new event.
             tournament.RescheduleGame(
                 _gameId,
+                TournamentDay,
                 _startTime,
                 _endTime);
             // rescheduling to new times SHOULD raise a new event.
             tournament.RescheduleGame(
                 _gameId,
+                TournamentDay,
                 newStart,
                 newEnd);
             // rescheduling identically should not raise a new event.
             tournament.RescheduleGame(
                 _gameId,
+                TournamentDay,
                 newStart,
                 newEnd);
             Assert.True(tournament.HasRecordedEvents);
@@ -340,6 +351,7 @@ namespace TournamentManager.Tests.Domain
             Assert.Throws<ArgumentException>(
                 () => tournament.RescheduleGame(
                         Guid.NewGuid(),
+                        TournamentDay,
                         newStart,
                         newEnd));
             Assert.False(tournament.HasRecordedEvents);
@@ -354,6 +366,7 @@ namespace TournamentManager.Tests.Domain
             Assert.Throws<ArgumentException>(
                 () => tournament.RescheduleGame(
                         Guid.Empty,
+                        TournamentDay,
                         newStart,
                         newEnd));
             Assert.False(tournament.HasRecordedEvents);
@@ -367,6 +380,7 @@ namespace TournamentManager.Tests.Domain
             Assert.Throws<ArgumentException>(
                 () => tournament.RescheduleGame(
                         Guid.NewGuid(),
+                        TournamentDay,
                         newTime,
                         newTime));
             Assert.False(tournament.HasRecordedEvents);
@@ -381,25 +395,22 @@ namespace TournamentManager.Tests.Domain
             Assert.Throws<ArgumentException>(
                 () => tournament.RescheduleGame(
                         Guid.NewGuid(),
+                        TournamentDay,
                         newEnd,
                         newStart));
             Assert.False(tournament.HasRecordedEvents);
         }
 
         [Fact]
-        public void cannot_reschedule_game_outside_tournament_dates()
+        public void cannot_reschedule_game_after_tournament_ends()
         {
             var tournament = AddTournamentWithGame();
             Assert.Throws<ArgumentException>(
                 () => tournament.RescheduleGame(
                         Guid.NewGuid(),
-                        _startTime - TimeSpan.FromDays(1),
-                        _endTime - TimeSpan.FromDays(1)));
-            Assert.Throws<ArgumentException>(
-                () => tournament.RescheduleGame(
-                        Guid.NewGuid(),
-                        _startTime + TimeSpan.FromDays(1),
-                        _endTime + TimeSpan.FromDays(1)));
+                        TournamentDay + 1,
+                        _startTime,
+                        _endTime));
             Assert.False(tournament.HasRecordedEvents);
         }
 

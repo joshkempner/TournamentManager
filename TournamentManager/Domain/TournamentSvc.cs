@@ -143,6 +143,7 @@ namespace TournamentManager.Domain
             tournament.AddGame(
                 command.GameId,
                 command.FieldId,
+                command.TournamentDay,
                 command.StartTime,
                 command.EndTime,
                 command.HomeTeamId,
@@ -164,6 +165,7 @@ namespace TournamentManager.Domain
             var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
             tournament.RescheduleGame(
                 command.GameId,
+                command.TournamentDay,
                 command.StartTime,
                 command.EndTime);
             _repository.Save(tournament);

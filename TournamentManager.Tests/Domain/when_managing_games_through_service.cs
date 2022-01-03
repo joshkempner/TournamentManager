@@ -18,6 +18,7 @@ namespace TournamentManager.Tests.Domain
         private readonly Guid _referee1Id = Guid.NewGuid();
         private readonly Guid _referee2Id = Guid.NewGuid();
         private const TournamentMsgs.AgeBracket AgeBracket = TournamentMsgs.AgeBracket.U14;
+        private const uint TournamentDay = 0;
         private readonly DateTime _startTime = new DateTime(2020, 6, 1, 9, 0, 0);
         private readonly DateTime _endTime = new DateTime(2020, 6, 1, 10, 0, 0);
 
@@ -51,6 +52,7 @@ namespace TournamentManager.Tests.Domain
             tournament.AddGame(
                 _gameId,
                 _fieldId,
+                TournamentDay,
                 _startTime,
                 _endTime,
                 _homeTeamId,
@@ -67,6 +69,7 @@ namespace TournamentManager.Tests.Domain
             tournament.AddGame(
                 _gameId,
                 _fieldId,
+                TournamentDay,
                 _startTime,
                 _endTime,
                 _homeTeamId,
@@ -86,6 +89,7 @@ namespace TournamentManager.Tests.Domain
                                                     TournamentId,
                                                     _gameId,
                                                     _fieldId,
+                                                    TournamentDay,
                                                     _startTime,
                                                     _endTime,
                                                     _homeTeamId,
@@ -114,6 +118,7 @@ namespace TournamentManager.Tests.Domain
                                                     Guid.NewGuid(),
                                                     _gameId,
                                                     _fieldId,
+                                                    TournamentDay,
                                                     _startTime,
                                                     _endTime,
                                                     _homeTeamId,
@@ -170,6 +175,7 @@ namespace TournamentManager.Tests.Domain
             var cmd = MessageBuilder.New(() => new GameMsgs.RescheduleGame(
                                                     TournamentId,
                                                     _gameId,
+                                                    TournamentDay,
                                                     newStart,
                                                     newEnd));
             Fixture.Dispatcher.Send(cmd);
@@ -194,6 +200,7 @@ namespace TournamentManager.Tests.Domain
             var cmd = MessageBuilder.New(() => new GameMsgs.RescheduleGame(
                                                     Guid.NewGuid(),
                                                     _gameId,
+                                                    TournamentDay,
                                                     _startTime,
                                                     _endTime));
             AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));

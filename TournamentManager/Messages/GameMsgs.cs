@@ -10,6 +10,7 @@ namespace TournamentManager.Messages
             public readonly Guid TournamentId;
             public readonly Guid GameId;
             public readonly Guid FieldId;
+            public readonly uint TournamentDay;
             public readonly DateTime StartTime;
             public readonly DateTime EndTime;
             public readonly Guid HomeTeamId;
@@ -19,6 +20,7 @@ namespace TournamentManager.Messages
                 Guid tournamentId,
                 Guid gameId,
                 Guid fieldId,
+                uint tournamentDay,
                 DateTime startTime,
                 DateTime endTime,
                 Guid homeTeamId,
@@ -27,6 +29,7 @@ namespace TournamentManager.Messages
                 TournamentId = tournamentId;
                 GameId = gameId;
                 FieldId = fieldId;
+                TournamentDay = tournamentDay;
                 HomeTeamId = homeTeamId;
                 AwayTeamId = awayTeamId;
                 StartTime = startTime;
@@ -39,6 +42,7 @@ namespace TournamentManager.Messages
             public readonly Guid TournamentId;
             public readonly Guid GameId;
             public readonly Guid FieldId;
+            public readonly uint TournamentDay;
             public readonly DateTime StartTime;
             public readonly DateTime EndTime;
             public readonly Guid HomeTeamId;
@@ -48,6 +52,7 @@ namespace TournamentManager.Messages
                 Guid tournamentId,
                 Guid gameId,
                 Guid fieldId,
+                uint tournamentDay,
                 DateTime startTime,
                 DateTime endTime,
                 Guid homeTeamId,
@@ -56,6 +61,7 @@ namespace TournamentManager.Messages
                 TournamentId = tournamentId;
                 GameId = gameId;
                 FieldId = fieldId;
+                TournamentDay = tournamentDay;
                 StartTime = startTime;
                 EndTime = endTime;
                 HomeTeamId = homeTeamId;
@@ -95,17 +101,20 @@ namespace TournamentManager.Messages
         {
             public readonly Guid TournamentId;
             public readonly Guid GameId;
+            public readonly uint TournamentDay;
             public readonly DateTime StartTime;
             public readonly DateTime EndTime;
 
             public RescheduleGame(
                 Guid tournamentId,
                 Guid gameId,
+                uint tournamentDay,
                 DateTime startTime,
                 DateTime endTime)
             {
                 TournamentId = tournamentId;
                 GameId = gameId;
+                TournamentDay = tournamentDay;
                 StartTime = startTime;
                 EndTime = endTime;
             }
@@ -115,17 +124,20 @@ namespace TournamentManager.Messages
         {
             public readonly Guid TournamentId;
             public readonly Guid GameId;
+            public readonly uint TournamentDay;
             public readonly DateTime StartTime;
             public readonly DateTime EndTime;
 
             public GameRescheduled(
                 Guid tournamentId,
                 Guid gameId,
+                uint tournamentDay,
                 DateTime startTime,
                 DateTime endTime)
             {
                 TournamentId = tournamentId;
                 GameId = gameId;
+                TournamentDay = tournamentDay;
                 StartTime = startTime;
                 EndTime = endTime;
             }
