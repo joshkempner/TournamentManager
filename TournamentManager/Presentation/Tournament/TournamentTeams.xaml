@@ -20,7 +20,7 @@
     <DockPanel LastChildFill="True" Margin="20">
         <Button Name="Done" Content="Done" DockPanel.Dock="Bottom"
                 Style="{StaticResource DialogAction}"
-                HorizontalAlignment="Left" Margin="0,20,0,0" />
+                HorizontalAlignment="Right" Margin="0,20,0,0" />
         <DockPanel Name="NewTeamParameters" DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" Margin="0,20,0,0">
             <Button Name="AddTeam" Content="Add Team" Style="{StaticResource DialogAction}"
                     DockPanel.Dock="Right"

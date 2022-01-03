@@ -8,7 +8,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel LastChildFill="True" Margin="20">
-        <Button DockPanel.Dock="Bottom" Name="AddTournament" HorizontalAlignment="Left" Width="46" Style="{StaticResource ColorHighlightButton}">
+        <Button DockPanel.Dock="Bottom" Name="AddTournament" HorizontalAlignment="Left" Width="46" Style="{StaticResource ColorHighlightButton}"
+                ToolTip="Add a tournament">
             <Grid Margin="-4,0,0,0">
                 <iconPacks:PackIconMaterial Kind="Tournament" Width="32" Height="32">
                     <iconPacks:PackIconMaterial.Style>
