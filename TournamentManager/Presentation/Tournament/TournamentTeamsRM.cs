@@ -29,8 +29,9 @@ namespace TournamentManager.Presentation
             EventStream.Subscribe<TournamentMsgs.TeamAddedToTournament>(this);
             EventStream.Subscribe<TournamentMsgs.TeamRemovedFromTournament>(this);
             EventStream.Subscribe<TournamentMsgs.TeamAgeBracketChanged>(this);
-            Start<Team>();
-            Start<Tournament>(tournamentId);
+            // NB: blockUntilLive to ensure we know about all teams before reading tournament events
+            Start<Team>(blockUntilLive: true);
+            Start<Tournament>(tournamentId, blockUntilLive: true);
         }
 
         private readonly SourceCache<TeamModel, Guid> _allTeams = new SourceCache<TeamModel, Guid>(x => x.TeamId);
