@@ -9,25 +9,28 @@ namespace TournamentManager.Messages
         {
             public readonly Guid TournamentId;
             public readonly Guid GameId;
-            public readonly Guid GameSlotId;
             public readonly Guid FieldId;
+            public readonly DateTime StartTime;
+            public readonly DateTime EndTime;
             public readonly Guid HomeTeamId;
             public readonly Guid AwayTeamId;
 
             public AddGame(
                 Guid tournamentId,
                 Guid gameId,
-                Guid gameSlotId,
                 Guid fieldId,
+                DateTime startTime,
+                DateTime endTime,
                 Guid homeTeamId,
                 Guid awayTeamId)
             {
                 TournamentId = tournamentId;
                 GameId = gameId;
-                GameSlotId = gameSlotId;
                 FieldId = fieldId;
                 HomeTeamId = homeTeamId;
                 AwayTeamId = awayTeamId;
+                StartTime = startTime;
+                EndTime = endTime;
             }
         }
 
@@ -35,23 +38,26 @@ namespace TournamentManager.Messages
         {
             public readonly Guid TournamentId;
             public readonly Guid GameId;
-            public readonly Guid GameSlotId;
             public readonly Guid FieldId;
+            public readonly DateTime StartTime;
+            public readonly DateTime EndTime;
             public readonly Guid HomeTeamId;
             public readonly Guid AwayTeamId;
 
             public GameAdded(
                 Guid tournamentId,
                 Guid gameId,
-                Guid gameSlotId,
                 Guid fieldId,
+                DateTime startTime,
+                DateTime endTime,
                 Guid homeTeamId,
                 Guid awayTeamId)
             {
                 TournamentId = tournamentId;
                 GameId = gameId;
-                GameSlotId = gameSlotId;
                 FieldId = fieldId;
+                StartTime = startTime;
+                EndTime = endTime;
                 HomeTeamId = homeTeamId;
                 AwayTeamId = awayTeamId;
             }
@@ -82,6 +88,46 @@ namespace TournamentManager.Messages
             {
                 TournamentId = tournamentId;
                 GameId = gameId;
+            }
+        }
+
+        public class RescheduleGame : Command
+        {
+            public readonly Guid TournamentId;
+            public readonly Guid GameId;
+            public readonly DateTime StartTime;
+            public readonly DateTime EndTime;
+
+            public RescheduleGame(
+                Guid tournamentId,
+                Guid gameId,
+                DateTime startTime,
+                DateTime endTime)
+            {
+                TournamentId = tournamentId;
+                GameId = gameId;
+                StartTime = startTime;
+                EndTime = endTime;
+            }
+        }
+
+        public class GameRescheduled : Event
+        {
+            public readonly Guid TournamentId;
+            public readonly Guid GameId;
+            public readonly DateTime StartTime;
+            public readonly DateTime EndTime;
+
+            public GameRescheduled(
+                Guid tournamentId,
+                Guid gameId,
+                DateTime startTime,
+                DateTime endTime)
+            {
+                TournamentId = tournamentId;
+                GameId = gameId;
+                StartTime = startTime;
+                EndTime = endTime;
             }
         }
 

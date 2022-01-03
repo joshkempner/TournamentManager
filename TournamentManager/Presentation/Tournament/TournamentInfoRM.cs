@@ -2,7 +2,6 @@
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
-using TournamentManager.Domain;
 using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
@@ -21,7 +20,7 @@ namespace TournamentManager.Presentation
             EventStream.Subscribe<TournamentMsgs.TournamentAdded>(this);
             EventStream.Subscribe<TournamentMsgs.TournamentRenamed>(this);
             EventStream.Subscribe<TournamentMsgs.TournamentRescheduled>(this);
-            Start<Tournament>(tournamentId);
+            Start<Domain.Tournament>(tournamentId);
         }
 
         public IObservable<string> TournamentName => _tournamentName;

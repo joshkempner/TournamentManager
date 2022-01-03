@@ -12,13 +12,13 @@ namespace TournamentManager.Domain
         IHandleCommand<TournamentMsgs.RenameTournament>,
         IHandleCommand<TournamentMsgs.RescheduleTournament>,
         IHandleCommand<TournamentMsgs.AddField>,
-        IHandleCommand<TournamentMsgs.AddGameSlot>,
         IHandleCommand<TournamentMsgs.AddRefereeToTournament>,
         IHandleCommand<TournamentMsgs.AddTeamToTournament>,
         IHandleCommand<TournamentMsgs.RemoveTeamFromTournament>,
         IHandleCommand<TournamentMsgs.ChangeTeamAgeBracket>,
         IHandleCommand<GameMsgs.AddGame>,
         IHandleCommand<GameMsgs.CancelGame>,
+        IHandleCommand<GameMsgs.RescheduleGame>,
         IHandleCommand<GameMsgs.UpdateHomeTeam>,
         IHandleCommand<GameMsgs.UpdateAwayTeam>,
         IHandleCommand<GameMsgs.AssignReferee>,
@@ -38,7 +38,6 @@ namespace TournamentManager.Domain
             Subscribe<TournamentMsgs.RenameTournament>(this);
             Subscribe<TournamentMsgs.RescheduleTournament>(this);
             Subscribe<TournamentMsgs.AddField>(this);
-            Subscribe<TournamentMsgs.AddGameSlot>(this);
             Subscribe<TournamentMsgs.AddRefereeToTournament>(this);
             Subscribe<TournamentMsgs.AddTeamToTournament>(this);
             Subscribe<TournamentMsgs.RemoveTeamFromTournament>(this);
@@ -46,6 +45,7 @@ namespace TournamentManager.Domain
 
             Subscribe<GameMsgs.AddGame>(this);
             Subscribe<GameMsgs.CancelGame>(this);
+            Subscribe<GameMsgs.RescheduleGame>(this);
             Subscribe<GameMsgs.UpdateHomeTeam>(this);
             Subscribe<GameMsgs.UpdateAwayTeam>(this);
             Subscribe<GameMsgs.AssignReferee>(this);
@@ -97,17 +97,6 @@ namespace TournamentManager.Domain
             return command.Succeed();
         }
 
-        public CommandResponse Handle(TournamentMsgs.AddGameSlot command)
-        {
-            var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
-            tournament.AddGameSlot(
-                command.GameSlotId,
-                command.StartTime,
-                command.EndTime);
-            _repository.Save(tournament);
-            return command.Succeed();
-        }
-
         public CommandResponse Handle(TournamentMsgs.AddRefereeToTournament command)
         {
             var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
@@ -153,8 +142,9 @@ namespace TournamentManager.Domain
             var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
             tournament.AddGame(
                 command.GameId,
-                command.GameSlotId,
                 command.FieldId,
+                command.StartTime,
+                command.EndTime,
                 command.HomeTeamId,
                 command.AwayTeamId);
             _repository.Save(tournament);
@@ -165,6 +155,17 @@ namespace TournamentManager.Domain
         {
             var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
             tournament.CancelGame(command.GameId);
+            _repository.Save(tournament);
+            return command.Succeed();
+        }
+
+        public CommandResponse Handle(GameMsgs.RescheduleGame command)
+        {
+            var tournament = _repository.GetById<Tournament>(command.TournamentId, command);
+            tournament.RescheduleGame(
+                command.GameId,
+                command.StartTime,
+                command.EndTime);
             _repository.Save(tournament);
             return command.Succeed();
         }

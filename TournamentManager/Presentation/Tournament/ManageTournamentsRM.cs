@@ -3,7 +3,6 @@ using System.Linq;
 using DynamicData;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging.Bus;
-using TournamentManager.Domain;
 using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
@@ -22,7 +21,7 @@ namespace TournamentManager.Presentation
             EventStream.Subscribe<TournamentMsgs.TournamentAdded>(this);
             EventStream.Subscribe<TournamentMsgs.TournamentRenamed>(this);
             EventStream.Subscribe<TournamentMsgs.TournamentRescheduled>(this);
-            Start<Tournament>();
+            Start<Domain.Tournament>();
         }
 
         public SourceCache<TournamentModel, Guid> Tournaments { get; } = new SourceCache<TournamentModel, Guid>(x => x.Id);

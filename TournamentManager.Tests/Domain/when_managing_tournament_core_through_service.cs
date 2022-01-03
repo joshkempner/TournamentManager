@@ -176,54 +176,6 @@ namespace TournamentManager.Tests.Domain
         }
 
         [Fact]
-        public void can_add_game_slot()
-        {
-            var gameSlotId = Guid.NewGuid();
-            var startTime = FirstDay.AddHours(9);
-            var endTime = startTime.AddHours(1);
-            AddTournament();
-            var cmd = MessageBuilder.New(() => new TournamentMsgs.AddGameSlot(
-                                                    TournamentId,
-                                                    gameSlotId,
-                                                    startTime,
-                                                    endTime));
-            Fixture.Dispatcher.Send(cmd);
-            Fixture.RepositoryEvents.WaitFor<TournamentMsgs.GameSlotAdded>(TimeSpan.FromMilliseconds(200));
-            Fixture
-                .TestQueue
-                .AssertNext<TournamentMsgs.AddGameSlot>(cmd.CorrelationId)
-                .AssertEmpty();
-            Fixture
-                .RepositoryEvents
-                .AssertNext<TournamentMsgs.GameSlotAdded>(cmd.CorrelationId, out var evt)
-                .AssertEmpty();
-            Assert.Equal(TournamentId, evt.TournamentId);
-            Assert.Equal(gameSlotId, evt.GameSlotId);
-            Assert.Equal(startTime, evt.StartTime);
-            Assert.Equal(endTime, evt.EndTime);
-        }
-
-        [Fact]
-        public void cannot_add_game_slot_to_invalid_tournament()
-        {
-            var gameSlotId = Guid.NewGuid();
-            var startTime = FirstDay.AddHours(9);
-            var endTime = startTime.AddHours(1);
-            AddTournament();
-            var cmd = MessageBuilder.New(() => new TournamentMsgs.AddGameSlot(
-                                                    Guid.NewGuid(),
-                                                    gameSlotId,
-                                                    startTime,
-                                                    endTime));
-            AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
-            Fixture
-                .TestQueue
-                .AssertNext<TournamentMsgs.AddGameSlot>(cmd.CorrelationId)
-                .AssertEmpty();
-            Fixture.RepositoryEvents.AssertEmpty();
-        }
-
-        [Fact]
         public void can_add_referee_to_tournament()
         {
             var refereeId = Guid.NewGuid();

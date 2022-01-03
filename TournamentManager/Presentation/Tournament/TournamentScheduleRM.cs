@@ -2,14 +2,12 @@
 using DynamicData;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging.Bus;
-using TournamentManager.Domain;
 using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
 {
     public class TournamentScheduleRM :
         ReadModelBase,
-        IHandle<TournamentMsgs.GameSlotAdded>,
         IHandle<TournamentMsgs.FieldAdded>
     {
         public TournamentScheduleRM(
@@ -18,27 +16,15 @@ namespace TournamentManager.Presentation
                 nameof(TournamentScheduleRM),
                 () => Bootstrap.GetListener(nameof(TournamentScheduleRM)))
         {
-            EventStream.Subscribe<TournamentMsgs.GameSlotAdded>(this);
             EventStream.Subscribe<TournamentMsgs.FieldAdded>(this);
-            Start<Tournament>(tournamentId);
+            Start<Domain.Tournament>(tournamentId);
         }
 
-        public readonly SourceCache<GameSlotModel, Guid> GameSlots = new SourceCache<GameSlotModel, Guid>(x => x.Id);
-
-        public void Handle(TournamentMsgs.GameSlotAdded message)
-        {
-            GameSlots.AddOrUpdate(new GameSlotModel(
-                                        message.GameSlotId,
-                                        message.StartTime,
-                                        message.EndTime));
-        }
+        public readonly SourceCache<FieldModel, Guid> Fields = new SourceCache<FieldModel, Guid>(x => x.FieldId);
 
         public void Handle(TournamentMsgs.FieldAdded message)
         {
-            foreach (var gameSlot in GameSlots.Items)
-            {
-                gameSlot.AddField(message);
-            }
+            Fields.AddOrUpdate(new FieldModel(message.FieldId, message.FieldName));
         }
     }
 }

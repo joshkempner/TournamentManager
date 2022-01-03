@@ -141,46 +141,6 @@ namespace TournamentManager.Messages
             }
         }
 
-        public class AddGameSlot : Command
-        {
-            public readonly Guid TournamentId;
-            public readonly Guid GameSlotId;
-            public readonly DateTime StartTime;
-            public readonly DateTime EndTime;
-
-            public AddGameSlot(
-                Guid tournamentId,
-                Guid gameSlotId,
-                DateTime startTime,
-                DateTime endTime)
-            {
-                TournamentId = tournamentId;
-                GameSlotId = gameSlotId;
-                StartTime = startTime;
-                EndTime = endTime;
-            }
-        }
-
-        public class GameSlotAdded : Event
-        {
-            public readonly Guid TournamentId;
-            public readonly Guid GameSlotId;
-            public readonly DateTime StartTime;
-            public readonly DateTime EndTime;
-
-            public GameSlotAdded(
-                Guid tournamentId,
-                Guid gameSlotId,
-                DateTime startTime,
-                DateTime endTime)
-            {
-                TournamentId = tournamentId;
-                GameSlotId = gameSlotId;
-                StartTime = startTime;
-                EndTime = endTime;
-            }
-        }
-
         public class AddRefereeToTournament : Command
         {
             public readonly Guid TournamentId;

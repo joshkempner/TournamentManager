@@ -11,7 +11,6 @@ namespace TournamentManager.Tests.Domain
     public sealed class when_managing_games_through_service : with_tournament_service
     {
         private readonly Guid _gameId = Guid.NewGuid();
-        private readonly Guid _gameSlotId = Guid.NewGuid();
         private readonly Guid _fieldId = Guid.NewGuid();
         private readonly Guid _homeTeamId = Guid.NewGuid();
         private readonly Guid _awayTeamId = Guid.NewGuid();
@@ -19,6 +18,8 @@ namespace TournamentManager.Tests.Domain
         private readonly Guid _referee1Id = Guid.NewGuid();
         private readonly Guid _referee2Id = Guid.NewGuid();
         private const TournamentMsgs.AgeBracket AgeBracket = TournamentMsgs.AgeBracket.U14;
+        private readonly DateTime _startTime = new DateTime(2020, 6, 1, 9, 0, 0);
+        private readonly DateTime _endTime = new DateTime(2020, 6, 1, 10, 0, 0);
 
         public when_managing_games_through_service()
         {
@@ -33,10 +34,6 @@ namespace TournamentManager.Tests.Domain
             tournament.AddField(
                 _fieldId,
                 "Field 1");
-            tournament.AddGameSlot(
-                _gameSlotId,
-                new DateTime(2020, 6, 1, 9, 0, 0),
-                new DateTime(2020, 6, 1, 10, 0, 0));
             tournament.AddTeamToTournament(_homeTeamId, AgeBracket);
             tournament.AddTeamToTournament(_awayTeamId, AgeBracket);
             tournament.AddTeamToTournament(_thirdTeamId, AgeBracket);
@@ -53,8 +50,9 @@ namespace TournamentManager.Tests.Domain
             var tournament = repo.GetById<Tournament>(TournamentId, MessageBuilder.New(() => new TestCommands.Command1()));
             tournament.AddGame(
                 _gameId,
-                _gameSlotId,
                 _fieldId,
+                _startTime,
+                _endTime,
                 _homeTeamId,
                 _awayTeamId);
             repo.Save(tournament);
@@ -68,8 +66,9 @@ namespace TournamentManager.Tests.Domain
             var tournament = repo.GetById<Tournament>(TournamentId, MessageBuilder.New(() => new TestCommands.Command1()));
             tournament.AddGame(
                 _gameId,
-                _gameSlotId,
                 _fieldId,
+                _startTime,
+                _endTime,
                 _homeTeamId,
                 _awayTeamId);
             tournament.AssignRefereeToGame(
@@ -86,8 +85,9 @@ namespace TournamentManager.Tests.Domain
             var cmd = MessageBuilder.New(() => new GameMsgs.AddGame(
                                                     TournamentId,
                                                     _gameId,
-                                                    _gameSlotId,
                                                     _fieldId,
+                                                    _startTime,
+                                                    _endTime,
                                                     _homeTeamId,
                                                     _awayTeamId));
             Fixture.Dispatcher.Send(cmd);
@@ -102,7 +102,6 @@ namespace TournamentManager.Tests.Domain
                 .AssertEmpty();
             Assert.Equal(TournamentId, evt.TournamentId);
             Assert.Equal(_gameId, evt.GameId);
-            Assert.Equal(_gameSlotId, evt.GameSlotId);
             Assert.Equal(_fieldId, evt.FieldId);
             Assert.Equal(_homeTeamId, evt.HomeTeamId);
             Assert.Equal(_awayTeamId, evt.AwayTeamId);
@@ -114,8 +113,9 @@ namespace TournamentManager.Tests.Domain
             var cmd = MessageBuilder.New(() => new GameMsgs.AddGame(
                                                     Guid.NewGuid(),
                                                     _gameId,
-                                                    _gameSlotId,
                                                     _fieldId,
+                                                    _startTime,
+                                                    _endTime,
                                                     _homeTeamId,
                                                     _awayTeamId));
             AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
@@ -157,6 +157,49 @@ namespace TournamentManager.Tests.Domain
             Fixture
                 .TestQueue
                 .AssertNext<GameMsgs.CancelGame>(cmd.CorrelationId)
+                .AssertEmpty();
+            Fixture.RepositoryEvents.AssertEmpty();
+        }
+
+        [Fact]
+        public void can_reschedule_game()
+        {
+            AddGame();
+            var newStart = _startTime + TimeSpan.FromHours(1);
+            var newEnd = _endTime + TimeSpan.FromHours(1);
+            var cmd = MessageBuilder.New(() => new GameMsgs.RescheduleGame(
+                                                    TournamentId,
+                                                    _gameId,
+                                                    newStart,
+                                                    newEnd));
+            Fixture.Dispatcher.Send(cmd);
+            Fixture.RepositoryEvents.WaitFor<GameMsgs.GameRescheduled>(TimeSpan.FromMilliseconds(200));
+            Fixture
+                .TestQueue
+                .AssertNext<GameMsgs.RescheduleGame>(cmd.CorrelationId)
+                .AssertEmpty();
+            Fixture
+                .RepositoryEvents
+                .AssertNext<GameMsgs.GameRescheduled>(cmd.CorrelationId, out var evt)
+                .AssertEmpty();
+            Assert.Equal(TournamentId, evt.TournamentId);
+            Assert.Equal(_gameId, evt.GameId);
+            Assert.Equal(newStart, evt.StartTime);
+            Assert.Equal(newEnd, evt.EndTime);
+        }
+
+        [Fact]
+        public void cannot_reschedule_game_in_invalid_tournament()
+        {
+            var cmd = MessageBuilder.New(() => new GameMsgs.RescheduleGame(
+                                                    Guid.NewGuid(),
+                                                    _gameId,
+                                                    _startTime,
+                                                    _endTime));
+            AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
+            Fixture
+                .TestQueue
+                .AssertNext<GameMsgs.RescheduleGame>(cmd.CorrelationId)
                 .AssertEmpty();
             Fixture.RepositoryEvents.AssertEmpty();
         }

@@ -31,7 +31,7 @@ namespace TournamentManager.Presentation
             EventStream.Subscribe<TournamentMsgs.TeamAgeBracketChanged>(this);
             // NB: blockUntilLive to ensure we know about all teams before reading tournament events
             Start<Team>(blockUntilLive: true);
-            Start<Tournament>(tournamentId, blockUntilLive: true);
+            Start<Domain.Tournament>(tournamentId, blockUntilLive: true);
         }
 
         private readonly SourceCache<TeamModel, Guid> _allTeams = new SourceCache<TeamModel, Guid>(x => x.TeamId);

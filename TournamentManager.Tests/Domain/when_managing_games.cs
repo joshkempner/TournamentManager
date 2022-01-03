@@ -12,7 +12,6 @@ namespace TournamentManager.Tests.Domain
     {
         private readonly Guid _tournamentId = Guid.NewGuid();
         private readonly Guid _gameId = Guid.NewGuid();
-        private readonly Guid _gameSlotId = Guid.NewGuid();
         private readonly Guid _fieldId = Guid.NewGuid();
         private readonly Guid _homeTeamId = Guid.NewGuid();
         private readonly Guid _awayTeamId = Guid.NewGuid();
@@ -20,6 +19,8 @@ namespace TournamentManager.Tests.Domain
         private readonly Guid _referee1Id = Guid.NewGuid();
         private readonly Guid _referee2Id = Guid.NewGuid();
         private const TournamentMsgs.AgeBracket AgeBracket = TournamentMsgs.AgeBracket.U14;
+        private readonly DateTime _startTime = new DateTime(2020, 6, 1, 9, 0, 0);
+        private readonly DateTime _endTime = new DateTime(2020, 6, 1, 10, 0, 0);
 
         private Tournament AddTournament()
         {
@@ -32,10 +33,6 @@ namespace TournamentManager.Tests.Domain
             tournament.AddField(
                 _fieldId,
                 "Field 1");
-            tournament.AddGameSlot(
-                _gameSlotId,
-                new DateTime(2020, 6, 1, 9, 0, 0),
-                new DateTime(2020, 6, 1, 10, 0, 0));
             tournament.AddTeamToTournament(_homeTeamId, AgeBracket);
             tournament.AddTeamToTournament(_awayTeamId, AgeBracket);
             tournament.AddTeamToTournament(_thirdTeamId, AgeBracket);
@@ -52,8 +49,9 @@ namespace TournamentManager.Tests.Domain
             var tournament = AddTournament();
             tournament.AddGame(
                 _gameId,
-                _gameSlotId,
                 _fieldId,
+                _startTime,
+                _endTime,
                 _homeTeamId,
                 _awayTeamId);
             // Take events and reset the Source so we can continue to use the aggregate as "pre-hydrated"
@@ -68,8 +66,9 @@ namespace TournamentManager.Tests.Domain
             var tournament = AddTournament();
             tournament.AddGame(
                 _gameId,
-                _gameSlotId,
                 _fieldId,
+                _startTime,
+                _endTime,
                 _homeTeamId,
                 _awayTeamId);
             Assert.True(tournament.HasRecordedEvents);
@@ -79,8 +78,9 @@ namespace TournamentManager.Tests.Domain
                 e => Assert.True(e is GameMsgs.GameAdded evt &&
                                  evt.TournamentId == _tournamentId &&
                                  evt.GameId == _gameId &&
-                                 evt.GameSlotId == _gameSlotId &&
                                  evt.FieldId == _fieldId &&
+                                 evt.StartTime == _startTime &&
+                                 evt.EndTime == _endTime &&
                                  evt.HomeTeamId == _homeTeamId &&
                                  evt.AwayTeamId == _awayTeamId));
         }
@@ -92,36 +92,17 @@ namespace TournamentManager.Tests.Domain
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGame(
                         _gameId,
-                        _gameSlotId,
                         Guid.Empty,
-                        _homeTeamId,
-                        _awayTeamId));
-            Assert.Throws<ArgumentException>(
-                () => tournament.AddGame(
-                        _gameId,
-                        _gameSlotId,
-                        Guid.NewGuid(),
-                        _homeTeamId,
-                        _awayTeamId));
-            Assert.False(tournament.HasRecordedEvents);
-        }
-
-        [Fact]
-        public void cannot_add_game_to_invalid_game_slot()
-        {
-            var tournament = AddTournament();
-            Assert.Throws<ArgumentException>(
-                () => tournament.AddGame(
-                        _gameId,
-                        Guid.Empty,
-                        _fieldId,
+                        _startTime,
+                        _endTime,
                         _homeTeamId,
                         _awayTeamId));
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGame(
                         _gameId,
                         Guid.NewGuid(),
-                        _fieldId,
+                        _startTime,
+                        _endTime,
                         _homeTeamId,
                         _awayTeamId));
             Assert.False(tournament.HasRecordedEvents);
@@ -134,8 +115,88 @@ namespace TournamentManager.Tests.Domain
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGame(
                         Guid.Empty,
-                        _gameSlotId,
                         _fieldId,
+                        _startTime,
+                        _endTime,
+                        _homeTeamId,
+                        _awayTeamId));
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void cannot_add_game_with_duplicate_id()
+        {
+            var tournament = AddTournament();
+            tournament.AddGame(
+                _gameId,
+                _fieldId,
+                _startTime,
+                _endTime,
+                _homeTeamId,
+                _awayTeamId);
+            Assert.Throws<ArgumentException>(
+                () => tournament.AddGame(
+                        _gameId,
+                        _fieldId,
+                        _startTime,
+                        _endTime,
+                        _homeTeamId,
+                        _awayTeamId));
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Collection(
+                events,
+                e => Assert.IsType<GameMsgs.GameAdded>(e));
+        }
+
+        [Fact]
+        public void cannot_add_game_with_same_start_and_end_times()
+        {
+            var tournament = AddTournament();
+            Assert.Throws<ArgumentException>(
+                () => tournament.AddGame(
+                        Guid.Empty,
+                        _fieldId,
+                        _startTime,
+                        _startTime,
+                        _homeTeamId,
+                        _awayTeamId));
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void cannot_add_game_with_start_time_after_end_time()
+        {
+            var tournament = AddTournament();
+            Assert.Throws<ArgumentException>(
+                () => tournament.AddGame(
+                        Guid.Empty,
+                        _fieldId,
+                        _endTime,
+                        _startTime,
+                        _homeTeamId,
+                        _awayTeamId));
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void cannot_add_game_outside_tournament_dates()
+        {
+            var tournament = AddTournament();
+            Assert.Throws<ArgumentException>(
+                () => tournament.AddGame(
+                        Guid.Empty,
+                        _fieldId,
+                        _startTime - TimeSpan.FromDays(1),
+                        _endTime - TimeSpan.FromDays(1),
+                        _homeTeamId,
+                        _awayTeamId));
+            Assert.Throws<ArgumentException>(
+                () => tournament.AddGame(
+                        Guid.Empty,
+                        _fieldId,
+                        _startTime + TimeSpan.FromDays(1),
+                        _endTime + TimeSpan.FromDays(1),
                         _homeTeamId,
                         _awayTeamId));
             Assert.False(tournament.HasRecordedEvents);
@@ -148,15 +209,17 @@ namespace TournamentManager.Tests.Domain
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGame(
                         _gameId,
-                        _gameSlotId,
                         _fieldId,
+                        _startTime,
+                        _endTime,
                         Guid.Empty,
                         _awayTeamId));
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGame(
                         _gameId,
-                        _gameSlotId,
                         _fieldId,
+                        _startTime,
+                        _endTime,
                         Guid.NewGuid(),
                         _awayTeamId));
             Assert.False(tournament.HasRecordedEvents);
@@ -169,15 +232,17 @@ namespace TournamentManager.Tests.Domain
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGame(
                         _gameId,
-                        _gameSlotId,
                         _fieldId,
+                        _startTime,
+                        _endTime,
                         _homeTeamId,
                         Guid.Empty));
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGame(
                         _gameId,
-                        _gameSlotId,
                         _fieldId,
+                        _startTime,
+                        _endTime,
                         _homeTeamId,
                         Guid.NewGuid()));
             Assert.False(tournament.HasRecordedEvents);
@@ -210,6 +275,131 @@ namespace TournamentManager.Tests.Domain
         {
             var tournament = AddTournamentWithGame();
             tournament.CancelGame(Guid.NewGuid());
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void can_reschedule_game()
+        {
+            var newStart = _startTime + TimeSpan.FromHours(1);
+            var newEnd = _endTime + TimeSpan.FromHours(1);
+            var tournament = AddTournamentWithGame();
+            tournament.RescheduleGame(
+                _gameId,
+                newStart,
+                newEnd);
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Collection(
+                events,
+                e => Assert.True(e is GameMsgs.GameRescheduled evt &&
+                                 evt.TournamentId == _tournamentId &&
+                                 evt.GameId == _gameId &&
+                                 evt.StartTime == newStart &&
+                                 evt.EndTime == newEnd));
+        }
+
+        [Fact]
+        public void reschedule_game_is_idempotent()
+        {
+            var newStart = _startTime + TimeSpan.FromHours(1);
+            var newEnd = _endTime + TimeSpan.FromHours(1);
+            var tournament = AddTournamentWithGame();
+            // rescheduling to initial times should not raise a new event.
+            tournament.RescheduleGame(
+                _gameId,
+                _startTime,
+                _endTime);
+            // rescheduling to new times SHOULD raise a new event.
+            tournament.RescheduleGame(
+                _gameId,
+                newStart,
+                newEnd);
+            // rescheduling identically should not raise a new event.
+            tournament.RescheduleGame(
+                _gameId,
+                newStart,
+                newEnd);
+            Assert.True(tournament.HasRecordedEvents);
+            var events = tournament.TakeEvents();
+            Assert.Collection(
+                events,
+                e => Assert.True(e is GameMsgs.GameRescheduled evt &&
+                                 evt.TournamentId == _tournamentId &&
+                                 evt.GameId == _gameId &&
+                                 evt.StartTime == newStart &&
+                                 evt.EndTime == newEnd));
+        }
+
+        [Fact]
+        public void cannot_reschedule_game_with_invalid_game_id()
+        {
+            var newStart = _startTime + TimeSpan.FromHours(1);
+            var newEnd = _endTime + TimeSpan.FromHours(1);
+            var tournament = AddTournamentWithGame();
+            Assert.Throws<ArgumentException>(
+                () => tournament.RescheduleGame(
+                        Guid.NewGuid(),
+                        newStart,
+                        newEnd));
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void cannot_reschedule_game_with_empty_game_id()
+        {
+            var newStart = _startTime + TimeSpan.FromHours(1);
+            var newEnd = _endTime + TimeSpan.FromHours(1);
+            var tournament = AddTournamentWithGame();
+            Assert.Throws<ArgumentException>(
+                () => tournament.RescheduleGame(
+                        Guid.Empty,
+                        newStart,
+                        newEnd));
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void cannot_reschedule_game_with_same_start_and_end_times()
+        {
+            var newTime = _startTime + TimeSpan.FromHours(1);
+            var tournament = AddTournamentWithGame();
+            Assert.Throws<ArgumentException>(
+                () => tournament.RescheduleGame(
+                        Guid.NewGuid(),
+                        newTime,
+                        newTime));
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void cannot_reschedule_game_with_start_time_after_end_time()
+        {
+            var newStart = _startTime + TimeSpan.FromHours(1);
+            var newEnd = _endTime + TimeSpan.FromHours(1);
+            var tournament = AddTournamentWithGame();
+            Assert.Throws<ArgumentException>(
+                () => tournament.RescheduleGame(
+                        Guid.NewGuid(),
+                        newEnd,
+                        newStart));
+            Assert.False(tournament.HasRecordedEvents);
+        }
+
+        [Fact]
+        public void cannot_reschedule_game_outside_tournament_dates()
+        {
+            var tournament = AddTournamentWithGame();
+            Assert.Throws<ArgumentException>(
+                () => tournament.RescheduleGame(
+                        Guid.NewGuid(),
+                        _startTime - TimeSpan.FromDays(1),
+                        _endTime - TimeSpan.FromDays(1)));
+            Assert.Throws<ArgumentException>(
+                () => tournament.RescheduleGame(
+                        Guid.NewGuid(),
+                        _startTime + TimeSpan.FromDays(1),
+                        _endTime + TimeSpan.FromDays(1)));
             Assert.False(tournament.HasRecordedEvents);
         }
 
