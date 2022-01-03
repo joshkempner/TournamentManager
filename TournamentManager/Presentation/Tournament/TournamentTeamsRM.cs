@@ -3,7 +3,6 @@ using System.Linq;
 using DynamicData;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging.Bus;
-using ReactiveUI;
 using TournamentManager.Domain;
 using TournamentManager.Messages;
 
@@ -87,32 +86,5 @@ namespace TournamentManager.Presentation
             if (!team.HasValue) return;
             team.Value.AgeBracket = message.AgeBracket;
         }
-    }
-
-    public class TeamModel : ReactiveObject
-    {
-        public TeamModel(
-            Guid teamId,
-            string name)
-        {
-            TeamId = teamId;
-            Name = name;
-        }
-
-        public Guid TeamId { get; }
-
-        public string Name
-        {
-            get => _name;
-            set => this.RaiseAndSetIfChanged(ref _name, value);
-        }
-        private string _name = null!;
-
-        public TournamentMsgs.AgeBracket AgeBracket
-        {
-            get => _ageBracket;
-            set => this.RaiseAndSetIfChanged(ref _ageBracket, value);
-        }
-        private TournamentMsgs.AgeBracket _ageBracket;
     }
 }

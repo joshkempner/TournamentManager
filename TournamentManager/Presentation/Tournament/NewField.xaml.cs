@@ -5,39 +5,43 @@ using ReactiveUI;
 namespace TournamentManager.Presentation
 {
     /// <summary>
-    /// Interaction logic for TournamentSchedule.xaml
+    /// Interaction logic for NewField.xaml
     /// </summary>
-    public partial class TournamentSchedule : IViewFor<TournamentScheduleVM>
+    public partial class NewField : IViewFor<NewFieldVM>
     {
-        public TournamentSchedule()
+        public NewField()
         {
             InitializeComponent();
 
+
             this.WhenActivated(disposables =>
             {
-                this.BindCommand(ViewModel, vm => vm.AddField, v => v.AddField)
+                this.Bind(ViewModel, vm => vm.FieldName, v => v.FieldName.Text)
                     .DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.Cancel, v => v.Done)
+
+                this.BindCommand(ViewModel, vm => vm.Save, v => v.Add)
+                    .DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.Cancel, v => v.Cancel)
                     .DisposeWith(disposables);
             });
         }
 
         public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
             "ViewModel",
-            typeof(TournamentScheduleVM),
-            typeof(TournamentSchedule),
-            new PropertyMetadata(default(TournamentScheduleVM)));
+            typeof(NewFieldVM),
+            typeof(NewField),
+            new PropertyMetadata(default(NewFieldVM)));
 
-        public TournamentScheduleVM? ViewModel
+        public NewFieldVM? ViewModel
         {
-            get => (TournamentScheduleVM)GetValue(ViewModelProperty);
+            get => (NewFieldVM)GetValue(ViewModelProperty);
             set => SetValue(ViewModelProperty, value);
         }
 
         object? IViewFor.ViewModel
         {
             get => ViewModel;
-            set => ViewModel = value as TournamentScheduleVM;
+            set => ViewModel = value as NewFieldVM;
         }
     }
 }

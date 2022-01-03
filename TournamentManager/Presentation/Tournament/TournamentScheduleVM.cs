@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Reactive.Linq;
-using DynamicData;
-using DynamicData.Binding;
+using System.Reactive;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveUI;
 
@@ -11,6 +9,8 @@ namespace TournamentManager.Presentation
     {
         private readonly TournamentScheduleRM _rm;
 
+        public ReactiveCommand<Unit, IRoutableViewModel> AddField { get; }
+
         public TournamentScheduleVM(
             Guid tournamentId,
             IDispatcher bus,
@@ -18,16 +18,22 @@ namespace TournamentManager.Presentation
             : base(screen)
         {
             _rm = new TournamentScheduleRM(tournamentId);
+
+            AddField = ReactiveCommand.CreateFromObservable(
+                        () => HostScreen.Router.Navigate.Execute(new NewFieldVM(
+                                                                        tournamentId,
+                                                                        bus,
+                                                                        HostScreen)));
         }
 
         private bool _disposed;
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
             if (_disposed) return;
             if (disposing)
                 _rm.Dispose();
             _disposed = true;
+            base.Dispose(disposing);
         }
 
         public override string UrlPathSegment => "TournamentSchedule";

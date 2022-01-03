@@ -1,4 +1,5 @@
 ﻿using System;
+using DynamicData;
 
 namespace TournamentManager.Presentation
 {
@@ -12,5 +13,18 @@ namespace TournamentManager.Presentation
 
         public Guid FieldId { get; }
         public string FieldName { get; }
+
+        public IConnectableCache<GameModel, Guid> Games => _games;
+        private readonly SourceCache<GameModel, Guid> _games = new SourceCache<GameModel, Guid>(x => x.GameId);
+
+        public bool TryAddGame(GameModel game)
+        {
+            if (game.FieldId == FieldId && game.FieldName == FieldName)
+            {
+                _games.AddOrUpdate(game);
+                return true;
+            }
+            return false;
+        }
     }
 }

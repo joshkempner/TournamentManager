@@ -76,11 +76,11 @@ namespace TournamentManager.Presentation
         private bool _disposed;
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
             if (_disposed) return;
             if (disposing)
                 _rm.Dispose();
             _disposed = true;
+            base.Dispose(disposing);
         }
 
         public string Name
