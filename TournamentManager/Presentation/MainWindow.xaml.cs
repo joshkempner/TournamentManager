@@ -1,4 +1,7 @@
-﻿using System.Reactive.Disposables;
+﻿using System;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Windows;
 using ReactiveUI;
 
 namespace TournamentManager.Presentation
@@ -18,7 +21,15 @@ namespace TournamentManager.Presentation
                     .DisposeWith(disposables);
                 this.OneWayBind(ViewModel, vm => vm.TournamentVM, v => v.MainTournamentsView.ViewModel)
                     .DisposeWith(disposables);
+                this.OneWayBind(ViewModel, vm => vm.OverlayVM, v => v.OverlayViewHost.ViewModel)
+                    .DisposeWith(disposables);
             });
+
+#pragma warning disable CS8602
+            this.WhenAnyValue(x => x.ViewModel.OverlayVM)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => Overlay.Visibility = x is null ? Visibility.Collapsed : Visibility.Visible);
+#pragma warning restore CS8602
         }
     }
 }

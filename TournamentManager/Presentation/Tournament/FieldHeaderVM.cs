@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Disposables;
+using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
 using ReactiveUI;
+using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
 {
-    public class FieldHeaderVM : ReactiveObject, IDisposable, IActivatableViewModel
+    public class FieldHeaderVM : ReactiveObject, IActivatableViewModel
     {
         public ReactiveCommand<Unit, Unit> AddGame { get; }
 
@@ -20,21 +22,17 @@ namespace TournamentManager.Presentation
         {
             FieldName = fieldName;
 
-            AddGame = CommandBuilder.FromAction(
+            AddGame = bus.BuildSendCommand(
                         this.WhenAnyValue(
-                            x => x.NewGameViewModel,
                             x => x.GameDay,
-                            (vm, day) => vm is null && day >= 0),
-                        () => NewGameViewModel = new NewGameVM(
-                                                      tournamentId,
-                                                      fieldId,
-                                                      (uint)GameDay,
-                                                      bus,
-                                                      vm =>
-                                                      {
-                                                          vm.Dispose();
-                                                          NewGameViewModel = null;
-                                                      }));
+                            day => day >= 0),
+                        () => MessageBuilder.New(
+                                () => new HostViewMsgs.DisplayOverlay(
+                                            () => new NewGameVM(
+                                                          tournamentId,
+                                                          fieldId,
+                                                          (uint)GameDay,
+                                                          bus))));
 
             this.WhenActivated(disposables =>
             {
@@ -48,13 +46,6 @@ namespace TournamentManager.Presentation
 
         public int GameDay => _gameDay.Value;
         private ObservableAsPropertyHelper<int> _gameDay = ObservableAsPropertyHelper<int>.Default();
-
-        public NewGameVM? NewGameViewModel { get; set; }
-
-        public void Dispose()
-        {
-            NewGameViewModel?.Dispose();
-        }
 
         public ViewModelActivator Activator { get; } = new ViewModelActivator();
     }
