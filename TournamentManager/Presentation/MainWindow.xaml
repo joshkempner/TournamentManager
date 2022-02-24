@@ -21,5 +21,9 @@
                 </Grid>
             </TabItem>
         </TabControl>
+        <Grid Name="Overlay">
+            <Rectangle Fill="#222" Opacity="0.6" />
+            <reactiveUi:ViewModelViewHost Name="OverlayViewHost" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
     </Grid>
 </reactiveUi:ReactiveWindow>

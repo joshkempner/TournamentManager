@@ -9,6 +9,7 @@ using Splat;
 using TournamentManager.Domain;
 using TournamentManager.Helpers;
 using TournamentManager.Presentation;
+using TournamentManager.Services;
 using ILogger = ReactiveDomain.Logging.ILogger;
 
 namespace TournamentManager
@@ -25,6 +26,7 @@ namespace TournamentManager
         private RefereeSvc? _refereeSvc;
         private TournamentSvc? _tournamentSvc;
         private TeamSvc? _teamSvc;
+        private HostViewSvc? _hostViewSvc;
         private MainWindowVM? _mainVM;
 
         internal Bootstrap()
@@ -39,6 +41,7 @@ namespace TournamentManager
             Configure(esConnection, _mainBus);
 
             _mainVM = new MainWindowVM(_mainBus);
+            _hostViewSvc = new HostViewSvc(_mainVM, _mainBus);
             var mainWindow = new MainWindow { ViewModel = _mainVM };
             mainWindow.Show();
         }
@@ -63,9 +66,10 @@ namespace TournamentManager
 
         internal void Shutdown()
         {
-            _tournamentSvc?.Dispose();
             _refereeSvc?.Dispose();
             _teamSvc?.Dispose();
+            _hostViewSvc?.Dispose();
+            _tournamentSvc?.Dispose();
         }
 
         internal static IListener GetListener(string name)
