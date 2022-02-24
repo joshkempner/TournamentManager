@@ -8,16 +8,16 @@ using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
 {
-    public class NewGameVM : ReactiveObject, IDisposable
+    public class NewGameVM : OverlayViewModel
     {
         public ReactiveCommand<Unit, Unit> AddGame { get; }
+        public ReactiveCommand<Unit, Unit> Cancel { get; }
 
         public NewGameVM(
             Guid tournamentId,
             Guid fieldId,
             uint gameDay,
-            IDispatcher bus,
-            Action<IDisposable> close)
+            IDispatcher bus)
         {
             AddGame = bus.BuildSendCommand(
                             this.WhenAnyValue(
@@ -37,8 +37,12 @@ namespace TournamentManager.Presentation
                                                 HomeTeam!.TeamId,
                                                 AwayTeam!.TeamId)));
 
-            this.WhenAnyObservable(x => x.AddGame)
-                .Subscribe(_ => close(this));
+            Cancel = CommandBuilder.FromAction(() => { /* This is effectively a dummy command */ });
+
+            this.WhenAnyObservable(
+                    x => x.AddGame,
+                    x => x.Cancel)
+                .InvokeCommand(Done);
         }
 
         public DateTime StartTime
@@ -68,8 +72,5 @@ namespace TournamentManager.Presentation
             set => this.RaiseAndSetIfChanged(ref _awayTeam, value);
         }
         private TeamModel? _awayTeam;
-
-        public void Dispose()
-        { }
     }
 }

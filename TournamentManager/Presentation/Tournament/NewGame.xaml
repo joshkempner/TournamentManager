@@ -1,10 +1,9 @@
-﻿<UserControl x:Class="TournamentManager.Presentation.Tournament.NewGame"
+﻿<UserControl x:Class="TournamentManager.Presentation.NewGame"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TournamentManager.Presentation.Tournament"
-             mc:Ignorable="d">
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" Background="White">
     <StackPanel Margin="20">
         <TextBlock Name="Title" Text="New game on field 1" Style="{DynamicResource Header}" Margin="0,0,0,10" />
         <Grid>
@@ -44,7 +43,7 @@
             <ComboBox Name="Referee" Grid.Row="6" Grid.Column="2" Margin="0,5" />
         </Grid>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Name="Add" Content="Add" IsDefault="True" Style="{DynamicResource DialogAction}" />
+            <Button Name="AddGame" Content="Add" IsDefault="True" Style="{DynamicResource DialogAction}" />
             <Button Name="Cancel" Content="Cancel" IsCancel="True" Style="{DynamicResource DialogAction}" Margin="10,0,0,0" />
         </StackPanel>
     </StackPanel>

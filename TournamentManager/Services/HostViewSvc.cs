@@ -1,6 +1,7 @@
 ﻿using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
+using TournamentManager.Helpers;
 using TournamentManager.Messages;
 using TournamentManager.Presentation;
 
@@ -14,8 +15,8 @@ namespace TournamentManager.Services
 
         public HostViewSvc(
             MainWindowVM mainWindowVM,
-            ISubscriber subscriber)
-            : base(subscriber)
+            IDispatcher bus)
+            : base(bus)
         {
             _mainWindowVM = mainWindowVM;
 
@@ -25,7 +26,7 @@ namespace TournamentManager.Services
 
         public CommandResponse Handle(HostViewMsgs.DisplayOverlay command)
         {
-            _mainWindowVM.OverlayVM = command.GetVM();
+            Threading.RunOnUiThread(() => _mainWindowVM.OverlayVM = command.GetVM());
             return command.Succeed();
         }
     }
