@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Windows;
 using ReactiveUI;
 
@@ -26,6 +27,7 @@ namespace TournamentManager.Presentation
 
 #pragma warning disable CS8602
             this.WhenAnyValue(x => x.ViewModel.OverlayVM)
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => Overlay.Visibility = x is null ? Visibility.Collapsed : Visibility.Visible);
 #pragma warning restore CS8602
         }
