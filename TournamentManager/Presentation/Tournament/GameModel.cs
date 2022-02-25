@@ -7,16 +7,12 @@ namespace TournamentManager.Presentation
     {
         public GameModel(
             Guid gameId,
-            Guid homeTeamId,
-            Guid awayTeamId,
             DateTime startTime,
             DateTime endTime,
             Guid fieldId,
             string fieldName)
         {
             GameId = gameId;
-            HomeTeamId = homeTeamId;
-            AwayTeamId = awayTeamId;
             StartTime = startTime;
             EndTime = endTime;
             FieldId = fieldId;

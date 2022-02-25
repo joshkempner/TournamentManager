@@ -53,9 +53,7 @@ namespace TournamentManager.Tests.Domain
                 _fieldId,
                 TournamentDay,
                 _startTime,
-                _endTime,
-                _homeTeamId,
-                _awayTeamId);
+                _endTime);
             // Take events and reset the Source so we can continue to use the aggregate as "pre-hydrated"
             tournament.TakeEvents();
             ((ICorrelatedEventSource)tournament).Source = MessageBuilder.New(() => new TestCommands.Command1());
@@ -71,9 +69,7 @@ namespace TournamentManager.Tests.Domain
                 _fieldId,
                 TournamentDay,
                 _startTime,
-                _endTime,
-                _homeTeamId,
-                _awayTeamId);
+                _endTime);
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
             Assert.Collection(
@@ -83,9 +79,7 @@ namespace TournamentManager.Tests.Domain
                                  evt.GameId == _gameId &&
                                  evt.FieldId == _fieldId &&
                                  evt.StartTime == _startTime &&
-                                 evt.EndTime == _endTime &&
-                                 evt.HomeTeamId == _homeTeamId &&
-                                 evt.AwayTeamId == _awayTeamId));
+                                 evt.EndTime == _endTime));
         }
 
         [Fact]
@@ -98,18 +92,14 @@ namespace TournamentManager.Tests.Domain
                         Guid.Empty,
                         TournamentDay,
                         _startTime,
-                        _endTime,
-                        _homeTeamId,
-                        _awayTeamId));
+                        _endTime));
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGame(
                         _gameId,
                         Guid.NewGuid(),
                         TournamentDay,
                         _startTime,
-                        _endTime,
-                        _homeTeamId,
-                        _awayTeamId));
+                        _endTime));
             Assert.False(tournament.HasRecordedEvents);
         }
 
@@ -123,9 +113,7 @@ namespace TournamentManager.Tests.Domain
                         _fieldId,
                         TournamentDay,
                         _startTime,
-                        _endTime,
-                        _homeTeamId,
-                        _awayTeamId));
+                        _endTime));
             Assert.False(tournament.HasRecordedEvents);
         }
 
@@ -138,18 +126,14 @@ namespace TournamentManager.Tests.Domain
                 _fieldId,
                 TournamentDay,
                 _startTime,
-                _endTime,
-                _homeTeamId,
-                _awayTeamId);
+                _endTime);
             Assert.Throws<ArgumentException>(
                 () => tournament.AddGame(
                         _gameId,
                         _fieldId,
                         TournamentDay,
                         _startTime,
-                        _endTime,
-                        _homeTeamId,
-                        _awayTeamId));
+                        _endTime));
             Assert.True(tournament.HasRecordedEvents);
             var events = tournament.TakeEvents();
             Assert.Collection(
@@ -167,9 +151,7 @@ namespace TournamentManager.Tests.Domain
                         _fieldId,
                         TournamentDay,
                         _startTime,
-                        _startTime,
-                        _homeTeamId,
-                        _awayTeamId));
+                        _startTime));
             Assert.False(tournament.HasRecordedEvents);
         }
 
@@ -183,9 +165,7 @@ namespace TournamentManager.Tests.Domain
                         _fieldId,
                         TournamentDay,
                         _endTime,
-                        _startTime,
-                        _homeTeamId,
-                        _awayTeamId));
+                        _startTime));
             Assert.False(tournament.HasRecordedEvents);
         }
 
@@ -199,59 +179,7 @@ namespace TournamentManager.Tests.Domain
                         _fieldId,
                         TournamentDay + 1,
                         _startTime,
-                        _endTime,
-                        _homeTeamId,
-                        _awayTeamId));
-            Assert.False(tournament.HasRecordedEvents);
-        }
-
-        [Fact]
-        public void cannot_add_game_with_invalid_home_team()
-        {
-            var tournament = AddTournament();
-            Assert.Throws<ArgumentException>(
-                () => tournament.AddGame(
-                        _gameId,
-                        _fieldId,
-                        TournamentDay,
-                        _startTime,
-                        _endTime,
-                        Guid.Empty,
-                        _awayTeamId));
-            Assert.Throws<ArgumentException>(
-                () => tournament.AddGame(
-                        _gameId,
-                        _fieldId,
-                        TournamentDay,
-                        _startTime,
-                        _endTime,
-                        Guid.NewGuid(),
-                        _awayTeamId));
-            Assert.False(tournament.HasRecordedEvents);
-        }
-
-        [Fact]
-        public void cannot_add_game_with_invalid_away_team()
-        {
-            var tournament = AddTournament();
-            Assert.Throws<ArgumentException>(
-                () => tournament.AddGame(
-                        _gameId,
-                        _fieldId,
-                        TournamentDay,
-                        _startTime,
-                        _endTime,
-                        _homeTeamId,
-                        Guid.Empty));
-            Assert.Throws<ArgumentException>(
-                () => tournament.AddGame(
-                        _gameId,
-                        _fieldId,
-                        TournamentDay,
-                        _startTime,
-                        _endTime,
-                        _homeTeamId,
-                        Guid.NewGuid()));
+                        _endTime));
             Assert.False(tournament.HasRecordedEvents);
         }
 

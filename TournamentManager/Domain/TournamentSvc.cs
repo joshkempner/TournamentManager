@@ -145,9 +145,7 @@ namespace TournamentManager.Domain
                 command.FieldId,
                 command.TournamentDay,
                 command.StartTime,
-                command.EndTime,
-                command.HomeTeamId,
-                command.AwayTeamId);
+                command.EndTime);
             _repository.Save(tournament);
             return command.Succeed();
         }

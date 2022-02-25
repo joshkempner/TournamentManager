@@ -54,9 +54,7 @@ namespace TournamentManager.Tests.Domain
                 _fieldId,
                 TournamentDay,
                 _startTime,
-                _endTime,
-                _homeTeamId,
-                _awayTeamId);
+                _endTime);
             repo.Save(tournament);
             Fixture.RepositoryEvents.WaitFor<GameMsgs.GameAdded>(TimeSpan.FromMilliseconds(200));
             Fixture.ClearQueues();
@@ -71,9 +69,7 @@ namespace TournamentManager.Tests.Domain
                 _fieldId,
                 TournamentDay,
                 _startTime,
-                _endTime,
-                _homeTeamId,
-                _awayTeamId);
+                _endTime);
             tournament.AssignRefereeToGame(
                 _gameId,
                 _referee1Id);
@@ -91,9 +87,7 @@ namespace TournamentManager.Tests.Domain
                                                     _fieldId,
                                                     TournamentDay,
                                                     _startTime,
-                                                    _endTime,
-                                                    _homeTeamId,
-                                                    _awayTeamId));
+                                                    _endTime));
             Fixture.Dispatcher.Send(cmd);
             Fixture.RepositoryEvents.WaitFor<GameMsgs.GameAdded>(TimeSpan.FromMilliseconds(200));
             Fixture
@@ -107,8 +101,6 @@ namespace TournamentManager.Tests.Domain
             Assert.Equal(TournamentId, evt.TournamentId);
             Assert.Equal(_gameId, evt.GameId);
             Assert.Equal(_fieldId, evt.FieldId);
-            Assert.Equal(_homeTeamId, evt.HomeTeamId);
-            Assert.Equal(_awayTeamId, evt.AwayTeamId);
         }
 
         [Fact]
@@ -120,9 +112,7 @@ namespace TournamentManager.Tests.Domain
                                                     _fieldId,
                                                     TournamentDay,
                                                     _startTime,
-                                                    _endTime,
-                                                    _homeTeamId,
-                                                    _awayTeamId));
+                                                    _endTime));
             AssertEx.CommandThrows<AggregateNotFoundException>(() => Fixture.Dispatcher.Send(cmd));
             Fixture
                 .TestQueue

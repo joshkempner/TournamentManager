@@ -19,23 +19,41 @@ namespace TournamentManager.Presentation
             uint gameDay,
             IDispatcher bus)
         {
-            AddGame = bus.BuildSendCommand(
+            AddGame = CommandBuilder.FromAction(
                             this.WhenAnyValue(
                                 x => x.StartTime,
                                 x => x.EndTime,
                                 x => x.HomeTeam,
                                 x => x.AwayTeam,
                                 (s, e, h, a) => e > s && h != null && a != null),
-                            () => MessageBuilder.New(
-                                    () => new GameMsgs.AddGame(
-                                                tournamentId,
-                                                Guid.NewGuid(),
-                                                fieldId,
-                                                gameDay,
-                                                StartTime,
-                                                EndTime,
-                                                HomeTeam!.TeamId,
-                                                AwayTeam!.TeamId)));
+                            () =>
+                            {
+                                var gameId = Guid.NewGuid();
+                                var add =
+                                    MessageBuilder.New(
+                                        () => new GameMsgs.AddGame(
+                                                    tournamentId,
+                                                    gameId,
+                                                    fieldId,
+                                                    gameDay,
+                                                    StartTime,
+                                                    EndTime));
+                                bus.Send(add);
+                                if (HomeTeam != null)
+                                    bus.Send(MessageBuilder
+                                                .From(add)
+                                                .Build(() => new GameMsgs.UpdateHomeTeam(
+                                                                    tournamentId,
+                                                                    gameId,
+                                                                    HomeTeam.TeamId)));
+                                if (AwayTeam != null)
+                                    bus.Send(MessageBuilder
+                                                .From(add)
+                                                .Build(() => new GameMsgs.UpdateAwayTeam(
+                                                                    tournamentId,
+                                                                    gameId,
+                                                                    AwayTeam.TeamId)));
+                            });
 
             Cancel = CommandBuilder.FromAction(() => { /* This is effectively a dummy command */ });
 

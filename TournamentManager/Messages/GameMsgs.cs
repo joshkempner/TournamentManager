@@ -13,8 +13,6 @@ namespace TournamentManager.Messages
             public readonly uint TournamentDay;
             public readonly DateTime StartTime;
             public readonly DateTime EndTime;
-            public readonly Guid HomeTeamId;
-            public readonly Guid AwayTeamId;
 
             public AddGame(
                 Guid tournamentId,
@@ -22,16 +20,12 @@ namespace TournamentManager.Messages
                 Guid fieldId,
                 uint tournamentDay,
                 DateTime startTime,
-                DateTime endTime,
-                Guid homeTeamId,
-                Guid awayTeamId)
+                DateTime endTime)
             {
                 TournamentId = tournamentId;
                 GameId = gameId;
                 FieldId = fieldId;
                 TournamentDay = tournamentDay;
-                HomeTeamId = homeTeamId;
-                AwayTeamId = awayTeamId;
                 StartTime = startTime;
                 EndTime = endTime;
             }
@@ -45,8 +39,6 @@ namespace TournamentManager.Messages
             public readonly uint TournamentDay;
             public readonly DateTime StartTime;
             public readonly DateTime EndTime;
-            public readonly Guid HomeTeamId;
-            public readonly Guid AwayTeamId;
 
             public GameAdded(
                 Guid tournamentId,
@@ -54,9 +46,7 @@ namespace TournamentManager.Messages
                 Guid fieldId,
                 uint tournamentDay,
                 DateTime startTime,
-                DateTime endTime,
-                Guid homeTeamId,
-                Guid awayTeamId)
+                DateTime endTime)
             {
                 TournamentId = tournamentId;
                 GameId = gameId;
@@ -64,8 +54,6 @@ namespace TournamentManager.Messages
                 TournamentDay = tournamentDay;
                 StartTime = startTime;
                 EndTime = endTime;
-                HomeTeamId = homeTeamId;
-                AwayTeamId = awayTeamId;
             }
         }
 

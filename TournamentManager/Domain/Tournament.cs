@@ -169,9 +169,7 @@ namespace TournamentManager.Domain
             Guid fieldId,
             uint tournamentDay,
             DateTime startTime,
-            DateTime endTime,
-            Guid homeTeamId,
-            Guid awayTeamId)
+            DateTime endTime)
         {
             Ensure.NotEmptyGuid(gameId, nameof(gameId));
             Ensure.NotEmptyGuid(fieldId, nameof(fieldId));
@@ -179,25 +177,17 @@ namespace TournamentManager.Domain
             Ensure.LessThanOrEqualTo((uint)duration.TotalDays, tournamentDay, nameof(tournamentDay));
             Ensure.False(() => startTime == endTime, "Cannot add a game with identical start and end times.");
             Ensure.True(() => startTime < endTime, "Cannot add a game with a start time before the end time.");
-            Ensure.NotEmptyGuid(homeTeamId, nameof(homeTeamId));
-            Ensure.NotEmptyGuid(awayTeamId, nameof(awayTeamId));
             if (_gameTimes.ContainsKey(gameId))
                 throw new ArgumentException($"A game with ID {gameId} has already been added.");
             if (!_fields.Contains(fieldId))
                 throw new ArgumentException("Cannot add a game to an invalid field.");
-            if (!_teams.Contains(homeTeamId))
-                throw new ArgumentException("Cannot add a game with an invalid home team.");
-            if (!_teams.Contains(awayTeamId))
-                throw new ArgumentException("Cannot add a game with an invalid away team.");
             Raise(new GameMsgs.GameAdded(
                         Id,
                         gameId,
                         fieldId,
                         tournamentDay,
                         startTime,
-                        endTime,
-                        homeTeamId,
-                        awayTeamId));
+                        endTime));
         }
 
         public void CancelGame(Guid gameId)

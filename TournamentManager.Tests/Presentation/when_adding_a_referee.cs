@@ -3,6 +3,7 @@ using System.Reactive;
 using ReactiveDomain.Messaging;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.Testing;
+using ReactiveUI;
 using TournamentManager.Messages;
 using TournamentManager.Presentation;
 using TournamentManager.Tests.Helpers;
@@ -19,7 +20,7 @@ namespace TournamentManager.Tests.Presentation
         IHandleCommand<RefereeMsgs.AddOrUpdateMaxAgeBracket>
     {
         private readonly MockRepositorySpecification _fixture = new MockRepositorySpecification();
-        private readonly MockHostScreen _mockHostScreen = new MockHostScreen();
+        private readonly IScreen _mockHostScreen = new MockHostScreen();
 
         public when_adding_a_referee()
         {

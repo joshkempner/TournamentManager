@@ -64,8 +64,6 @@ namespace TournamentManager.Presentation
             if (!field.HasValue) return;
             var game = new GameModel(
                             message.GameId,
-                            message.HomeTeamId,
-                            message.AwayTeamId,
                             message.StartTime,
                             message.EndTime,
                             field.Value.FieldId,
