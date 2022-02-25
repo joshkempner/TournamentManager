@@ -13,6 +13,7 @@ using Xunit;
 
 namespace TournamentManager.Tests.Presentation
 {
+    [Collection("Presentation")]
     public sealed class when_managing_tournaments
     {
         private readonly MockRepositorySpecification _fixture = new MockRepositorySpecification();

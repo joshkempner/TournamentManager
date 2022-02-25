@@ -72,11 +72,6 @@ namespace TournamentManager
             _tournamentSvc?.Dispose();
         }
 
-        internal static IListener GetListener(string name)
-        {
-            return _esConnection?.GetListener(name) ?? throw new Exception("Cannot get a listener without a valid ESDB connection.");
-        }
-
         private void RegisterViews()
         {
             // Splat uses assembly scanning here to register all views and view models.

@@ -10,6 +10,7 @@ using Xunit;
 
 namespace TournamentManager.Tests.Presentation
 {
+    [Collection("Presentation")]
     public sealed class when_adding_a_tournament :
         IDisposable,
         IHandleCommand<TournamentMsgs.AddTournament>

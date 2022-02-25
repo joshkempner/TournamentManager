@@ -1,7 +1,9 @@
 ﻿using System;
+using ReactiveDomain;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
+using Splat;
 using TournamentManager.Domain;
 using TournamentManager.Helpers;
 using TournamentManager.Messages;
@@ -19,7 +21,7 @@ namespace TournamentManager.Presentation
         public CredentialsRM(Guid refereeId)
             : base(
                 nameof(CredentialsRM),
-                () => Bootstrap.GetListener(nameof(CredentialsRM)))
+                () => Locator.Current.GetService<IStreamStoreConnection>()!.GetListener(nameof(CredentialsRM)))
         {
             EventStream.Subscribe<RefereeMsgs.RefereeAdded>(this);
             EventStream.Subscribe<RefereeMsgs.GradeChanged>(this);

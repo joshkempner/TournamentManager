@@ -224,6 +224,7 @@ namespace TournamentManager.Tests.Presentation
                 RefereeTestHelper.FullName,
                 Fixture.Dispatcher,
                 Screen);
+            Screen.Router.Navigate.Execute(vm);
             // ReSharper disable once AccessToDisposedClosure
             AssertEx.IsOrBecomesTrue(() => vm.FullName == RefereeTestHelper.FullName);
 

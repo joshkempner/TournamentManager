@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using DynamicData;
+using ReactiveDomain;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging.Bus;
 using ReactiveDomain.UI;
+using Splat;
+using TournamentManager.Helpers;
 using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
@@ -20,7 +23,7 @@ namespace TournamentManager.Presentation
             Guid tournamentId)
             : base(
                 nameof(TournamentScheduleRM),
-                () => Bootstrap.GetListener(nameof(TournamentScheduleRM)))
+                () => Locator.Current.GetService<IStreamStoreConnection>()!.GetListener(nameof(TournamentScheduleRM)))
         {
             EventStream.Subscribe<TournamentMsgs.TournamentAdded>(this);
             EventStream.Subscribe<TournamentMsgs.TournamentRescheduled>(this);

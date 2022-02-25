@@ -2,9 +2,11 @@
 using ReactiveDomain.Testing;
 using Splat;
 using TournamentManager.Tests.Helpers;
+using Xunit;
 
 namespace TournamentManager.Tests.Presentation
 {
+    [Collection("Presentation")]
     public abstract class with_vm_fixtures
     {
         protected readonly MockRepositorySpecification Fixture = new MockRepositorySpecification();

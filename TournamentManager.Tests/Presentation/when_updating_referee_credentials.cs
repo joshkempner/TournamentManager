@@ -246,6 +246,7 @@ namespace TournamentManager.Tests.Presentation
             var refereeId = Guid.NewGuid();
             RefereeTestHelper.AddTravelReferee(refereeId);
             using var vm = new CredentialsVM(refereeId, RefereeTestHelper.FullName, Fixture.Dispatcher, Screen);
+            Screen.Router.Navigate.Execute(vm);
             vm.Cancel.Execute().Subscribe();
             Fixture.TestQueue.AssertEmpty();
             Fixture.RepositoryEvents.AssertEmpty();

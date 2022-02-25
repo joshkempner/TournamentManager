@@ -11,6 +11,7 @@ using Xunit;
 
 namespace TournamentManager.Tests.Presentation
 {
+    [Collection("Presentation")]
     public sealed class when_adding_a_referee :
         IDisposable,
         IHandleCommand<RefereeMsgs.AddReferee>,
@@ -111,6 +112,7 @@ namespace TournamentManager.Tests.Presentation
         public void can_cancel_adding_a_referee()
         {
             var vm = new NewRefereeVM(_fixture.Dispatcher, _mockHostScreen);
+            _mockHostScreen.Router.Navigate.Execute(vm);
             vm.Cancel.Execute(Unit.Default).Subscribe();
             Assert.Throws<TimeoutException>(
                 () => _fixture.TestQueue.WaitFor<RefereeMsgs.RefereeAdded>(TimeSpan.FromMilliseconds(100)));

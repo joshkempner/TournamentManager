@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using ReactiveDomain;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging.Bus;
+using Splat;
+using TournamentManager.Helpers;
 using TournamentManager.Messages;
 
 namespace TournamentManager.Presentation
@@ -13,7 +16,7 @@ namespace TournamentManager.Presentation
         public FieldsRM(Guid tournamentId)
             : base(
                 nameof(FieldsRM),
-                () => Bootstrap.GetListener(nameof(FieldsRM)))
+                () => Locator.Current.GetService<IStreamStoreConnection>()!.GetListener(nameof(FieldsRM)))
         {
             EventStream.Subscribe<TournamentMsgs.FieldAdded>(this);
         }

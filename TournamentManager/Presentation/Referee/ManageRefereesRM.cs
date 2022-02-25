@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using DynamicData;
+using ReactiveDomain;
 using ReactiveDomain.Foundation;
 using ReactiveDomain.Messaging.Bus;
+using Splat;
 using TournamentManager.Helpers;
 using TournamentManager.Messages;
 
@@ -22,7 +24,7 @@ namespace TournamentManager.Presentation
         public ManageRefereesRM()
             : base(
                 nameof(ManageRefereesRM),
-                () => Bootstrap.GetListener(nameof(ManageRefereesRM)))
+                () => Locator.Current.GetService<IStreamStoreConnection>()!.GetListener(nameof(ManageRefereesRM)))
         {
             EventStream.Subscribe<RefereeMsgs.RefereeAdded>(this);
             EventStream.Subscribe<RefereeMsgs.GivenNameChanged>(this);
