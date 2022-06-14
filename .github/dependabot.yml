@@ -14,3 +14,12 @@ updates:
     commit-message:
       prefix: "bot "
       include: "scope"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    reviewers:
+      - "joshkempner"
+    commit-message:
+      prefix: "bot "
+      include: "scope"
