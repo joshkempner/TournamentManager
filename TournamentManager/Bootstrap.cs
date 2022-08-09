@@ -19,8 +19,8 @@ namespace TournamentManager
         private const string LogName = "TournamentManager";
         private static readonly ILogger Log = LogManager.GetLogger(LogName);
 
-        private static IStreamStoreConnection? _esConnection;
-        private static StreamStoreRepository? _repo;
+        private static IConfiguredConnection? _esConnection;
+        private static IRepository? _repo;
         private IDispatcher? _mainBus;
 
         private RefereeSvc? _refereeSvc;
@@ -35,7 +35,7 @@ namespace TournamentManager
             var fullName = Assembly.GetExecutingAssembly().FullName ?? LogName;
             Log.Info(fullName + " Created.");
         }
-        internal void Run(IStreamStoreConnection esConnection)
+        internal void Run(IConfiguredConnection esConnection)
         {
             _mainBus = new Dispatcher("Main Bus");
             Configure(esConnection, _mainBus);
@@ -47,15 +47,12 @@ namespace TournamentManager
         }
 
         private void Configure(
-            IStreamStoreConnection esConnection,
+            IConfiguredConnection esConnection,
             IDispatcher bus)
         {
             _esConnection = esConnection;
-            _repo = new StreamStoreRepository(
-                            new PrefixedCamelCaseStreamNameBuilder(),
-                            esConnection,
-                            new JsonMessageSerializer());
-            Locator.CurrentMutable.RegisterConstant(_esConnection, typeof(IStreamStoreConnection));
+            _repo = esConnection.GetRepository();
+            Locator.CurrentMutable.RegisterConstant(_esConnection, typeof(IConfiguredConnection));
 
             _refereeSvc = new RefereeSvc(bus, _repo);
             _tournamentSvc = new TournamentSvc(bus, _repo);
